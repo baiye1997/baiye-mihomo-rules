@@ -24,6 +24,7 @@
 3. `baiye-single.yaml` 为「单一订阅」使用
 4. 也可直接在 Clash / Mihomo 配置文件中引用本仓库的规则文件，例如：
 
+```yaml
 rule-providers:
   adblock:
     type: http
@@ -34,7 +35,6 @@ rule-providers:
     interval: 86400
 
 ---
-
 
 ## 🤝 帮助与支持
 
@@ -59,3 +59,4 @@ rule-providers:
 - [SukkaW/Surge](https://github.com/SukkaW/Surge)  
 - [Loyalsoldier/clash-rules](https://github.com/Loyalsoldier/clash-rules)
 - [blackmatrix7/ios_rule_script](https://github.com/blackmatrix7/ios_rule_script)
+- [TG-Twilight/AWAvenue-Ads-Rule](https://github.com/TG-Twilight/AWAvenue-Ads-Rule)
