@@ -34,6 +34,11 @@ rule-providers:
     path: ./rules/yaml/fuckAds.yaml
     interval: 86400
 ```
+PS：如IOS等限制内存的设备最好将geodata-loader改为：memconservative
+
+```yaml
+geodata-loader: memconservative
+```
 ---
 
 ## 🤝 帮助与支持
