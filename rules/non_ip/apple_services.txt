@@ -1,0 +1,38 @@
+#########################################
+# Sukka's Ruleset - Apple Domains
+# Last Updated: 2025-09-05T11:49:28.985Z
+# Size: 26
+# License: AGPL 3.0
+# Homepage: https://ruleset.skk.moe
+# GitHub: https://github.com/SukkaW/Surge
+#
+# This file contains domains of Apple, Inc.
+#########################################
+DOMAIN,7h1s_rul35et_i5_mad3_by_5ukk4w-ruleset.skk.moe
+DOMAIN-SUFFIX,apple.news
+DOMAIN-SUFFIX,apple-dns.net
+DOMAIN-SUFFIX,push-apple.com.akadns.net
+DOMAIN-SUFFIX,organicfruitapps.com
+DOMAIN-SUFFIX,icloud-content.com
+DOMAIN-SUFFIX,apple-cloudkit.com
+DOMAIN-SUFFIX,apple-mapkit.com
+DOMAIN-SUFFIX,cdn-apple.com
+DOMAIN-SUFFIX,appstore.com
+DOMAIN-SUFFIX,aaplimg.com
+DOMAIN-SUFFIX,itunes.com
+DOMAIN-SUFFIX,icloud.com
+DOMAIN-SUFFIX,apple.com
+DOMAIN-SUFFIX,me.com
+DOMAIN-SUFFIX,appsto.re
+DOMAIN-SUFFIX,apple.co
+PROCESS-NAME,netbiosd
+PROCESS-NAME,com.apple.geod
+PROCESS-NAME,mapspushd
+PROCESS-NAME,com.apple.Maps
+PROCESS-NAME,apsd
+PROCESS-NAME,fmfd
+PROCESS-NAME,findmydevice-user-agent
+PROCESS-NAME,CoreLocationAgent
+PROCESS-NAME,WeatherWidget
+################## EOF ##################
+
