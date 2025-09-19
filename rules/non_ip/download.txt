@@ -1,0 +1,20 @@
+#########################################
+# Sukka's Ruleset - Large Files Hosting IPs
+# Last Updated: 2025-08-08T04:16:47.812Z
+# Size: 8
+# License: AGPL 3.0
+# Homepage: https://ruleset.skk.moe
+# GitHub: https://github.com/SukkaW/Surge
+#
+# This file contains ruleset for software updating & large file hosting.
+#########################################
+DOMAIN,7h1s_rul35et_i5_mad3_by_5ukk4w-ruleset.skk.moe
+DOMAIN-WILDCARD,cdn-*.comaps.tech
+DOMAIN-WILDCARD,ftp.??.freebsd.org
+DOMAIN-WILDCARD,ftp.??.debian.org
+DOMAIN-WILDCARD,*.s3.*.backblazeb2.com
+DOMAIN-WILDCARD,download*.mediafire.com
+DOMAIN-WILDCARD,cdn-*.organicmaps.app
+DOMAIN-WILDCARD,cdn-*.comaps.app
+################## EOF ##################
+
