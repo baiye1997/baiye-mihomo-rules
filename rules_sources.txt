@@ -1,0 +1,15 @@
+https://raw.githubusercontent.com/TG-Twilight/AWAvenue-Ads-Rule/main/Filters/AWAvenue-Ads-Rule-Clash.yaml /rules/yaml/fuckAds.yaml
+https://ruleset.skk.moe/Clash/domainset/cdn.txt /rules/domainset/cdn.txt
+https://ruleset.skk.moe/Clash/non_ip/cdn.txt /rules/non_ip/cdn.txt
+https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Game/Game.yaml /rules/yaml/Game.yaml
+https://ruleset.skk.moe/Clash/non_ip/stream.txt /rules/non_ip/stream.txt
+https://ruleset.skk.moe/Clash/ip/stream.txt /rules/ip/stream.txt
+https://ruleset.skk.moe/Clash/non_ip/ai.txt /rules/non_ip/ai.txt
+https://ruleset.skk.moe/Clash/ip/telegram.txt /rules/ip/telegram.txt
+https://ruleset.skk.moe/Clash/domainset/apple_cdn.txt /rules/domainset/apple_cdn.txt
+https://ruleset.skk.moe/Clash/non_ip/apple_services.txt /rules/non_ip/apple_services.txt
+https://ruleset.skk.moe/Clash/non_ip/apple_cn.txt /rules/non_ip/apple_cn.txt
+https://ruleset.skk.moe/Clash/non_ip/microsoft_cdn.txt /rules/non_ip/microsoft_cdn.txt
+https://ruleset.skk.moe/Clash/non_ip/microsoft.txt /rules/non_ip/microsoft.txt
+https://ruleset.skk.moe/Clash/domainset/download.txt /rules/domainset/download.txt
+https://ruleset.skk.moe/Clash/non_ip/download.txt /rules/non_ip/download.txt
