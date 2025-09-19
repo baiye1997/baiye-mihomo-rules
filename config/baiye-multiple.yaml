@@ -325,21 +325,21 @@ RS_cls: &RS_cls {type: http, behavior: classical, interval: 43200, format: text,
 RS_dom: &RS_dom {type: http, behavior: domain,    interval: 43200, format: text, proxy: 🎯  节点选择}
 #规则集
 rule-providers:
-  FuckAD:                {<<: *RS_dom, format: yaml, url: https://raw.githubusercontent.com/TG-Twilight/AWAvenue-Ads-Rule/main/Filters/AWAvenue-Ads-Rule-Clash.yaml, path: ./baiyerules/AWAvenue-Ads-Rule-Clash.yaml}
-  cdn_domainset:         {<<: *RS_dom, url: https://ruleset.skk.moe/Clash/domainset/cdn.txt,            path: ./baiyerules/cdn_domainset.txt}
-  cdn_non_ip:            {<<: *RS_cls, url: https://ruleset.skk.moe/Clash/non_ip/cdn.txt,               path: ./baiyerules/cdn_non_ip.txt}
-  Game:                  {<<: *RS_cls, format: yaml, url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Game/Game.yaml, path: ./baiyerules/Game.yaml}
-  stream_non_ip:         {<<: *RS_cls, url: https://ruleset.skk.moe/Clash/non_ip/stream.txt,            path: ./baiyerules/stream_non_ip.txt}
-  stream_ip:             {<<: *RS_cls, url: https://ruleset.skk.moe/Clash/ip/stream.txt,                path: ./baiyerules/stream_ip.txt}
-  ai_non_ip:             {<<: *RS_cls, url: https://ruleset.skk.moe/Clash/non_ip/ai.txt,                path: ./baiyerules/ai_non_ip.txt}
-  telegram_ip:           {<<: *RS_cls, url: https://ruleset.skk.moe/Clash/ip/telegram.txt,              path: ./baiyerules/telegram_ip.txt}
-  apple_cdn:             {<<: *RS_dom, url: https://ruleset.skk.moe/Clash/domainset/apple_cdn.txt,      path: ./baiyerules/apple_cdn.txt}
-  apple_services:        {<<: *RS_cls, url: https://ruleset.skk.moe/Clash/non_ip/apple_services.txt,    path: ./baiyerules/apple_services.txt}
-  apple_cn_non_ip:       {<<: *RS_cls, url: https://ruleset.skk.moe/Clash/non_ip/apple_cn.txt,          path: ./baiyerules/apple_cn_non_ip.txt}
-  microsoft_cdn_non_ip:  {<<: *RS_cls, url: https://ruleset.skk.moe/Clash/non_ip/microsoft_cdn.txt,     path: ./baiyerules/microsoft_cdn_non_ip.txt}
-  microsoft_non_ip:      {<<: *RS_cls, url: https://ruleset.skk.moe/Clash/non_ip/microsoft.txt,         path: ./baiyerules/microsoft_non_ip.txt}
-  download_domainset:    {<<: *RS_dom, url: https://ruleset.skk.moe/Clash/domainset/download.txt,       path: ./baiyerules/download_domainset.txt}
-  download_non_ip:       {<<: *RS_cls, url: https://ruleset.skk.moe/Clash/non_ip/download.txt,          path: ./baiyerules/download_non_ip.txt}
+  FuckAD:                {<<: *RS_dom, format: yaml, url: https://raw.githubusercontent.com/baiye1997/baiye-mihomo-rules/main/rules/yaml/fuckAds.yaml, path: ./rules/yaml/fuckAds.yaml}
+  cdn_domainset:         {<<: *RS_dom, url: https://raw.githubusercontent.com/baiye1997/baiye-mihomo-rules/main/rules/domainset/cdn.txt,            path: ./rules/domainset/cdn.txt}
+  cdn_non_ip:            {<<: *RS_cls, url: https://raw.githubusercontent.com/baiye1997/baiye-mihomo-rules/main/rules/non_ip/cdn.txt,               path: ./rules/non_ip/cdn.txt}
+  Game:                  {<<: *RS_cls, format: yaml, url: https://raw.githubusercontent.com/baiye1997/baiye-mihomo-rules/main/rules/yaml/Game.yaml, path: ./rules/yaml/Game.yaml}
+  stream_non_ip:         {<<: *RS_cls, url: https://raw.githubusercontent.com/baiye1997/baiye-mihomo-rules/main/rules/non_ip/stream.txt,            path: ./rules/non_ip/stream.txt}
+  stream_ip:             {<<: *RS_cls, url: https://raw.githubusercontent.com/baiye1997/baiye-mihomo-rules/main/rules/ip/stream.txt,                path: ./rules/ip/stream.txt}
+  ai_non_ip:             {<<: *RS_cls, url: https://raw.githubusercontent.com/baiye1997/baiye-mihomo-rules/main/rules/non_ip/ai.txt,                path: ./rules/non_ip/ai.txt}
+  telegram_ip:           {<<: *RS_cls, url: https://raw.githubusercontent.com/baiye1997/baiye-mihomo-rules/main/rules/ip/telegram.txt,              path: ./rules/ip/telegram.txt}
+  apple_cdn:             {<<: *RS_dom, url: https://raw.githubusercontent.com/baiye1997/baiye-mihomo-rules/main/rules/domainset/apple_cdn.txt,      path: ./rules/domainset/apple_cdn.txt}
+  apple_services:        {<<: *RS_cls, url: https://raw.githubusercontent.com/baiye1997/baiye-mihomo-rules/main/rules/non_ip/apple_services.txt,    path: ./rules/non_ip/apple_services.txt}
+  apple_cn_non_ip:       {<<: *RS_cls, url: https://raw.githubusercontent.com/baiye1997/baiye-mihomo-rules/main/rules/non_ip/apple_cn.txt,          path: ./rules/non_ip/apple_cn.txt}
+  microsoft_cdn_non_ip:  {<<: *RS_cls, url: https://raw.githubusercontent.com/baiye1997/baiye-mihomo-rules/main/rules/non_ip/microsoft_cdn.txt,     path: ./rules/non_ip/microsoft_cdn.txt}
+  microsoft_non_ip:      {<<: *RS_cls, url: https://raw.githubusercontent.com/baiye1997/baiye-mihomo-rules/main/rules/non_ip/microsoft.txt,         path: ./rules/non_ip/microsoft.txt}
+  download_domainset:    {<<: *RS_dom, url: https://raw.githubusercontent.com/baiye1997/baiye-mihomo-rules/main/rules/domainset/download.txt,       path: ./rules/domainset/download.txt}
+  download_non_ip:       {<<: *RS_cls, url: https://raw.githubusercontent.com/baiye1997/baiye-mihomo-rules/main/rules/non_ip/download.txt,          path: ./rules/non_ip/download.txt}
 
 # 分流规则
 rules:
