@@ -1,7 +1,7 @@
 #########################################
 # Sukka's Ruleset - CDN Domains
-# Last Updated: 2025-09-18T08:10:28.574Z
-# Size: 3921
+# Last Updated: 2025-09-19T13:19:13.546Z
+# Size: 3923
 # License: AGPL 3.0
 # Homepage: https://ruleset.skk.moe
 # GitHub: https://github.com/SukkaW/Surge
@@ -1770,6 +1770,7 @@ images.moovitapp.com
 static.mocortech.com
 public.mocortech.com
 cdn.miohentai.com
+learn-attachment.microsoft.com
 cdn-dynmedia-1.microsoft.com
 cdn.techcommunity.microsoft.com
 store-images.microsoft.com
@@ -2120,6 +2121,7 @@ cdn-uicons.flaticon.com
 media.flaticon.com
 cdn.firebase.com
 widget.finlogix.com
+images.filepuma.com
 s3.filebase.com
 icons.ferndocs.com
 +.favicone.com

@@ -1,7 +1,7 @@
 #########################################
 # Sukka's Ruleset - Large Files Hosting Domains
-# Last Updated: 2025-09-16T18:53:12.990Z
-# Size: 1178
+# Last Updated: 2025-09-19T13:19:13.546Z
+# Size: 1181
 # License: AGPL 3.0
 # Homepage: https://ruleset.skk.moe
 # GitHub: https://github.com/SukkaW/Surge
@@ -25,6 +25,7 @@ jing.rocks
 +.s3-website.fr-par.scw.cloud
 +.s3.fr-par.scw.cloud
 cdn-builds.paw.cloud
+repo.sleeping.town
 +.mirror.globo.tech
 gimp.ip-connect.info
 +.1fichier.info
@@ -175,6 +176,7 @@ mirror.webtastix.net
 +.mirrors.spacedump.net
 mirror.ossplanet.net
 mirror.olnevhost.net
+maven.neoforged.net
 libraries.minecraft.net
 textures.minecraft.net
 +.download.minecraft.net
@@ -281,6 +283,7 @@ ruleset.skk.moe
 speedtest-net-servers.cdn.skk.moe
 chnroutes2.cdn.skk.moe
 filters.cdn.skk.moe
+maven.is-quite.gay
 ctan.math.washington.edu
 apache.uniminuto.edu
 ctan.math.illinois.edu
