@@ -1,1 +1,396 @@
+# ===================== 基础运行参数 =====================
+mixed-port: 7897
+allow-lan: true
+bind-address: '*'
+mode: rule
+log-level: warning
+unified-delay: true
+tcp-concurrent: true
+find-process-mode: strict
+global-client-fingerprint: chrome
 
+# UI 控制面板
+external-controller: 127.0.0.1:9090
+# external-ui: ui
+# secret: "yourpassword"
+
+# 连接保活
+keep-alive-idle: 600
+keep-alive-interval: 60
+
+# 免认证网段
+skip-auth-prefixes:
+  - 127.0.0.0/8
+  - 10.0.0.0/8
+  - 172.16.0.0/12
+  - 192.168.0.0/16
+  - 100.64.0.0/10
+  - ::1/128
+  - fc00::/7
+  - fe80::/10
+
+profile:
+  store-selected: true
+  store-fake-ip: true
+
+## DNS 配置
+dns:
+  enable: true
+  prefer-h3: true
+  listen: 0.0.0.0:1053
+  ipv6: true
+  enhanced-mode: fake-ip
+  fake-ip-range: 198.18.0.1/16
+  use-hosts: true
+
+  # 国际 DNS（加密，防污染）
+  nameserver:
+    - "tls://1.1.1.1"
+    - "tls://8.8.8.8"
+    - "tls://[2606:4700:4700::1111]"
+    - "tls://[2001:4860:4860::8888]"
+
+  # 国内 DNS（快速稳定）
+  default-nameserver:
+    - "223.5.5.5"
+    - "119.29.29.29"
+    - "180.184.1.1"
+    - "[2400:3200::1]"
+    - "[2402:4e00::]"
+
+  # 国内/国外分流解析
+  nameserver-policy:
+    'geosite:cn':
+      - "223.5.5.5"
+      - "119.29.29.29"
+      - "180.184.1.1"
+      - "[2400:3200::1]"
+      - "[2402:4e00::]"
+    'geosite:geolocation-!cn':
+      - "tls://1.1.1.1"
+      - "tls://8.8.8.8"
+      - "tls://[2606:4700:4700::1111]"
+      - "tls://[2001:4860:4860::8888]"
+
+  # 节点域名解析（建议仅境外加密）
+  proxy-server-nameserver:
+    - "system"
+    - "223.5.5.5"
+    - "119.29.29.29"
+    - "[2400:3200::1]"
+    - "[2402:4e00::]"
+
+  # fake-ip 过滤（确保在 dns 内部）
+  fake-ip-filter:
+    - geosite:private
+    - geosite:connectivity-check
+    - geosite:cn
+    - '*.lan'
+    - '*.local'
+    - '*.localdomain'
+    - '*.home.arpa'
+    - '*.localhost'
+    - '*.msftncsi.com'
+    - '*.msftconnecttest.com'
+    - 'time.*'
+    - 'ntp.*'
+    - 'pool.ntp.org'
+    - '*.ntp.org.cn'
+    - 'stun.*'
+    - 'stun.*.*'
+    - 'stun.*.*.*'
+    - 'Mijia Cloud'
+    - 'dig.io.mi.com'
+    - 'localhost.ptlogin2.qq.com'
+
+# Sniffer 域名嗅探
+sniffer:
+  enable: true
+  sniff:
+    HTTP: {ports: [80, 8080-8880], override-destination: true}
+    TLS:  {ports: [443, 8443]}
+    QUIC: {ports: [443, 8443]}
+  skip-domain:
+    # Apple Push
+    - "courier.push.apple.com"
+    - "api.push.apple.com"
+    - "+.push.apple.com"
+    # Microsoft Push (WNS)
+    - "wns.windows.com"
+    - "*.wns.windows.com"
+    - "*.notify.windows.com"
+    - "+.push.microsoft.com"
+    # Google FCM
+    - "mtalk.google.com"
+    - "fcm.googleapis.com"
+    - "+.push.google.com"
+    # Xiaomi / Mijia
+    - "Mijia Cloud"
+    - "miot-spec.org"
+    - "api.io.mi.com"
+    - "push.xiaomi.com"
+    # 其他常见厂商
+    - "push.hicloud.com"
+    - "push.oppomobile.com"
+
+# TUN 模式
+tun:
+  enable: true
+  stack: mixed
+  device: Ethernet99
+  auto-route: true
+  auto-detect-interface: true
+  dns-hijack:
+    - any:53
+    - tcp://any:53
+  strict-route: true
+  mtu: 1500
+
+# Geodata配置
+geodata-mode: true
+geodata-loader: standard
+geo-auto-update: true
+geo-update-interval: 24
+
+geox-url:
+  geoip: "https://cdn.jsdelivr.net/gh/Loyalsoldier/v2ray-rules-dat@release/geoip.dat"
+  geosite: "https://cdn.jsdelivr.net/gh/Loyalsoldier/v2ray-rules-dat@release/geosite.dat"
+  mmdb: "https://cdn.jsdelivr.net/gh/Loyalsoldier/geoip@release/Country.mmdb"
+  asn: "https://cdn.jsdelivr.net/gh/Loyalsoldier/geoip@release/GeoLite2-ASN.mmdb"
+
+# 订阅基础配置 [每天更新一次订阅节点，每 300 秒一次健康检查]
+NodeParam: &NodeParam {type: http, interval: 86400, health-check: {enable: true, url: 'http://connectivitycheck.platform.hicloud.com/generate_204', interval: 300}}
+    
+proxy-providers:
+  Node-1:
+    url: 替换订阅链接1
+    <<: *NodeParam
+    path: './proxy_provider/providers-1.yaml'
+    override:
+      additional-prefix: "[Haita] "
+  Node-2:
+    url: 替换订阅链接2
+    <<: *NodeParam
+    path: './proxy_provider/providers-2.yaml'
+    override:
+      additional-prefix: "[BoostNet] "
+      
+# ===================== 节点筛选 =====================
+# 按地区筛选
+FilterHK: &FilterHK '^(?=.*((?i)🇭🇰|香港|\b(HK|Hong)(\d+)?\b))(?!.*((?i)回国|校园|网站|地址|剩余|过期|时间|有效|网址|禁止|邮箱|发布|客服|订阅|节点)).*$'
+FilterTW: &FilterTW '^(?=.*((?i)🇹🇼|台湾|\b(TW|Tai|Taiwan)(\d+)?\b))(?!.*((?i)回国|校园|网站|地址|剩余|过期|时间|有效|网址|禁止|邮箱|发布|客服|订阅|节点)).*$'
+FilterJP: &FilterJP '^(?=.*((?i)🇯🇵|日本|川日|东京|大阪|泉日|埼玉|\b(JP|Japan)(\d+)?\b))(?!.*((?i)回国|校园|网站|地址|剩余|过期|时间|有效|网址|禁止|邮箱|发布|客服|订阅|节点)).*$'
+FilterKR: &FilterKR '^(?=.*((?i)🇰🇷|韩国|韓|首尔|\b(KR|Korea)(\d+)?\b))(?!.*((?i)回国|校园|网站|地址|剩余|过期|时间|有效|网址|禁止|邮箱|发布|客服|订阅|节点)).*$'
+FilterSG: &FilterSG '^(?=.*((?i)🇸🇬|新加坡|狮|\b(SG|Singapore)(\d+)?\b))(?!.*((?i)回国|校园|网站|地址|剩余|过期|时间|有效|网址|禁止|邮箱|发布|客服|订阅|节点)).*$'
+FilterUS: &FilterUS '^(?=.*((?i)🇺🇸|美国|波特兰|达拉斯|俄勒冈|凤凰城|费利蒙|硅谷|拉斯维加斯|洛杉矶|圣何塞|圣克拉拉|西雅图|芝加哥|\b(US|United States)(\d+)?\b))(?!.*((?i)回国|校园|网站|地址|剩余|过期|时间|有效|网址|禁止|邮箱|发布|客服|订阅|节点)).*$'
+FilterUK: &FilterUK '^(?=.*((?i)🇬🇧|英国|伦敦|\b(UK|United Kingdom)(\d+)?\b))(?!.*((?i)回国|校园|网站|地址|剩余|过期|时间|有效|网址|禁止|邮箱|发布|客服|订阅|节点)).*$'
+FilterFR: &FilterFR '^(?=.*((?i)🇫🇷|法国|\b(FR|France)(\d+)?\b))(?!.*((?i)回国|校园|网站|地址|剩余|过期|时间|有效|网址|禁止|邮箱|发布|客服|订阅|节点)).*$'
+FilterDE: &FilterDE '^(?=.*((?i)🇩🇪|德国|\b(DE|Germany)(\d+)?\b))(?!.*((?i)回国|校园|网站|地址|剩余|过期|时间|有效|网址|禁止|邮箱|发布|客服|订阅|节点)).*$'
+FilterAll: &FilterAll '^(?=.*(.))(?!.*((?i)群|邀请|返利|循环|官网|客服|网站|网址|获取|订阅|流量|到期|机场|下次|版本|官址|备用|过期|已用|联系|邮箱|工单|贩卖|通知|倒卖|防止|国内|地址|频道|无法|说明|使用|提示|特别|访问|支持|教程|关注|更新|作者|加入|(\b(USE|USED|TOTAL|EXPIRE|EMAIL|Panel|Channel|Author)\b|(\d{4}-\d{2}-\d{2}|\d+G)))).*$'
+
+# ===================== 策略组基础配置 =====================
+# 顶层 URL
+TestURL: &TestURL "http://connectivitycheck.platform.hicloud.com/generate_204"
+
+# 基模板
+TmplBase: &TmplBase {url: *TestURL, interval: 300, lazy: true, timeout: 2000, disable-udp: false, max-failed-times: 3, hidden: true, include-all: true}
+
+Select:      &Select      {type: select,     url: *TestURL, disable-udp: false, hidden: false, include-all: true}
+UrlTest:     &UrlTest     {type: url-test,   <<: *TmplBase, tolerance: 50}
+FallBack:    &FallBack    {type: fallback,   <<: *TmplBase}
+LoadBalance: &LoadBalance {type: load-balance, <<: *TmplBase, strategy: consistent-hashing}
+
+# 各场景常用选择清单（单行序列）
+AppRegionWithDirect: &AppRegionWithDirect ["DIRECT","🎯  节点选择","🇭🇰 香港节点","🇯🇵 日本节点","🇰🇷 韩国节点","🇸🇬 狮城节点","🇺🇸 美国节点","🇬🇧 英国节点","🇫🇷 法国节点","🇩🇪 德国节点","🇹🇼 台湾节点"]
+FallbackWithDirect: &FallbackWithDirect ["DIRECT","🎯  节点选择","🇭🇰 - 自动回退","🇯🇵 - 自动回退","🇰🇷 - 自动回退","🇸🇬 - 自动回退","🇺🇸 - 自动回退","🇬🇧 - 自动回退","🇫🇷 - 自动回退","🇩🇪 - 自动回退","🇹🇼 - 自动回退"]
+AutoRegionChoices: &AutoRegionChoices ["🇭🇰 香港节点","🇯🇵 日本节点","🇸🇬 狮城节点","🇺🇸 美国节点","🇹🇼 台湾节点"]
+
+# ===================== 策略组 =====================
+proxy-groups:
+  # 主选择组
+  - name: 🎯  节点选择
+    type: select
+    proxies:
+      - 🛫  智能选择
+      - 🤝  手动选择
+      - DIRECT
+
+  # 手动 / Auto 顶层
+  - name: 🤝  手动选择
+    <<: *Select
+    filter: *FilterAll
+
+  - name: 🛫  智能选择
+    type: url-test
+    proxies: *AutoRegionChoices
+    url: http://connectivitycheck.platform.hicloud.com/generate_204
+    interval: 300
+    tolerance: 50
+
+  # 应用分组
+  - name: 💡   A I 服务
+    type: select
+    proxies: *AppRegionWithDirect
+
+  - name: 🍎  苹果服务
+    type: select
+    proxies: *AppRegionWithDirect
+
+  - name: Ⓜ️  微软服务
+    type: select
+    proxies: *AppRegionWithDirect
+
+  - name: 🎮  游戏服务
+    type: select
+    proxies: *AppRegionWithDirect
+
+  - name: ✈️  电报信息
+    type: select
+    proxies: *AppRegionWithDirect
+
+  - name: 📺  视频规则
+    type: select
+    proxies: *FallbackWithDirect
+
+  # Auto 顶层（各地区自动聚合）
+  - name: 🇭🇰 香港节点
+    type: select
+    proxies: [🇭🇰 - 延迟最低, 🇭🇰 - 自动回退, 🇭🇰 - 负载均衡]
+
+  - name: 🇯🇵 日本节点
+    type: select
+    proxies: [🇯🇵 - 延迟最低, 🇯🇵 - 自动回退, 🇯🇵 - 负载均衡]
+
+  - name: 🇰🇷 韩国节点
+    type: select
+    proxies: [🇰🇷 - 延迟最低, 🇰🇷 - 自动回退, 🇰🇷 - 负载均衡]
+
+  - name: 🇸🇬 狮城节点
+    type: select
+    proxies: [🇸🇬 - 延迟最低, 🇸🇬 - 自动回退, 🇸🇬 - 负载均衡]
+
+  - name: 🇺🇸 美国节点
+    type: select
+    proxies: [🇺🇸 - 延迟最低, 🇺🇸 - 自动回退, 🇺🇸 - 负载均衡]
+
+  - name: 🇬🇧 英国节点
+    type: select
+    proxies: [🇬🇧 - 延迟最低, 🇬🇧 - 自动回退, 🇬🇧 - 负载均衡]
+
+  - name: 🇫🇷 法国节点
+    type: select
+    proxies: [🇫🇷 - 延迟最低, 🇫🇷 - 自动回退, 🇫🇷 - 负载均衡]
+
+  - name: 🇩🇪 德国节点
+    type: select
+    proxies: [🇩🇪 - 延迟最低, 🇩🇪 - 自动回退, 🇩🇪 - 负载均衡]
+
+  - name: 🇹🇼 台湾节点
+    type: select
+    proxies: [🇹🇼 - 延迟最低, 🇹🇼 - 自动回退, 🇹🇼 - 负载均衡]
+
+  # 延迟最低 - 按地区
+  - {name: 🇭🇰 - 延迟最低, <<: *UrlTest, filter: *FilterHK}
+  - {name: 🇯🇵 - 延迟最低, <<: *UrlTest, filter: *FilterJP}
+  - {name: 🇰🇷 - 延迟最低, <<: *UrlTest, filter: *FilterKR}
+  - {name: 🇸🇬 - 延迟最低, <<: *UrlTest, filter: *FilterSG}
+  - {name: 🇺🇸 - 延迟最低, <<: *UrlTest, filter: *FilterUS}
+  - {name: 🇬🇧 - 延迟最低, <<: *UrlTest, filter: *FilterUK}
+  - {name: 🇫🇷 - 延迟最低, <<: *UrlTest, filter: *FilterFR}
+  - {name: 🇩🇪 - 延迟最低, <<: *UrlTest, filter: *FilterDE}
+  - {name: 🇹🇼 - 延迟最低, <<: *UrlTest, filter: *FilterTW}
+  # 自动回退 - 按地区
+  - {name: 🇭🇰 - 自动回退, <<: *FallBack, filter: *FilterHK}
+  - {name: 🇯🇵 - 自动回退, <<: *FallBack, filter: *FilterJP}
+  - {name: 🇰🇷 - 自动回退, <<: *FallBack, filter: *FilterKR}
+  - {name: 🇸🇬 - 自动回退, <<: *FallBack, filter: *FilterSG}
+  - {name: 🇺🇸 - 自动回退, <<: *FallBack, filter: *FilterUS}
+  - {name: 🇬🇧 - 自动回退, <<: *FallBack, filter: *FilterUK}
+  - {name: 🇫🇷 - 自动回退, <<: *FallBack, filter: *FilterFR}
+  - {name: 🇩🇪 - 自动回退, <<: *FallBack, filter: *FilterDE}
+  - {name: 🇹🇼 - 自动回退, <<: *FallBack, filter: *FilterTW}
+  # 负载均衡 - 按地区
+  - {name: 🇭🇰 - 负载均衡, <<: *LoadBalance, filter: *FilterHK}
+  - {name: 🇯🇵 - 负载均衡, <<: *LoadBalance, filter: *FilterJP}
+  - {name: 🇰🇷 - 负载均衡, <<: *LoadBalance, filter: *FilterKR}
+  - {name: 🇸🇬 - 负载均衡, <<: *LoadBalance, filter: *FilterSG}
+  - {name: 🇺🇸 - 负载均衡, <<: *LoadBalance, filter: *FilterUS}
+  - {name: 🇬🇧 - 负载均衡, <<: *LoadBalance, filter: *FilterUK}
+  - {name: 🇫🇷 - 负载均衡, <<: *LoadBalance, filter: *FilterFR}
+  - {name: 🇩🇪 - 负载均衡, <<: *LoadBalance, filter: *FilterDE}
+  - {name: 🇹🇼 - 负载均衡, <<: *LoadBalance, filter: *FilterTW}
+  
+# 规则集锚点（统一参数）
+RS_cls: &RS_cls {type: http, behavior: classical, interval: 43200, format: text, proxy: 🎯  节点选择}
+RS_dom: &RS_dom {type: http, behavior: domain,    interval: 43200, format: text, proxy: 🎯  节点选择}
+#规则集
+rule-providers:
+  FuckAD:                {<<: *RS_dom, format: yaml, url: https://raw.githubusercontent.com/TG-Twilight/AWAvenue-Ads-Rule/main/Filters/AWAvenue-Ads-Rule-Clash.yaml, path: ./baiyerules/AWAvenue-Ads-Rule-Clash.yaml}
+  cdn_domainset:         {<<: *RS_dom, url: https://ruleset.skk.moe/Clash/domainset/cdn.txt,            path: ./baiyerules/cdn_domainset.txt}
+  cdn_non_ip:            {<<: *RS_cls, url: https://ruleset.skk.moe/Clash/non_ip/cdn.txt,               path: ./baiyerules/cdn_non_ip.txt}
+  Game:                  {<<: *RS_cls, format: yaml, url: https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Game/Game.yaml, path: ./baiyerules/Game.yaml}
+  stream_non_ip:         {<<: *RS_cls, url: https://ruleset.skk.moe/Clash/non_ip/stream.txt,            path: ./baiyerules/stream_non_ip.txt}
+  stream_ip:             {<<: *RS_cls, url: https://ruleset.skk.moe/Clash/ip/stream.txt,                path: ./baiyerules/stream_ip.txt}
+  ai_non_ip:             {<<: *RS_cls, url: https://ruleset.skk.moe/Clash/non_ip/ai.txt,                path: ./baiyerules/ai_non_ip.txt}
+  telegram_ip:           {<<: *RS_cls, url: https://ruleset.skk.moe/Clash/ip/telegram.txt,              path: ./baiyerules/telegram_ip.txt}
+  apple_cdn:             {<<: *RS_dom, url: https://ruleset.skk.moe/Clash/domainset/apple_cdn.txt,      path: ./baiyerules/apple_cdn.txt}
+  apple_services:        {<<: *RS_cls, url: https://ruleset.skk.moe/Clash/non_ip/apple_services.txt,    path: ./baiyerules/apple_services.txt}
+  apple_cn_non_ip:       {<<: *RS_cls, url: https://ruleset.skk.moe/Clash/non_ip/apple_cn.txt,          path: ./baiyerules/apple_cn_non_ip.txt}
+  microsoft_cdn_non_ip:  {<<: *RS_cls, url: https://ruleset.skk.moe/Clash/non_ip/microsoft_cdn.txt,     path: ./baiyerules/microsoft_cdn_non_ip.txt}
+  microsoft_non_ip:      {<<: *RS_cls, url: https://ruleset.skk.moe/Clash/non_ip/microsoft.txt,         path: ./baiyerules/microsoft_non_ip.txt}
+  download_domainset:    {<<: *RS_dom, url: https://ruleset.skk.moe/Clash/domainset/download.txt,       path: ./baiyerules/download_domainset.txt}
+  download_non_ip:       {<<: *RS_cls, url: https://ruleset.skk.moe/Clash/non_ip/download.txt,          path: ./baiyerules/download_non_ip.txt}
+
+# 分流规则
+rules:
+  ## 非 IP 类规则
+  # 局域网
+  - GEOSITE,PRIVATE,DIRECT
+  # 广告规则
+  - RULE-SET,FuckAD,REJECT
+  # 剔除bing
+  - DOMAIN-SUFFIX,bing.com,DIRECT
+  # 通用CDN
+  - DOMAIN-SUFFIX,oaiusercontent.com,💡   A I 服务
+  - DOMAIN-SUFFIX,oaistatic.com,💡   A I 服务
+  - RULE-SET,cdn_domainset,🎯  节点选择
+  - RULE-SET,cdn_non_ip,🎯  节点选择
+  # 视频规则
+  - RULE-SET,stream_non_ip,📺  视频规则
+  # AI规则
+  - DOMAIN-SUFFIX,openai.com,💡   A I 服务
+  - DOMAIN-SUFFIX,claude.ai,💡   A I 服务
+  - DOMAIN-SUFFIX,gemini.google.com,💡   A I 服务
+  - DOMAIN-SUFFIX,perplexity.ai,💡   A I 服务
+  - DOMAIN-SUFFIX,bingapis.com,💡   A I 服务
+  - DOMAIN-SUFFIX,copilot.microsoft.com,💡   A I 服务
+  - RULE-SET,ai_non_ip,💡   A I 服务
+  # 游戏规则
+  - GEOSITE,category-games@cn,DIRECT
+  - RULE-SET,Game,🎮  游戏服务
+  # 谷歌规则
+  - GEOSITE,google-cn,DIRECT
+  # 苹果规则
+  - RULE-SET,apple_cdn,DIRECT
+  - RULE-SET,apple_cn_non_ip,DIRECT
+  - RULE-SET,apple_services,🍎  苹果服务
+  # 微软规则
+  - RULE-SET,microsoft_cdn_non_ip,DIRECT
+  - RULE-SET,microsoft_non_ip,Ⓜ️  微软服务
+  # 下载更新
+  - RULE-SET,download_domainset,🎯  节点选择
+  - RULE-SET,download_non_ip,🎯  节点选择
+  # 通用规则
+  - GEOSITE,CN,DIRECT
+  - GEOSITE,geolocation-!cn,🎯  节点选择
+  ## IP 类规则
+  # 局域网
+  - GEOIP,PRIVATE,DIRECT,no-resolve
+  # 视频规则
+  - RULE-SET,stream_ip,📺  视频规则,no-resolve
+  # 电报
+  - RULE-SET,telegram_ip,✈️  电报信息,no-resolve
+  # 通用规则
+  - GEOIP,CN,DIRECT,no-resolve
+  # 兜底
+  - MATCH,🎯  节点选择
