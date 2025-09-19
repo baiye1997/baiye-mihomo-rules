@@ -33,7 +33,7 @@ rule-providers:
     url: https://raw.githubusercontent.com/baiye1997/baiye-mihomo-rules/main/rules/yaml/fuckAds.yaml
     path: ./rules/yaml/fuckAds.yaml
     interval: 86400
-
+```
 ---
 
 ## 🤝 帮助与支持
