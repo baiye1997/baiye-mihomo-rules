@@ -1,7 +1,7 @@
 #########################################
 # Sukka's Ruleset - CDN Domains
-# Last Updated: 2025-09-19T13:19:13.546Z
-# Size: 3923
+# Last Updated: 2025-09-20T17:07:28.759Z
+# Size: 3925
 # License: AGPL 3.0
 # Homepage: https://ruleset.skk.moe
 # GitHub: https://github.com/SukkaW/Surge
@@ -2314,6 +2314,8 @@ userpic.redgifs.com
 rbds-static.redbull.com
 img.redbull.com
 js.recurly.com
+reader.readmoo.com
+cdn.readmoo.com
 cdn-rdstaticassets.readdle.com
 +.ravenjs.com
 static.rakuten.com
