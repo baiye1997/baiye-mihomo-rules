@@ -75,10 +75,10 @@ dns:
   # 节点域名解析（建议仅境外加密）
   proxy-server-nameserver:
     - "system"
-    - "223.5.5.5"
-    - "119.29.29.29"
-    - "[2400:3200::1]"
-    - "[2402:4e00::]"
+    - "tls://1.1.1.1"
+    - "tls://8.8.8.8"
+    - "tls://[2606:4700:4700::1111]"
+    - "tls://[2001:4860:4860::8888]"
 
   # fake-ip 过滤（确保在 dns 内部）
   fake-ip-filter:
@@ -145,7 +145,6 @@ sniffer:
 tun:
   enable: true
   stack: mixed
-  device: Ethernet99
   auto-route: true
   auto-detect-interface: true
   dns-hijack:
@@ -209,28 +208,28 @@ FallBack:    &FallBack    {type: fallback,   <<: *TmplBase}
 LoadBalance: &LoadBalance {type: load-balance, <<: *TmplBase, strategy: consistent-hashing}
 
 # 各场景常用选择清单（单行序列）
-AppRegionWithDirect: &AppRegionWithDirect ["DIRECT","节点选择","香港节点","日本节点","韩国节点","狮城节点","美国节点","英国节点","法国节点","德国节点","台湾节点"]
-FallbackWithDirect: &FallbackWithDirect ["DIRECT","节点选择","🇭🇰 - 自动回退","🇯🇵 - 自动回退","🇰🇷 - 自动回退","🇸🇬 - 自动回退","🇺🇸 - 自动回退","🇬🇧 - 自动回退","🇫🇷 - 自动回退","🇩🇪 - 自动回退","🇨🇳 - 自动回退"]
-AutoRegionChoices: &AutoRegionChoices ["香港节点","日本节点","狮城节点","美国节点","台湾节点"]
+AppRegionWithDirect: &AppRegionWithDirect ["🚀 节点选择","DIRECT","🇭🇰 - 择优节点","🇹🇼 - 择优节点","🇯🇵 - 择优节点","🇰🇷 - 择优节点","🇸🇬 - 择优节点","🇺🇸 - 择优节点","🇬🇧 - 择优节点","🇫🇷 - 择优节点","🇩🇪 - 择优节点"]
+FallbackWithDirect: &FallbackWithDirect ["🚀 节点选择","DIRECT","🇭🇰 - 自动回退","🇹🇼 - 自动回退","🇯🇵 - 自动回退","🇰🇷 - 自动回退","🇸🇬 - 自动回退","🇺🇸 - 自动回退","🇬🇧 - 自动回退","🇫🇷 - 自动回退","🇩🇪 - 自动回退"]
+AutoRegionChoices: &AutoRegionChoices ["🇭🇰 - 择优节点","🇹🇼 - 择优节点","🇯🇵 - 择优节点","🇸🇬 - 择优节点"]
 
 # ===================== 策略组 =====================
 proxy-groups:
   # 主选择组
-  - name: 节点选择
+  - name: 🚀 节点选择
     type: select
     proxies:
-      - 智能选择
-      - 手动选择
+      - ♻️ 智能选择
+      - 👆 手动选择
       - DIRECT
     icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/choice.png"
 
   # 手动 / Auto 顶层
-  - name: 手动选择
+  - name: 👆 手动选择
     <<: *Select
     filter: *FilterAll
     icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/select.png"
 
-  - name: 智能选择
+  - name: ♻️ 智能选择
     type: url-test
     proxies: *AutoRegionChoices
     url: http://connectivitycheck.platform.hicloud.com/generate_204
@@ -239,93 +238,53 @@ proxy-groups:
     icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/auto.png"
 
 # 应用分组
-  - name: A I 服务
+  - name: 🍼 AI  服务
     type: select
     proxies: *AppRegionWithDirect
     icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/openai.png"
 
-  - name: 苹果服务
+  - name: 🍎 苹果服务
     type: select
     proxies: *AppRegionWithDirect
     icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/apple.png"
 
-  - name: 微软服务
+  - name: Ⓜ️ 微软服务
     type: select
     proxies: *AppRegionWithDirect
     icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/microsoft.png"
 
-  - name: 游戏服务
+  - name: 🎮 游戏服务
     type: select
     proxies: *AppRegionWithDirect
     icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/game.png"
 
-  - name: 电报信息
+  - name: ☁️ Onedrive
     type: select
     proxies: *AppRegionWithDirect
-    icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/telegram.png"
+    icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/onedrive.png"
 
-  - name: 视频规则
+  - name: 📺 视频规则
     type: select
     proxies: *FallbackWithDirect
     icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/netflix.png"
 
-# Auto 顶层（各地区自动聚合）
-  - name: 香港节点
+  - name: ✈️ 电报信息
     type: select
-    proxies: [🇭🇰 - 延迟最低, 🇭🇰 - 自动回退, 🇭🇰 - 负载均衡]
-    icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/hk.png"
+    proxies: *AppRegionWithDirect
+    icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/telegram.png"
 
-  - name: 日本节点
-    type: select
-    proxies: [🇯🇵 - 延迟最低, 🇯🇵 - 自动回退, 🇯🇵 - 负载均衡]
-    icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/jp.png"
+# Auto 
+  # 择优节点 - 按地区
+  - {name: 🇭🇰 - 择优节点, <<: *UrlTest, filter: *FilterHK}
+  - {name: 🇯🇵 - 择优节点, <<: *UrlTest, filter: *FilterJP}
+  - {name: 🇰🇷 - 择优节点, <<: *UrlTest, filter: *FilterKR}
+  - {name: 🇸🇬 - 择优节点, <<: *UrlTest, filter: *FilterSG}
+  - {name: 🇺🇸 - 择优节点, <<: *UrlTest, filter: *FilterUS}
+  - {name: 🇬🇧 - 择优节点, <<: *UrlTest, filter: *FilterUK}
+  - {name: 🇫🇷 - 择优节点, <<: *UrlTest, filter: *FilterFR}
+  - {name: 🇩🇪 - 择优节点, <<: *UrlTest, filter: *FilterDE}
+  - {name: 🇹🇼 - 择优节点, <<: *UrlTest, filter: *FilterTW}
 
-  - name: 韩国节点
-    type: select
-    proxies: [🇰🇷 - 延迟最低, 🇰🇷 - 自动回退, 🇰🇷 - 负载均衡]
-    icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/kr.png"
-
-  - name: 狮城节点
-    type: select
-    proxies: [🇸🇬 - 延迟最低, 🇸🇬 - 自动回退, 🇸🇬 - 负载均衡]
-    icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/sg.png"
-
-  - name: 美国节点
-    type: select
-    proxies: [🇺🇸 - 延迟最低, 🇺🇸 - 自动回退, 🇺🇸 - 负载均衡]
-    icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/us.png"
-
-  - name: 英国节点
-    type: select
-    proxies: [🇬🇧 - 延迟最低, 🇬🇧 - 自动回退, 🇬🇧 - 负载均衡]
-    icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/gb.png"
-
-  - name: 法国节点
-    type: select
-    proxies: [🇫🇷 - 延迟最低, 🇫🇷 - 自动回退, 🇫🇷 - 负载均衡]
-    icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/fr.png"
-
-  - name: 德国节点
-    type: select
-    proxies: [🇩🇪 - 延迟最低, 🇩🇪 - 自动回退, 🇩🇪 - 负载均衡]
-    icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/de.png"
-
-  - name: 台湾节点
-    type: select
-    proxies: [🇨🇳 - 延迟最低, 🇨🇳 - 自动回退, 🇨🇳 - 负载均衡]
-    icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/cn.png"
-
-
-  # 延迟最低 - 按地区
-  - {name: 🇭🇰 - 延迟最低, <<: *UrlTest, filter: *FilterHK}
-  - {name: 🇯🇵 - 延迟最低, <<: *UrlTest, filter: *FilterJP}
-  - {name: 🇰🇷 - 延迟最低, <<: *UrlTest, filter: *FilterKR}
-  - {name: 🇸🇬 - 延迟最低, <<: *UrlTest, filter: *FilterSG}
-  - {name: 🇺🇸 - 延迟最低, <<: *UrlTest, filter: *FilterUS}
-  - {name: 🇬🇧 - 延迟最低, <<: *UrlTest, filter: *FilterUK}
-  - {name: 🇫🇷 - 延迟最低, <<: *UrlTest, filter: *FilterFR}
-  - {name: 🇩🇪 - 延迟最低, <<: *UrlTest, filter: *FilterDE}
-  - {name: 🇨🇳 - 延迟最低, <<: *UrlTest, filter: *FilterTW}
   # 自动回退 - 按地区
   - {name: 🇭🇰 - 自动回退, <<: *FallBack, filter: *FilterHK}
   - {name: 🇯🇵 - 自动回退, <<: *FallBack, filter: *FilterJP}
@@ -335,22 +294,12 @@ proxy-groups:
   - {name: 🇬🇧 - 自动回退, <<: *FallBack, filter: *FilterUK}
   - {name: 🇫🇷 - 自动回退, <<: *FallBack, filter: *FilterFR}
   - {name: 🇩🇪 - 自动回退, <<: *FallBack, filter: *FilterDE}
-  - {name: 🇨🇳 - 自动回退, <<: *FallBack, filter: *FilterTW}
-  # 负载均衡 - 按地区
-  - {name: 🇭🇰 - 负载均衡, <<: *LoadBalance, filter: *FilterHK}
-  - {name: 🇯🇵 - 负载均衡, <<: *LoadBalance, filter: *FilterJP}
-  - {name: 🇰🇷 - 负载均衡, <<: *LoadBalance, filter: *FilterKR}
-  - {name: 🇸🇬 - 负载均衡, <<: *LoadBalance, filter: *FilterSG}
-  - {name: 🇺🇸 - 负载均衡, <<: *LoadBalance, filter: *FilterUS}
-  - {name: 🇬🇧 - 负载均衡, <<: *LoadBalance, filter: *FilterUK}
-  - {name: 🇫🇷 - 负载均衡, <<: *LoadBalance, filter: *FilterFR}
-  - {name: 🇩🇪 - 负载均衡, <<: *LoadBalance, filter: *FilterDE}
-  - {name: 🇨🇳 - 负载均衡, <<: *LoadBalance, filter: *FilterTW}
+  - {name: 🇹🇼 - 自动回退, <<: *FallBack, filter: *FilterTW}
   
 # 规则集锚点（统一参数）
-RS_cls: &RS_cls {type: http, behavior: classical, interval: 43200, format: text, proxy: 节点选择}
-RS_dom: &RS_dom {type: http, behavior: domain,    interval: 43200, format: text, proxy: 节点选择}
-#规则集
+RS_cls: &RS_cls {type: http, behavior: classical, interval: 43200, format: text, proxy: 🚀 节点选择}
+RS_dom: &RS_dom {type: http, behavior: domain,    interval: 43200, format: text, proxy: 🚀 节点选择}
+# 规则集
 rule-providers:
   FuckAD:                {<<: *RS_dom, format: yaml, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/yaml/fuckAds.yaml,      path: ./rules/yaml/fuckAds.yaml}
   cdn_domainset:         {<<: *RS_dom, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/domainset/cdn.txt,                   path: ./rules/domainset/cdn.txt}
@@ -371,53 +320,34 @@ rule-providers:
 # 分流规则
 rules:
   ## 非 IP 类规则
-  # 局域网
-  - GEOSITE,PRIVATE,DIRECT
-  # 广告规则
-  - RULE-SET,FuckAD,REJECT
-  # 剔除bing
-  - DOMAIN-SUFFIX,bing.com,DIRECT
-  # 通用CDN
-  - DOMAIN-SUFFIX,oaiusercontent.com,A I 服务
-  - DOMAIN-SUFFIX,oaistatic.com,A I 服务
-  - RULE-SET,cdn_domainset,节点选择
-  - RULE-SET,cdn_non_ip,节点选择
-  # 视频规则
-  - RULE-SET,stream_non_ip,视频规则
-  # AI规则
-  - DOMAIN-SUFFIX,openai.com,A I 服务
-  - DOMAIN-SUFFIX,claude.ai,A I 服务
-  - DOMAIN-SUFFIX,gemini.google.com,A I 服务
-  - DOMAIN-SUFFIX,perplexity.ai,A I 服务
-  - DOMAIN-SUFFIX,bingapis.com,A I 服务
-  - DOMAIN-SUFFIX,copilot.microsoft.com,A I 服务
-  - RULE-SET,ai_non_ip,A I 服务
-  # 游戏规则
-  - GEOSITE,category-games@cn,DIRECT
-  - RULE-SET,Game,游戏服务
-  # 谷歌规则
-  - GEOSITE,google-cn,DIRECT
-  # 苹果规则
-  - RULE-SET,apple_cdn,DIRECT
-  - RULE-SET,apple_cn_non_ip,DIRECT
-  - RULE-SET,apple_services,苹果服务
-  # 微软规则
-  - RULE-SET,microsoft_cdn_non_ip,DIRECT
-  - RULE-SET,microsoft_non_ip,微软服务
-  # 下载更新
-  - RULE-SET,download_domainset,节点选择
-  - RULE-SET,download_non_ip,节点选择
-  # 通用规则
-  - GEOSITE,CN,DIRECT
-  - GEOSITE,geolocation-!cn,节点选择
+  - GEOSITE,private,DIRECT # 局域网/内网直连
+  - RULE-SET,FuckAD,REJECT # 广告拦截
+  - DOMAIN-SUFFIX,www.bing.com,DIRECT # Bing 中国直连
+  - DOMAIN-SUFFIX,oaiusercontent.com,🍼 AI 服务 # OpenAI 图片/文件域名
+  - DOMAIN-SUFFIX,oaistatic.com,🍼 AI 服务 # OpenAI 静态资源
+  - RULE-SET,cdn_domainset,🚀 节点选择 # 通用 CDN 域名
+  - RULE-SET,cdn_non_ip,🚀 节点选择 # 通用 CDN 非 IP
+  - RULE-SET,stream_non_ip,📺 视频规则 # 流媒体域名
+  - RULE-SET,ai_non_ip,🍼 AI 服务 # AI 服务域名
+  - GEOSITE,category-games@cn,DIRECT # 国内游戏平台直连
+  - RULE-SET,Game,🎮 游戏服务 # 国际游戏平台
+  - GEOSITE,google-cn,DIRECT # 谷歌中国服务直连
+  - RULE-SET,apple_cdn,DIRECT # 苹果 CDN
+  - RULE-SET,apple_cn_non_ip,DIRECT # 苹果中国非 IP
+  - RULE-SET,apple_services,🍎 苹果服务 # 苹果在线服务
+  - RULE-SET,microsoft_cdn_non_ip,DIRECT # 微软 CDN 非 IP
+  - GEOSITE,onedrive,☁️ Onedrive # OneDrive 云盘
+  - RULE-SET,microsoft_non_ip,Ⓜ️ 微软服务 # 微软服务域名
+  - RULE-SET,download_domainset,🚀 节点选择 # 常用软件下载域名
+  - RULE-SET,download_non_ip,🚀 节点选择 # 常用软件下载非 IP
+  - GEOSITE,cn,DIRECT # 中国大陆域名直连
+  - GEOSITE,gfw,🚀 节点选择 # 常见被墙站先走代理
+  - GEOSITE,geolocation-!cn,🚀 节点选择 # 兜底境外域名
+
+
   ## IP 类规则
-  # 局域网
-  - GEOIP,PRIVATE,DIRECT,no-resolve
-  # 视频规则
-  - RULE-SET,stream_ip,视频规则,no-resolve
-  # 电报
-  - RULE-SET,telegram_ip,电报信息,no-resolve
-  # 通用规则
-  - GEOIP,CN,DIRECT,no-resolve
-  # 兜底
-  - MATCH,节点选择
+  - GEOIP,private,DIRECT,no-resolve # 局域网 IP 直连
+  - RULE-SET,stream_ip,📺 视频规则,no-resolve # 流媒体 IP
+  - RULE-SET,telegram_ip,✈️ 电报信息,no-resolve # Telegram IP
+  - GEOIP,cn,DIRECT,no-resolve # 中国大陆 IP 直连
+  - MATCH,🚀 节点选择 # 兜底规则

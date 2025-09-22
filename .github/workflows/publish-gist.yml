@@ -1,0 +1,34 @@
+name: Build & Publish Gist Subscription
+on:
+  push:
+    paths:
+      - "baiye-multiple.yaml"
+  workflow_dispatch: {}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Build & Publish to Gist
+        env:
+          SUB_URL_1: ${{ secrets.SUB_URL_1 }}
+          SUB_URL_2: ${{ secrets.SUB_URL_2 }}
+          GIST_TOKEN: ${{ secrets.GIST_TOKEN }}
+          GIST_ID: ${{ secrets.GIST_ID }}
+          GIST_FILE_NAME: baiye-multiple.yaml
+        run: node .github/scripts/build-and-publish.js
+
+      - name: Upload artifact (optional)
+        uses: actions/upload-artifact@v4
+        with:
+          name: built-config
+          path: baiye-multiple.generated.yaml
+
