@@ -1,3 +1,4 @@
+name: Publish-Gist-Personal
 on:
   push:
     paths:
