@@ -171,7 +171,7 @@ NodeParam: &NodeParam {type: http, interval: 86400, health-check: {enable: true,
 # 订阅合集
 proxy-providers:
   Node:
-    url: '替换订阅链接'
+    url: "替换订阅链接1"
     <<: *NodeParam
     path: './proxy_provider/providers.yaml'
       
@@ -315,7 +315,7 @@ rules:
   ## 非 IP 类规则
   - GEOSITE,private,DIRECT # 局域网/内网直连
   - RULE-SET,FuckAD,REJECT # 广告拦截
-  - DOMAIN-SUFFIX,www.bing.com,DIRECT # Bing 中国直连
+  - DOMAIN-SUFFIX,bing.com,DIRECT # Bing 中国直连
   - DOMAIN-SUFFIX,oaiusercontent.com,🍼 AI  服务 # OpenAI 图片/文件域名
   - DOMAIN-SUFFIX,oaistatic.com,🍼 AI  服务 # OpenAI 静态资源
   - RULE-SET,cdn_domainset,🚀 节点选择 # 通用 CDN 域名
