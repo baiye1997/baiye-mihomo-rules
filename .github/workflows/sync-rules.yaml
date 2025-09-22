@@ -1,5 +1,4 @@
-# .github/workflows/sync-rules.yml
-name: Sync external rules
+name: Sync External Rules
 
 on:
   schedule:
