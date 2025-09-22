@@ -1,8 +1,7 @@
-name: Build & Publish Gist Subscription
 on:
   push:
     paths:
-      - "baiye-multiple.yaml"
+      - "config/baiye-multiple.yaml"   # <- 触发路径改这里
   workflow_dispatch: {}
 
 jobs:
@@ -24,6 +23,7 @@ jobs:
           GIST_TOKEN: ${{ secrets.GIST_TOKEN }}
           GIST_ID: ${{ secrets.GIST_ID }}
           GIST_FILE_NAME: baiye-multiple.yaml
+          CONFIG_PATH: config/baiye-multiple.yaml   # <- 告诉脚本从这里读
         run: node .github/scripts/build-and-publish.js
 
       - name: Upload artifact (optional)
@@ -31,4 +31,3 @@ jobs:
         with:
           name: built-config
           path: baiye-multiple.generated.yaml
-

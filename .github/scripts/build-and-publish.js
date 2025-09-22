@@ -49,9 +49,10 @@ function patchGist({ gistId, token, filename, content }) {
 
   if (!sub1 || !sub2) throw new Error('Missing SUB_URL_1 or SUB_URL_2');
   if (!gistToken || !gistId) throw new Error('Missing GIST_TOKEN or GIST_ID');
-
-  const srcPath = path.resolve('baiye-multiple.yaml');
-  if (!fs.existsSync(srcPath)) throw new Error('baiye-multiple.yaml not found at repo root');
+  
+  const srcRel = process.env.CONFIG_PATH || 'baiye-multiple.yaml'; // 新增：可用环境变量覆盖
+  const srcPath = path.resolve(srcRel);
+  if (!fs.existsSync(srcPath)) throw new Error(`${srcRel} not found at repo root`);
 
   const raw = fs.readFileSync(srcPath, 'utf8');
 
