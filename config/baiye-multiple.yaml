@@ -167,13 +167,13 @@ proxy-providers:
     <<: *NodeParam
     path: './proxy_provider/providers-1.yaml'
     override:
-      additional-prefix: "[Haita] "
+      additional-prefix: "[替换显示A] "
   Node-2:
     url: 替换订阅链接2
     <<: *NodeParam
     path: './proxy_provider/providers-2.yaml'
     override:
-      additional-prefix: "[BoostNet] "
+      additional-prefix: "[替换显示B] "
       
 # ===================== 节点筛选 =====================
 # 按地区筛选
@@ -201,9 +201,9 @@ FallBack:    &FallBack    {type: fallback,   <<: *TmplBase}
 LoadBalance: &LoadBalance {type: load-balance, <<: *TmplBase, strategy: consistent-hashing}
 
 # 各场景常用选择清单（单行序列）
-AppRegionWithDirect: &AppRegionWithDirect ["DIRECT","🎯  节点选择","🇭🇰 香港节点","🇯🇵 日本节点","🇰🇷 韩国节点","🇸🇬 狮城节点","🇺🇸 美国节点","🇬🇧 英国节点","🇫🇷 法国节点","🇩🇪 德国节点","🇹🇼 台湾节点"]
-FallbackWithDirect: &FallbackWithDirect ["DIRECT","🎯  节点选择","🇭🇰 - 自动回退","🇯🇵 - 自动回退","🇰🇷 - 自动回退","🇸🇬 - 自动回退","🇺🇸 - 自动回退","🇬🇧 - 自动回退","🇫🇷 - 自动回退","🇩🇪 - 自动回退","🇹🇼 - 自动回退"]
-AutoRegionChoices: &AutoRegionChoices ["🇭🇰 香港节点","🇯🇵 日本节点","🇸🇬 狮城节点","🇺🇸 美国节点","🇹🇼 台湾节点"]
+AppRegionWithDirect: &AppRegionWithDirect ["DIRECT","🎯  节点选择","香港节点","日本节点","韩国节点","狮城节点","美国节点","英国节点","法国节点","德国节点","台湾节点"]
+FallbackWithDirect: &FallbackWithDirect ["DIRECT","🎯  节点选择","🇭🇰 - 自动回退","🇯🇵 - 自动回退","🇰🇷 - 自动回退","🇸🇬 - 自动回退","🇺🇸 - 自动回退","🇬🇧 - 自动回退","🇫🇷 - 自动回退","🇩🇪 - 自动回退","🇨🇳 - 自动回退"]
+AutoRegionChoices: &AutoRegionChoices ["🇭🇰 香港节点","日本节点","狮城节点","美国节点","台湾节点"]
 
 # ===================== 策略组 =====================
 proxy-groups:
@@ -211,83 +211,99 @@ proxy-groups:
   - name: 🎯  节点选择
     type: select
     proxies:
-      - 🛫  智能选择
-      - 🤝  手动选择
+      - ✈️  智能选择
+      - 👉  手动选择
       - DIRECT
 
   # 手动 / Auto 顶层
-  - name: 🤝  手动选择
+  - name: 👉  手动选择
     <<: *Select
     filter: *FilterAll
 
-  - name: 🛫  智能选择
+  - name: ✈️  智能选择
     type: url-test
     proxies: *AutoRegionChoices
     url: http://connectivitycheck.platform.hicloud.com/generate_204
     interval: 300
     tolerance: 50
 
-  # 应用分组
-  - name: 💡   A I 服务
+# 应用分组
+  - name: A I 服务
     type: select
     proxies: *AppRegionWithDirect
+    icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/openai.png"
 
-  - name: 🍎  苹果服务
+  - name: 苹果服务
     type: select
     proxies: *AppRegionWithDirect
+    icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/apple.png"
 
-  - name: Ⓜ️  微软服务
+  - name: 微软服务
     type: select
     proxies: *AppRegionWithDirect
+    icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/microsoft.png"
 
-  - name: 🎮  游戏服务
+  - name: 游戏服务
     type: select
     proxies: *AppRegionWithDirect
+    icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/game.png"
 
-  - name: ✈️  电报信息
+  - name: 电报信息
     type: select
     proxies: *AppRegionWithDirect
+    icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/telegram.png"
 
-  - name: 📺  视频规则
+  - name: 视频规则
     type: select
     proxies: *FallbackWithDirect
+    icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/netflix.png"
 
-  # Auto 顶层（各地区自动聚合）
-  - name: 🇭🇰 香港节点
+# Auto 顶层（各地区自动聚合）
+  - name: 香港节点
     type: select
     proxies: [🇭🇰 - 延迟最低, 🇭🇰 - 自动回退, 🇭🇰 - 负载均衡]
+    icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/hk.png"
 
-  - name: 🇯🇵 日本节点
+  - name: 日本节点
     type: select
     proxies: [🇯🇵 - 延迟最低, 🇯🇵 - 自动回退, 🇯🇵 - 负载均衡]
+    icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/jp.png"
 
-  - name: 🇰🇷 韩国节点
+  - name: 韩国节点
     type: select
     proxies: [🇰🇷 - 延迟最低, 🇰🇷 - 自动回退, 🇰🇷 - 负载均衡]
+    icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/kr.png"
 
-  - name: 🇸🇬 狮城节点
+  - name: 狮城节点
     type: select
     proxies: [🇸🇬 - 延迟最低, 🇸🇬 - 自动回退, 🇸🇬 - 负载均衡]
+    icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/sg.png"
 
-  - name: 🇺🇸 美国节点
+  - name: 美国节点
     type: select
     proxies: [🇺🇸 - 延迟最低, 🇺🇸 - 自动回退, 🇺🇸 - 负载均衡]
+    icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/us.png"
 
-  - name: 🇬🇧 英国节点
+  - name: 英国节点
     type: select
     proxies: [🇬🇧 - 延迟最低, 🇬🇧 - 自动回退, 🇬🇧 - 负载均衡]
+    icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/gb.png"
 
-  - name: 🇫🇷 法国节点
+  - name: 法国节点
     type: select
     proxies: [🇫🇷 - 延迟最低, 🇫🇷 - 自动回退, 🇫🇷 - 负载均衡]
+    icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/fr.png"
 
-  - name: 🇩🇪 德国节点
+  - name: 德国节点
     type: select
     proxies: [🇩🇪 - 延迟最低, 🇩🇪 - 自动回退, 🇩🇪 - 负载均衡]
+    icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/de.png"
 
-  - name: 🇹🇼 台湾节点
+  - name: 台湾节点
     type: select
-    proxies: [🇹🇼 - 延迟最低, 🇹🇼 - 自动回退, 🇹🇼 - 负载均衡]
+    proxies: [🇨🇳 - 延迟最低, 🇨🇳 - 自动回退, 🇨🇳 - 负载均衡]
+    icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/cn.png"
+
 
   # 延迟最低 - 按地区
   - {name: 🇭🇰 - 延迟最低, <<: *UrlTest, filter: *FilterHK}
@@ -298,7 +314,7 @@ proxy-groups:
   - {name: 🇬🇧 - 延迟最低, <<: *UrlTest, filter: *FilterUK}
   - {name: 🇫🇷 - 延迟最低, <<: *UrlTest, filter: *FilterFR}
   - {name: 🇩🇪 - 延迟最低, <<: *UrlTest, filter: *FilterDE}
-  - {name: 🇹🇼 - 延迟最低, <<: *UrlTest, filter: *FilterTW}
+  - {name: 🇨🇳 - 延迟最低, <<: *UrlTest, filter: *FilterTW}
   # 自动回退 - 按地区
   - {name: 🇭🇰 - 自动回退, <<: *FallBack, filter: *FilterHK}
   - {name: 🇯🇵 - 自动回退, <<: *FallBack, filter: *FilterJP}
@@ -308,7 +324,7 @@ proxy-groups:
   - {name: 🇬🇧 - 自动回退, <<: *FallBack, filter: *FilterUK}
   - {name: 🇫🇷 - 自动回退, <<: *FallBack, filter: *FilterFR}
   - {name: 🇩🇪 - 自动回退, <<: *FallBack, filter: *FilterDE}
-  - {name: 🇹🇼 - 自动回退, <<: *FallBack, filter: *FilterTW}
+  - {name: 🇨🇳 - 自动回退, <<: *FallBack, filter: *FilterTW}
   # 负载均衡 - 按地区
   - {name: 🇭🇰 - 负载均衡, <<: *LoadBalance, filter: *FilterHK}
   - {name: 🇯🇵 - 负载均衡, <<: *LoadBalance, filter: *FilterJP}
@@ -318,28 +334,28 @@ proxy-groups:
   - {name: 🇬🇧 - 负载均衡, <<: *LoadBalance, filter: *FilterUK}
   - {name: 🇫🇷 - 负载均衡, <<: *LoadBalance, filter: *FilterFR}
   - {name: 🇩🇪 - 负载均衡, <<: *LoadBalance, filter: *FilterDE}
-  - {name: 🇹🇼 - 负载均衡, <<: *LoadBalance, filter: *FilterTW}
+  - {name: 🇨🇳 - 负载均衡, <<: *LoadBalance, filter: *FilterTW}
   
 # 规则集锚点（统一参数）
 RS_cls: &RS_cls {type: http, behavior: classical, interval: 43200, format: text, proxy: 🎯  节点选择}
 RS_dom: &RS_dom {type: http, behavior: domain,    interval: 43200, format: text, proxy: 🎯  节点选择}
 #规则集
 rule-providers:
-  FuckAD:                {<<: *RS_dom, format: yaml, url: https://raw.githubusercontent.com/baiye1997/baiye-mihomo-rules/main/rules/yaml/fuckAds.yaml, path: ./rules/yaml/fuckAds.yaml}
-  cdn_domainset:         {<<: *RS_dom, url: https://raw.githubusercontent.com/baiye1997/baiye-mihomo-rules/main/rules/domainset/cdn.txt,            path: ./rules/domainset/cdn.txt}
-  cdn_non_ip:            {<<: *RS_cls, url: https://raw.githubusercontent.com/baiye1997/baiye-mihomo-rules/main/rules/non_ip/cdn.txt,               path: ./rules/non_ip/cdn.txt}
-  Game:                  {<<: *RS_cls, format: yaml, url: https://raw.githubusercontent.com/baiye1997/baiye-mihomo-rules/main/rules/yaml/Game.yaml, path: ./rules/yaml/Game.yaml}
-  stream_non_ip:         {<<: *RS_cls, url: https://raw.githubusercontent.com/baiye1997/baiye-mihomo-rules/main/rules/non_ip/stream.txt,            path: ./rules/non_ip/stream.txt}
-  stream_ip:             {<<: *RS_cls, url: https://raw.githubusercontent.com/baiye1997/baiye-mihomo-rules/main/rules/ip/stream.txt,                path: ./rules/ip/stream.txt}
-  ai_non_ip:             {<<: *RS_cls, url: https://raw.githubusercontent.com/baiye1997/baiye-mihomo-rules/main/rules/non_ip/ai.txt,                path: ./rules/non_ip/ai.txt}
-  telegram_ip:           {<<: *RS_cls, url: https://raw.githubusercontent.com/baiye1997/baiye-mihomo-rules/main/rules/ip/telegram.txt,              path: ./rules/ip/telegram.txt}
-  apple_cdn:             {<<: *RS_dom, url: https://raw.githubusercontent.com/baiye1997/baiye-mihomo-rules/main/rules/domainset/apple_cdn.txt,      path: ./rules/domainset/apple_cdn.txt}
-  apple_services:        {<<: *RS_cls, url: https://raw.githubusercontent.com/baiye1997/baiye-mihomo-rules/main/rules/non_ip/apple_services.txt,    path: ./rules/non_ip/apple_services.txt}
-  apple_cn_non_ip:       {<<: *RS_cls, url: https://raw.githubusercontent.com/baiye1997/baiye-mihomo-rules/main/rules/non_ip/apple_cn.txt,          path: ./rules/non_ip/apple_cn.txt}
-  microsoft_cdn_non_ip:  {<<: *RS_cls, url: https://raw.githubusercontent.com/baiye1997/baiye-mihomo-rules/main/rules/non_ip/microsoft_cdn.txt,     path: ./rules/non_ip/microsoft_cdn.txt}
-  microsoft_non_ip:      {<<: *RS_cls, url: https://raw.githubusercontent.com/baiye1997/baiye-mihomo-rules/main/rules/non_ip/microsoft.txt,         path: ./rules/non_ip/microsoft.txt}
-  download_domainset:    {<<: *RS_dom, url: https://raw.githubusercontent.com/baiye1997/baiye-mihomo-rules/main/rules/domainset/download.txt,       path: ./rules/domainset/download.txt}
-  download_non_ip:       {<<: *RS_cls, url: https://raw.githubusercontent.com/baiye1997/baiye-mihomo-rules/main/rules/non_ip/download.txt,          path: ./rules/non_ip/download.txt}
+  FuckAD:                {<<: *RS_dom, format: yaml, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/yaml/fuckAds.yaml,      path: ./rules/yaml/fuckAds.yaml}
+  cdn_domainset:         {<<: *RS_dom, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/domainset/cdn.txt,                   path: ./rules/domainset/cdn.txt}
+  cdn_non_ip:            {<<: *RS_cls, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/non_ip/cdn.txt,                      path: ./rules/non_ip/cdn.txt}
+  Game:                  {<<: *RS_cls, format: yaml, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/yaml/Game.yaml,       path: ./rules/yaml/Game.yaml}
+  stream_non_ip:         {<<: *RS_cls, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/non_ip/stream.txt,                   path: ./rules/non_ip/stream.txt}
+  stream_ip:             {<<: *RS_cls, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/ip/stream.txt,                       path: ./rules/ip/stream.txt}
+  ai_non_ip:             {<<: *RS_cls, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/non_ip/ai.txt,                       path: ./rules/non_ip/ai.txt}
+  telegram_ip:           {<<: *RS_cls, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/ip/telegram.txt,                     path: ./rules/ip/telegram.txt}
+  apple_cdn:             {<<: *RS_dom, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/domainset/apple_cdn.txt,             path: ./rules/domainset/apple_cdn.txt}
+  apple_services:        {<<: *RS_cls, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/non_ip/apple_services.txt,           path: ./rules/non_ip/apple_services.txt}
+  apple_cn_non_ip:       {<<: *RS_cls, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/non_ip/apple_cn.txt,                 path: ./rules/non_ip/apple_cn.txt}
+  microsoft_cdn_non_ip:  {<<: *RS_cls, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/non_ip/microsoft_cdn.txt,            path: ./rules/non_ip/microsoft_cdn.txt}
+  microsoft_non_ip:      {<<: *RS_cls, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/non_ip/microsoft.txt,                path: ./rules/non_ip/microsoft.txt}
+  download_domainset:    {<<: *RS_dom, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/domainset/download.txt,              path: ./rules/domainset/download.txt}
+  download_non_ip:       {<<: *RS_cls, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/non_ip/download.txt,                 path: ./rules/non_ip/download.txt}
 
 # 分流规则
 rules:
@@ -351,32 +367,32 @@ rules:
   # 剔除bing
   - DOMAIN-SUFFIX,bing.com,DIRECT
   # 通用CDN
-  - DOMAIN-SUFFIX,oaiusercontent.com,💡   A I 服务
-  - DOMAIN-SUFFIX,oaistatic.com,💡   A I 服务
+  - DOMAIN-SUFFIX,oaiusercontent.com,A I 服务
+  - DOMAIN-SUFFIX,oaistatic.com,A I 服务
   - RULE-SET,cdn_domainset,🎯  节点选择
   - RULE-SET,cdn_non_ip,🎯  节点选择
   # 视频规则
-  - RULE-SET,stream_non_ip,📺  视频规则
+  - RULE-SET,stream_non_ip,视频规则
   # AI规则
-  - DOMAIN-SUFFIX,openai.com,💡   A I 服务
-  - DOMAIN-SUFFIX,claude.ai,💡   A I 服务
-  - DOMAIN-SUFFIX,gemini.google.com,💡   A I 服务
-  - DOMAIN-SUFFIX,perplexity.ai,💡   A I 服务
-  - DOMAIN-SUFFIX,bingapis.com,💡   A I 服务
-  - DOMAIN-SUFFIX,copilot.microsoft.com,💡   A I 服务
-  - RULE-SET,ai_non_ip,💡   A I 服务
+  - DOMAIN-SUFFIX,openai.com,A I 服务
+  - DOMAIN-SUFFIX,claude.ai,A I 服务
+  - DOMAIN-SUFFIX,gemini.google.com,A I 服务
+  - DOMAIN-SUFFIX,perplexity.ai,A I 服务
+  - DOMAIN-SUFFIX,bingapis.com,A I 服务
+  - DOMAIN-SUFFIX,copilot.microsoft.com,A I 服务
+  - RULE-SET,ai_non_ip,A I 服务
   # 游戏规则
   - GEOSITE,category-games@cn,DIRECT
-  - RULE-SET,Game,🎮  游戏服务
+  - RULE-SET,Game,游戏服务
   # 谷歌规则
   - GEOSITE,google-cn,DIRECT
   # 苹果规则
   - RULE-SET,apple_cdn,DIRECT
   - RULE-SET,apple_cn_non_ip,DIRECT
-  - RULE-SET,apple_services,🍎  苹果服务
+  - RULE-SET,apple_services,苹果服务
   # 微软规则
   - RULE-SET,microsoft_cdn_non_ip,DIRECT
-  - RULE-SET,microsoft_non_ip,Ⓜ️  微软服务
+  - RULE-SET,microsoft_non_ip,微软服务
   # 下载更新
   - RULE-SET,download_domainset,🎯  节点选择
   - RULE-SET,download_non_ip,🎯  节点选择
@@ -387,9 +403,9 @@ rules:
   # 局域网
   - GEOIP,PRIVATE,DIRECT,no-resolve
   # 视频规则
-  - RULE-SET,stream_ip,📺  视频规则,no-resolve
+  - RULE-SET,stream_ip,视频规则,no-resolve
   # 电报
-  - RULE-SET,telegram_ip,✈️  电报信息,no-resolve
+  - RULE-SET,telegram_ip,电报信息,no-resolve
   # 通用规则
   - GEOIP,CN,DIRECT,no-resolve
   # 兜底

@@ -4,7 +4,7 @@ set -euo pipefail
 # 到仓库根目录（脚本在 scripts/ 下）
 cd "$(dirname "$0")/.."
 
-SOURCES_FILE="rules_sources.txt"
+SOURCES_FILE="rules/.source/rules_sources.txt"
 
 if [[ ! -f "$SOURCES_FILE" ]]; then
   echo "ERROR: $SOURCES_FILE 不存在，先创建它。"
