@@ -22,6 +22,9 @@ jobs:
   release_purge:
     runs-on: ubuntu-latest
     steps:
+      - name: Debounce wait
+        run: sleep 120
+        
       - name: Checkout (with tags)
         uses: actions/checkout@v4
         with:
