@@ -1,0 +1,84 @@
+name: Release (@latest) & Purge CDN on rules/icons change
+
+on:
+  push:
+    paths:
+      - "rules/**"
+      - "icons/**"
+    paths-ignore:
+      - "rules/.source/**"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  release_purge:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout (with tags)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Compute version tag (UTC)
+        id: ver
+        run: |
+          echo "TAG=v$(date -u +%Y.%m.%d-%H%M)" >> $GITHUB_OUTPUT
+
+      - name: Detect changed files (this push)
+        id: chg
+        shell: bash
+        run: |
+          git diff --name-only "${{ github.event.before }}" "${{ github.sha }}" > changed.all.txt
+          # 仅保留真正需要刷新的路径（rules/* 限定常用四类目录 + icons/*）
+          grep -E '^(icons/|rules/(ip|non_ip|domainset|yaml)/)' changed.all.txt | sort -u > changed.targets.txt || true
+          echo "Changed targets:"
+          cat changed.targets.txt || true
+
+      - name: Create lightweight tag (skip if exists)
+        run: |
+          TAG="${{ steps.ver.outputs.TAG }}"
+          if git rev-parse -q --verify "refs/tags/$TAG" >/dev/null; then
+            echo "Tag $TAG already exists. Skipping tag creation."
+          else
+            git tag "$TAG"
+            git push origin "$TAG"
+          fi
+
+      - name: (Optional) Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.ver.outputs.TAG }}
+          name: ${{ steps.ver.outputs.TAG }}
+          draft: false
+          prerelease: false
+
+      - name: Purge jsDelivr cache for changed files (@latest + @main)
+        if: always()
+        shell: bash
+        run: |
+          REPO="${{ github.repository }}"  # owner/repo
+          if [ -s changed.targets.txt ]; then
+            while read -r p; do
+              [ -n "$p" ] || continue
+              for REF in latest main; do
+                URL="https://purge.jsdelivr.net/gh/${REPO}@${REF}/${p}"
+                echo "Purging $URL"
+                curl -fsS "$URL" >/dev/null || true
+              done
+            done < changed.targets.txt
+          fi
+
+      - name: Purge jsDelivr cache for subscription templates (@latest + @main)
+        shell: bash
+        run: |
+          REPO="${{ github.repository }}"
+          shopt -s nullglob
+          for f in config/*.yaml config/*.yml; do
+            for REF in latest main; do
+              URL="https://purge.jsdelivr.net/gh/${REPO}@${REF}/${f}"
+              echo "Purging $URL"
+              curl -fsS "$URL" >/dev/null || true
+            done
+          done
