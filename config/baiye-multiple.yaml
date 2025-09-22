@@ -322,7 +322,7 @@ rules:
   ## 非 IP 类规则
   - GEOSITE,private,DIRECT # 局域网/内网直连
   - RULE-SET,FuckAD,REJECT # 广告拦截
-  - DOMAIN-SUFFIX,www.bing.com,DIRECT # Bing 中国直连
+  - DOMAIN-SUFFIX,bing.com,DIRECT # Bing 中国直连
   - DOMAIN-SUFFIX,oaiusercontent.com,🍼 AI  服务 # OpenAI 图片/文件域名
   - DOMAIN-SUFFIX,oaistatic.com,🍼 AI  服务 # OpenAI 静态资源
   - RULE-SET,cdn_domainset,🚀 节点选择 # 通用 CDN 域名
@@ -352,4 +352,5 @@ rules:
   - GEOIP,cn,DIRECT,no-resolve # 中国大陆 IP 直连
 
   - MATCH,🚀 节点选择 # 兜底规则
+
 
