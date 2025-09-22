@@ -1,4 +1,4 @@
-name: Release (@latest) & Purge CDN on rules/icons change
+name: Release (@latest) & Purge CDN on rules/icons/config change
 
 on:
   push:
@@ -8,9 +8,11 @@ on:
       - "rules/domainset/**"
       - "rules/yaml/**"
       - "icons/**"
+      - "config/*.yaml"
+      - "config/*.yml"
   workflow_dispatch: {}
 
-# 防重复并发（多次快速推送时只保留最新一次）
+# 防抖 + 并发：短时间多次 push 仅保留最后一次
 concurrency:
   group: release-and-purge
   cancel-in-progress: true
@@ -23,84 +25,114 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Debounce wait
-        run: sleep 120
-        
+        run: sleep 90
+
       - name: Checkout (with tags)
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Compute version tag (UTC + short SHA)
-        id: ver
+      # 如果是我们上一轮“只为图标 ?v= 碰了 config”的提交，直接跳过，避免自触发循环
+      - name: Self-skip if last commit is icon bump
+        id: selfskip
         shell: bash
         run: |
-          set -euo pipefail
-          echo "TAG=v$(date -u +%Y.%m.%d-%H%M)-${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
+          LASTMSG="$(git log -1 --pretty=%s)"
+          if echo "$LASTMSG" | grep -qE '^chore\(ci\): bump icon \?v='; then
+            echo "skip=true" >> $GITHUB_OUTPUT
+          else
+            echo "skip=false" >> $GITHUB_OUTPUT
+          fi
 
-      - name: Detect changed files (this push)
+      - name: Detect changed files (targets & flags)
+        if: steps.selfskip.outputs.skip == 'false'
         id: chg
         shell: bash
         run: |
           set -euo pipefail
           BEFORE="${{ github.event.before }}"
-          # 某些触发（例如第一次提交）可能拿不到 before；回退到上一提交
-          if [ -z "${BEFORE}" ]; then
-            BEFORE="$(git rev-parse HEAD^ || echo '')"
-          fi
+          if [ -z "${BEFORE}" ]; then BEFORE="$(git rev-parse HEAD^ || echo '')"; fi
 
           if [ -n "${BEFORE}" ]; then
             git diff --name-only "${BEFORE}" "${{ github.sha }}" > changed.all.txt
           else
-            # 没有 before：退化为本次提交的文件列表
             git show --name-only --pretty="" "${{ github.sha }}" > changed.all.txt
           fi
 
-          # 再保险过滤一遍（只保留真正分发的目录+icons）
+          # 仅供精准 purge 的目标（rules/icons）
           grep -E '^(icons/|rules/(ip|non_ip|domainset|yaml)/)' changed.all.txt | sort -u > changed.targets.txt || true
 
-          if [ -s changed.targets.txt ]; then
-            echo "HAS_TARGETS=true" >> $GITHUB_OUTPUT
-          else
-            echo "HAS_TARGETS=false" >> $GITHUB_OUTPUT
-          fi
+          # 标记是否变更了 icons 或 config（用于后续逻辑）
+          if grep -qE '^icons/' changed.all.txt; then echo "icons_changed=true" >> $GITHUB_OUTPUT; else echo "icons_changed=false" >> $GITHUB_OUTPUT; fi
+          if grep -qE '^config/.*\.ya?ml$' changed.all.txt; then echo "config_changed=true" >> $GITHUB_OUTPUT; else echo "config_changed=false" >> $GITHUB_OUTPUT; fi
+          if [ -s changed.targets.txt ]; then echo "has_targets=true" >> $GITHUB_OUTPUT; else echo "has_targets=false" >> $GITHUB_OUTPUT; fi
 
           {
-            echo "BODY<<EOF"
+            echo "body<<EOF"
             echo "### Changed files"
-            if [ -s changed.all.txt ]; then
-              sed 's/^/- /' changed.all.txt
-            else
-              echo "- (no file list available)"
-            fi
+            if [ -s changed.all.txt ]; then sed 's/^/- /' changed.all.txt; else echo "- (no file list available)"; fi
             echo "EOF"
           } >> $GITHUB_OUTPUT
 
-          echo "Changed targets:"
-          cat changed.targets.txt || true
+          echo "Changed targets:"; cat changed.targets.txt || true
 
-      - name: Create tag (skip if exists or no targets)
-        if: steps.chg.outputs.HAS_TARGETS == 'true'
+      # 仅当 icons 下有真实文件变动时，才为 config 里的 icon 链接追加 ?v=<短哈希>，解决客户端本地缓存不刷新的问题
+      - name: Bump icon URLs in config (?v=<short>) when icons changed
+        if: steps.selfskip.outputs.skip == 'false' && steps.chg.outputs.icons_changed == 'true'
         shell: bash
         run: |
           set -euo pipefail
-          TAG="${{ steps.ver.outputs.TAG }}"
+          SHORT="$(git rev-parse --short=7 HEAD)"
+          mapfile -t files < <(find config -type f \( -name "*.yaml" -o -name "*.yml" \) 2>/dev/null || true)
+          for f in "${files[@]}"; do
+            sed -i -E \
+              "s|(https://[^\"'()]+/icons/[^\"'()]+\.(png|jpg|jpeg|webp|svg))(\\?v=[^\"'()]+)?|\\1?v=${SHORT}|g" \
+              "$f"
+          done
+          if ! git diff --quiet; then
+            git config user.name  "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add -A
+            git commit -m "chore(ci): bump icon ?v=${SHORT} [skip ci]"
+            git push
+          else
+            echo "No icon URL changes in config."
+          fi
+
+      # 现在 HEAD 可能因为上一步提交而前进了；用最新 HEAD 生成带短 SHA 的 tag，确保 @latest 指向包含所有变更的快照
+      - name: Compute version tag (UTC + short HEAD)
+        if: steps.selfskip.outputs.skip == 'false'
+        id: ver
+        shell: bash
+        run: |
+          set -euo pipefail
+          SHORT="$(git rev-parse --short=7 HEAD)"
+          echo "tag=v$(date -u +%Y.%m.%d-%H%M)-${SHORT}" >> $GITHUB_OUTPUT
+
+      # 只要 rules/icons 有变更，或 config 有变更（比如你只改了模板），就发版
+      - name: Create tag
+        if: steps.selfskip.outputs.skip == 'false' && (steps.chg.outputs.has_targets == 'true' || steps.chg.outputs.config_changed == 'true')
+        shell: bash
+        run: |
+          set -euo pipefail
+          TAG="${{ steps.ver.outputs.tag }}"
           if git rev-parse -q --verify "refs/tags/$TAG" >/dev/null; then
-            echo "Tag $TAG already exists. Skipping tag creation."
+            echo "Tag $TAG already exists. Skipping."
           else
             git tag "$TAG"
             git push origin "$TAG"
           fi
 
       - name: Create GitHub Release
-        if: steps.chg.outputs.HAS_TARGETS == 'true'
+        if: steps.selfskip.outputs.skip == 'false' && (steps.chg.outputs.has_targets == 'true' || steps.chg.outputs.config_changed == 'true')
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ steps.ver.outputs.TAG }}
-          name: ${{ steps.ver.outputs.TAG }}
-          body: ${{ steps.chg.outputs.BODY }}
+          tag_name: ${{ steps.ver.outputs.tag }}
+          name: ${{ steps.ver.outputs.tag }}
+          body: ${{ steps.chg.outputs.body }}
 
-      - name: Purge jsDelivr cache for changed files (@latest + @main)
-        if: always() && steps.chg.outputs.HAS_TARGETS == 'true'
+      - name: Purge jsDelivr for changed rules/icons (@latest + @main)
+        if: always() && steps.selfskip.outputs.skip == 'false' && steps.chg.outputs.has_targets == 'true'
         shell: bash
         run: |
           set -euo pipefail
@@ -114,7 +146,7 @@ jobs:
             done
           done < changed.targets.txt
 
-      - name: Purge jsDelivr cache for subscription templates (@latest + @main)
+      - name: Purge jsDelivr for subscription templates (@latest + @main)
         if: always()
         shell: bash
         run: |
