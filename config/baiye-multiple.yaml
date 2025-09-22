@@ -132,6 +132,14 @@ sniffer:
     # 其他常见厂商
     - "push.hicloud.com"
     - "push.oppomobile.com"
+    - "+.zoom.us"
+    - "+.teams.microsoft.com"
+    - "+.skype.com"
+    - "+.live.com"
+    - "+.office.com"
+    - "+.outlook.com"
+    - "+.discord.com"
+    - "+.steamcontent.com"
 
 # TUN 模式
 tun:
@@ -201,31 +209,34 @@ FallBack:    &FallBack    {type: fallback,   <<: *TmplBase}
 LoadBalance: &LoadBalance {type: load-balance, <<: *TmplBase, strategy: consistent-hashing}
 
 # 各场景常用选择清单（单行序列）
-AppRegionWithDirect: &AppRegionWithDirect ["DIRECT","🎯  节点选择","香港节点","日本节点","韩国节点","狮城节点","美国节点","英国节点","法国节点","德国节点","台湾节点"]
-FallbackWithDirect: &FallbackWithDirect ["DIRECT","🎯  节点选择","🇭🇰 - 自动回退","🇯🇵 - 自动回退","🇰🇷 - 自动回退","🇸🇬 - 自动回退","🇺🇸 - 自动回退","🇬🇧 - 自动回退","🇫🇷 - 自动回退","🇩🇪 - 自动回退","🇨🇳 - 自动回退"]
-AutoRegionChoices: &AutoRegionChoices ["🇭🇰 香港节点","日本节点","狮城节点","美国节点","台湾节点"]
+AppRegionWithDirect: &AppRegionWithDirect ["DIRECT","节点选择","香港节点","日本节点","韩国节点","狮城节点","美国节点","英国节点","法国节点","德国节点","台湾节点"]
+FallbackWithDirect: &FallbackWithDirect ["DIRECT","节点选择","🇭🇰 - 自动回退","🇯🇵 - 自动回退","🇰🇷 - 自动回退","🇸🇬 - 自动回退","🇺🇸 - 自动回退","🇬🇧 - 自动回退","🇫🇷 - 自动回退","🇩🇪 - 自动回退","🇨🇳 - 自动回退"]
+AutoRegionChoices: &AutoRegionChoices ["香港节点","日本节点","狮城节点","美国节点","台湾节点"]
 
 # ===================== 策略组 =====================
 proxy-groups:
   # 主选择组
-  - name: 🎯  节点选择
+  - name: 节点选择
     type: select
     proxies:
-      - ✈️  智能选择
-      - 👉  手动选择
+      - 智能选择
+      - 手动选择
       - DIRECT
+    icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/choice.png"
 
   # 手动 / Auto 顶层
-  - name: 👉  手动选择
+  - name: 手动选择
     <<: *Select
     filter: *FilterAll
+    icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/select.png"
 
-  - name: ✈️  智能选择
+  - name: 智能选择
     type: url-test
     proxies: *AutoRegionChoices
     url: http://connectivitycheck.platform.hicloud.com/generate_204
     interval: 300
     tolerance: 50
+    icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/auto.png"
 
 # 应用分组
   - name: A I 服务
@@ -337,8 +348,8 @@ proxy-groups:
   - {name: 🇨🇳 - 负载均衡, <<: *LoadBalance, filter: *FilterTW}
   
 # 规则集锚点（统一参数）
-RS_cls: &RS_cls {type: http, behavior: classical, interval: 43200, format: text, proxy: 🎯  节点选择}
-RS_dom: &RS_dom {type: http, behavior: domain,    interval: 43200, format: text, proxy: 🎯  节点选择}
+RS_cls: &RS_cls {type: http, behavior: classical, interval: 43200, format: text, proxy: 节点选择}
+RS_dom: &RS_dom {type: http, behavior: domain,    interval: 43200, format: text, proxy: 节点选择}
 #规则集
 rule-providers:
   FuckAD:                {<<: *RS_dom, format: yaml, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/yaml/fuckAds.yaml,      path: ./rules/yaml/fuckAds.yaml}
@@ -369,8 +380,8 @@ rules:
   # 通用CDN
   - DOMAIN-SUFFIX,oaiusercontent.com,A I 服务
   - DOMAIN-SUFFIX,oaistatic.com,A I 服务
-  - RULE-SET,cdn_domainset,🎯  节点选择
-  - RULE-SET,cdn_non_ip,🎯  节点选择
+  - RULE-SET,cdn_domainset,节点选择
+  - RULE-SET,cdn_non_ip,节点选择
   # 视频规则
   - RULE-SET,stream_non_ip,视频规则
   # AI规则
@@ -394,11 +405,11 @@ rules:
   - RULE-SET,microsoft_cdn_non_ip,DIRECT
   - RULE-SET,microsoft_non_ip,微软服务
   # 下载更新
-  - RULE-SET,download_domainset,🎯  节点选择
-  - RULE-SET,download_non_ip,🎯  节点选择
+  - RULE-SET,download_domainset,节点选择
+  - RULE-SET,download_non_ip,节点选择
   # 通用规则
   - GEOSITE,CN,DIRECT
-  - GEOSITE,geolocation-!cn,🎯  节点选择
+  - GEOSITE,geolocation-!cn,节点选择
   ## IP 类规则
   # 局域网
   - GEOIP,PRIVATE,DIRECT,no-resolve
@@ -409,4 +420,4 @@ rules:
   # 通用规则
   - GEOIP,CN,DIRECT,no-resolve
   # 兜底
-  - MATCH,🎯  节点选择
+  - MATCH,节点选择
