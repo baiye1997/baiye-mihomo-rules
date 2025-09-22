@@ -176,7 +176,7 @@ proxy-providers:
     override:
       additional-prefix: "[替换显示A] "
   Node-2:
-    url: "替换订阅链接1"
+    url: "替换订阅链接2"
     <<: *NodeParam
     path: './proxy_provider/providers-2.yaml'
     override:
@@ -352,5 +352,6 @@ rules:
   - GEOIP,cn,DIRECT,no-resolve # 中国大陆 IP 直连
 
   - MATCH,🚀 节点选择 # 兜底规则
+
 
 
