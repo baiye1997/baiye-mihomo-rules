@@ -1,6 +1,6 @@
-name: Release (@latest) & Purge CDN on rules/icons/config change
+name: "Release & Purge CDN on rules/icons/config change"
 
-on:
+"on":
   push:
     paths:
       - "rules/ip/**"
@@ -24,6 +24,13 @@ jobs:
   release_purge:
     runs-on: ubuntu-latest
     steps:
+      - name: Show trigger info
+        if: always()
+        run: |
+          echo "Head: ${{ github.sha }}"
+          echo "Ref:  ${{ github.ref }}"
+          echo "Event: ${{ github.event_name }}"
+
       - name: Debounce wait
         run: sleep 90
 
@@ -38,10 +45,13 @@ jobs:
         shell: bash
         run: |
           LASTMSG="$(git log -1 --pretty=%s)"
+          echo "Last commit message: $LASTMSG"
           if echo "$LASTMSG" | grep -qE '^chore\(ci\): bump icon cache-buster \?v='; then
             echo "skip=true" >> $GITHUB_OUTPUT
+            echo "Decision: self-skip = true"
           else
             echo "skip=false" >> $GITHUB_OUTPUT
+            echo "Decision: self-skip = false"
           fi
 
       - name: Detect changed files (targets & flags)
@@ -88,10 +98,8 @@ jobs:
 import sys, re, pathlib, urllib.parse
 SHORT = sys.argv[1]
 
-# 抓取行内所有 URL（不限定域名，兼容 raw/jsDelivr 等）
 url_pat = re.compile(r'https?://[^\s"\'<>]+')
 
-# 仅对 icons/*.png|jpg|jpeg|webp|svg 生效
 def is_icon_path(parsed):
     path = parsed.path or ""
     return re.search(r'/icons/[^/]+\.(?:png|jpe?g|webp|svg)$', path, re.I) is not None
@@ -103,7 +111,6 @@ def bump_icon_url(u):
         return u
     if not is_icon_path(p):
         return u
-    # 保留原有 query，但把 v= 覆盖为 SHORT
     q = urllib.parse.parse_qsl(p.query, keep_blank_values=True)
     q = [(k, v) for (k, v) in q if k.lower() != 'v']
     q.append(('v', SHORT))
@@ -117,7 +124,6 @@ for path in pathlib.Path("config").rglob("*.yml*"):
     if ns != s:
         path.write_text(ns, encoding="utf-8")
         changed = True
-# 退出码为 0；是否提交交给外层 git diff 判断
 PY
 
           if ! git diff --quiet; then
@@ -130,7 +136,6 @@ PY
             echo "No icon URL changes in config."
           fi
 
-      # 现在 HEAD 可能因为上一步提交而前进了；用最新 HEAD 生成带短 SHA 的 tag，确保 @latest 指向包含所有变更的快照
       - name: Compute version tag (UTC + short HEAD)
         if: steps.selfskip.outputs.skip == 'false'
         id: ver
@@ -140,7 +145,6 @@ PY
           SHORT="$(git rev-parse --short=7 HEAD)"
           echo "tag=v$(date -u +%Y.%m.%d-%H%M)-${SHORT}" >> $GITHUB_OUTPUT
 
-      # 只要 rules/icons 有变更，或 config 有变更（比如你只改了模板），就发版
       - name: Create tag
         if: steps.selfskip.outputs.skip == 'false' && (steps.chg.outputs.has_targets == 'true' || steps.chg.outputs.config_changed == 'true')
         shell: bash
