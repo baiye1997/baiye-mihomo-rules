@@ -76,7 +76,7 @@ function patchGist({ gistId, token, filename, content }) {
     .replace(/替换订阅链接1/g, sub1)
     .replace(/替换订阅链接2/g, sub2)
     .replace(/\[显示名称A可修改\]/g, '[Haita]')
-    .replace(/\[显示名称A可修改\]/g, '[BoostNet]');
+    .replace(/\[显示名称B可修改\]/g, '[BoostNet]');
 
   fs.writeFileSync('baiye-multiple.generated.yaml', out, 'utf8');
 
