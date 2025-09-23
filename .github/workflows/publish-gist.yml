@@ -1,28 +1,48 @@
 name: Publish Gist Personal
 
 on:
-  push:
-    paths:
-      - "config/baiye-multiple.yaml"   # <- 触发路径改这里
+  workflow_run:
+    workflows: ["release_purge"]   # 上游工作流名
+    types: [completed]
   workflow_dispatch: {}
-  
+
 concurrency:
   group: build-and-publish
   cancel-in-progress: true
-  
+
 jobs:
   build:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repo
+      - name: Checkout repo at triggering commit
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+          fetch-depth: 2
+
+      # 只在目标文件确实被修改时继续
+      - name: Skip if config not changed
+        id: chk
+        run: |
+          set -euo pipefail
+          CHANGED=$(git show --name-only --pretty="" "${GITHUB_SHA}" | grep -x "config/baiye-multiple.yaml" || true)
+          if [ -z "$CHANGED" ]; then
+            echo "changed=false" >> $GITHUB_OUTPUT
+            echo "No change in config/baiye-multiple.yaml; skip."
+          else
+            echo "changed=true" >> $GITHUB_OUTPUT
+            echo "config/baiye-multiple.yaml changed; proceed."
+          fi
 
       - name: Setup Node
+        if: steps.chk.outputs.changed == 'true'
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
       - name: Build & Publish to Gist
+        if: steps.chk.outputs.changed == 'true'
         env:
           SUB_URL_1: ${{ secrets.SUB_URL_1 }}
           SUB_URL_2: ${{ secrets.SUB_URL_2 }}
@@ -30,12 +50,13 @@ jobs:
           GIST_ID: ${{ secrets.GIST_ID }}
           GIST_FILE_NAME: baiye-multiple.yaml
           CONFIG_PATH: config/baiye-multiple.yaml
-          COMMIT_SHORT: ${{ github.sha || '' }}  # 传当前提交
+          COMMIT_SHORT: ${{ github.event.workflow_run.head_sha }}
         run: |
           export COMMIT_SHORT="${COMMIT_SHORT:0:7}"
           node .github/scripts/build-and-publish.js
 
       - name: Upload artifact (optional)
+        if: steps.chk.outputs.changed == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: built-config
