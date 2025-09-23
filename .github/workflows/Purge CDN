@@ -1,0 +1,101 @@
+name: Purge CDN
+
+on:
+  push:
+    paths:
+      - "icons/**"
+      - "rules/ip/**"
+      - "rules/non_ip/**"
+      - "rules/domainset/**"
+      - "rules/yaml/**"
+  workflow_dispatch:
+    inputs:
+      force_purge:
+        description: "即使没有匹配到目标文件，也执行全量 purge（icons + rules）"
+        type: boolean
+        default: false
+
+concurrency:
+  group: purge-icons-rules
+  cancel-in-progress: true
+
+# 不需要写权限（不打 tag/不推送）
+permissions: {}
+
+jobs:
+  purge:
+    runs-on: ubuntu-latest
+    env:
+      FORCE_PURGE: ${{ inputs.force_purge && 'true' || 'false' }}
+    steps:
+      - name: Show trigger info
+        if: always()
+        run: |
+          echo "Head: ${{ github.sha }}"
+          echo "Ref:  ${{ github.ref }}"
+          echo "Event: ${{ github.event_name }}"
+          echo "FORCE_PURGE=${FORCE_PURGE}"
+
+      - name: Debounce wait
+        run: sleep 10
+
+      - name: Checkout (for diff / file listing)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Collect changed targets (icons & rules)
+        id: chg
+        shell: bash
+        run: |
+          set -euo pipefail
+          BEFORE="${{ github.event.before }}"
+          if [ -z "${BEFORE}" ]; then BEFORE="$(git rev-parse HEAD^ || echo '')"; fi
+
+          # 默认：根据本次提交差异收集文件
+          if [ -n "${BEFORE}" ]; then
+            git diff --name-only "${BEFORE}" "${{ github.sha }}" > changed.all.txt
+          else
+            git show --name-only --pretty="" "${{ github.sha }}" > changed.all.txt
+          fi
+
+          # 仅限 icons 和 rules
+          grep -E '^(icons/|rules/(ip|non_ip|domainset|yaml)/)' changed.all.txt | sort -u > changed.targets.txt || true
+
+          HAS_TARGETS=false
+          [ -s changed.targets.txt ] && HAS_TARGETS=true
+
+          # 手动全量：覆盖为仓库中所有 icons & rules
+          if [ "${FORCE_PURGE}" = "true" ]; then
+            { git ls-files \
+                "icons/*" \
+                "rules/ip/**" "rules/non_ip/**" "rules/domainset/**" "rules/yaml/**" \
+                || true; } | sort -u > changed.targets.txt
+            [ -s changed.targets.txt ] && HAS_TARGETS=true
+          fi
+
+          echo "has_targets=${HAS_TARGETS}" >> "$GITHUB_OUTPUT"
+
+          echo "== Changed targets to purge =="
+          if [ -s changed.targets.txt ]; then
+            cat changed.targets.txt
+          else
+            echo "(none)"
+          fi
+
+      - name: Purge jsDelivr @main (icons & rules)
+        if: steps.chg.outputs.has_targets == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          REPO="${{ github.repository }}"
+          while read -r p; do
+            [ -n "$p" ] || continue
+            URL="https://purge.jsdelivr.net/gh/${REPO}@main/${p}"
+            echo "Purging $URL"
+            curl -fsS "$URL" >/dev/null || true
+          done < changed.targets.txt
+
+      - name: Nothing to purge
+        if: steps.chg.outputs.has_targets != 'true'
+        run: echo "No icons/rules changes detected and no force purge requested."
