@@ -221,13 +221,13 @@ proxy-groups:
       - ♻️ 智能选择
       - 👆 手动选择
       - DIRECT
-    icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/choice.png?v=4075fbb"
+    icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/choice.png"
 
   # 手动 / Auto 顶层
   - name: 👆 手动选择
     <<: *Select
     filter: *FilterAll
-    icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/select.png?v=4075fbb"
+    icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/select.png"
 
   - name: ♻️ 智能选择
     type: url-test
@@ -235,7 +235,7 @@ proxy-groups:
     url: http://connectivitycheck.platform.hicloud.com/generate_204
     interval: 300
     tolerance: 50
-    icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/auto.png?v=4075fbb"
+    icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/auto.png"
 
 # 应用分组
   - name: 🧩 AI  服务
