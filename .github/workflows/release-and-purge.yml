@@ -121,6 +121,7 @@ jobs:
 
           python - "$SHORT" <<'PY'
           import sys, re, pathlib, urllib.parse
+
           SHORT = sys.argv[1]
 
           # 宽松匹配 URL，然后在回调里精确过滤
@@ -148,33 +149,31 @@ jobs:
               new_u = urllib.parse.urlunsplit((p.scheme, p.netloc, p.path, new_q, p.fragment))
               return new_u, (new_u != u)
 
-          hits = 0
-          changed_total = 0
+          counts = {"hits": 0, "changed_total": 0}
 
           for path in pathlib.Path("config").rglob("*.yml*"):
               s = path.read_text(encoding="utf-8")
-              changed_here = 0
+              changed_here = {"n": 0}
 
               def repl(m):
-                  nonlocal hits, changed_total, changed_here
                   url = m.group(0)
                   if not is_icon_url(url):
                       return url
-                  hits += 1
+                  counts["hits"] += 1
                   new_u, changed = bump_icon(url, SHORT)
                   if changed:
-                      changed_total += 1
-                      changed_here += 1
+                      counts["changed_total"] += 1
+                      changed_here["n"] += 1
                   return new_u
 
               ns = url_pat.sub(repl, s)
               if ns != s:
                   path.write_text(ns, encoding="utf-8")
-                  print(f"[icon-bump] changed {path} (+{changed_here})")
+                  print(f"[icon-bump] changed {path} (+{changed_here['n']})")
               else:
                   print(f"[icon-bump] no change in {path}")
 
-          print(f"[icon-bump] summary: url_hits={hits}, replacements={changed_total}")
+          print(f"[icon-bump] summary: url_hits={counts['hits']}, replacements={counts['changed_total']}")
           PY
 
           echo "[preview-after] icons URLs in config:"
