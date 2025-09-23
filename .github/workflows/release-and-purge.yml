@@ -10,7 +10,16 @@ on:
       - "icons/**"
       - "config/*.yaml"
       - "config/*.yml"
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      force_bump_icons:
+        description: "即使没有 icons 变更，也为 config 里的 icon URL 追加 ?v"
+        type: boolean
+        default: false
+      force_purge:
+        description: "即使没有匹配到目标文件，也执行全量 purge（icons + rules + config）"
+        type: boolean
+        default: false
 
 concurrency:
   group: release-and-purge
@@ -22,6 +31,9 @@ permissions:
 jobs:
   release_purge:
     runs-on: ubuntu-latest
+    env:
+      FORCE_BUMP_ICONS: ${{ inputs.force_bump_icons && 'true' || 'false' }}
+      FORCE_PURGE: ${{ inputs.force_purge && 'true' || 'false' }}
     steps:
       - name: Show trigger info
         if: always()
@@ -29,6 +41,8 @@ jobs:
           echo "Head: ${{ github.sha }}"
           echo "Ref:  ${{ github.ref }}"
           echo "Event: ${{ github.event_name }}"
+          echo "FORCE_BUMP_ICONS=${FORCE_BUMP_ICONS}"
+          echo "FORCE_PURGE=${FORCE_PURGE}"
 
       - name: Debounce wait
         run: sleep 30
@@ -67,13 +81,23 @@ jobs:
             git show --name-only --pretty="" "${{ github.sha }}" > changed.all.txt
           fi
 
-          # 仅供精准 purge 的目标（rules/icons）
           grep -E '^(icons/|rules/(ip|non_ip|domainset|yaml)/)' changed.all.txt | sort -u > changed.targets.txt || true
 
-          # 标记 flags
-          if grep -qE '^icons/' changed.all.txt; then echo "icons_changed=true" >> $GITHUB_OUTPUT; else echo "icons_changed=false" >> $GITHUB_OUTPUT; fi
-          if grep -qE '^config/.*\.ya?ml$' changed.all.txt; then echo "config_changed=true" >> $GITHUB_OUTPUT; else echo "config_changed=false" >> $GITHUB_OUTPUT; fi
-          if [ -s changed.targets.txt ]; then echo "has_targets=true" >> $GITHUB_OUTPUT; else echo "has_targets=false" >> $GITHUB_OUTPUT; fi
+          # 变更/强制 标记
+          ICONS_CHANGED=false
+          CONFIG_CHANGED=false
+          HAS_TARGETS=false
+          grep -qE '^icons/' changed.all.txt && ICONS_CHANGED=true
+          grep -qE '^config/.*\.ya?ml$' changed.all.txt && CONFIG_CHANGED=true
+          [ -s changed.targets.txt ] && HAS_TARGETS=true
+
+          # 接受手动强制
+          if [ "${FORCE_BUMP_ICONS}" = "true" ]; then ICONS_CHANGED=true; fi
+          if [ "${FORCE_PURGE}" = "true" ]; then HAS_TARGETS=true; fi
+
+          echo "icons_changed=${ICONS_CHANGED}"   >> $GITHUB_OUTPUT
+          echo "config_changed=${CONFIG_CHANGED}" >> $GITHUB_OUTPUT
+          echo "has_targets=${HAS_TARGETS}"       >> $GITHUB_OUTPUT
 
           {
             echo "body<<EOF"
@@ -84,7 +108,6 @@ jobs:
 
           echo "Changed targets:"; cat changed.targets.txt || true
 
-      # 仅当 icons 有变更时，才在 config 里为 icon URL 追加/更新 ?v=<short>
       - name: Bump icon URLs in config (?v=<short>) on icons change (with logs)
         if: steps.selfskip.outputs.skip == 'false' && steps.chg.outputs.icons_changed == 'true'
         shell: bash
@@ -93,11 +116,11 @@ jobs:
           SHORT="$(git rev-parse --short=7 HEAD)"
           echo "SHORT for this run = $SHORT"
 
-          # 预览替换前
+          # 预览替换前：列出 config 中的 icons URL
           echo "[preview-before] icons URLs in config:"
           grep -RnoE 'https?://[^"'"'"'<>[:space:]]+/icons/[^"'"'"'<>[:space:]]+\.(png|jpe?g|webp|svg)(\?[^"'"'"'<>[:space:]]*)?' config || true
 
-          python - <<'PY' "$SHORT"
+          python - "$SHORT" <<'PY'
           import sys, re, pathlib, urllib.parse
           SHORT = sys.argv[1]
 
@@ -107,7 +130,7 @@ jobs:
               path = parsed.path or ""
               return re.search(r'/icons/[^/]+\.(?:png|jpe?g|webp|svg)$', path, re.I) is not None
 
-          def bump_icon_url(u):
+          def bump_icon_url(u, short):
               try:
                   p = urllib.parse.urlsplit(u)
               except Exception:
@@ -116,31 +139,34 @@ jobs:
                   return u, False
               q = urllib.parse.parse_qsl(p.query, keep_blank_values=True)
               q = [(k, v) for (k, v) in q if k.lower() != 'v']
-              q.append(('v', SHORT))
+              q.append(('v', short))
               new_q = urllib.parse.urlencode(q)
               new_u = urllib.parse.urlunsplit((p.scheme, p.netloc, p.path, new_q, p.fragment))
               return new_u, (new_u != u)
 
-          total_hits = 0
-          total_changed = 0
+          # 计数用字典，避免 nonlocal 报错
+          counters = {"hits": 0, "changed": 0}
+
           for path in pathlib.Path("config").rglob("*.yml*"):
               s = path.read_text(encoding="utf-8")
-              changed_here = 0
-              def repl(m):
-                  nonlocal total_hits, total_changed, changed_here
-                  new, changed = bump_icon_url(m.group(0))
-                  total_hits += 1
+              changed_here = [0]  # 用列表包装成可变对象
+
+              def repl(m, counters=counters, changed_here=changed_here):
+                  counters["hits"] += 1
+                  new, changed = bump_icon_url(m.group(0), SHORT)
                   if changed:
-                      total_changed += 1
-                      changed_here += 1
+                      counters["changed"] += 1
+                      changed_here[0] += 1
                   return new
+
               ns = url_pat.sub(repl, s)
               if ns != s:
                   path.write_text(ns, encoding="utf-8")
-                  print(f"[icon-bump] changed {path} (+{changed_here})")
+                  print(f"[icon-bump] changed {path} (+{changed_here[0]})")
               else:
                   print(f"[icon-bump] no change in {path}")
-          print(f"[icon-bump] summary: url_hits={total_hits}, replacements={total_changed}")
+
+          print(f"[icon-bump] summary: url_hits={counters['hits']}, replacements={counters['changed']}")
           PY
 
           echo "[preview-after] icons URLs in config:"
@@ -193,6 +219,10 @@ jobs:
         run: |
           set -euo pipefail
           REPO="${{ github.repository }}"
+          # 如果是强制 purge，构造全量目标列表
+          if [ "${FORCE_PURGE}" = "true" ]; then
+            { git ls-files "icons/*" "rules/ip/**" "rules/non_ip/**" "rules/domainset/**" "rules/yaml/**" || true; } | sort -u > changed.targets.txt
+          fi
           while read -r p; do
             [ -n "$p" ] || continue
             for REF in latest main; do
