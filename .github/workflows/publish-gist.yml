@@ -126,8 +126,8 @@ jobs:
           GIST_ID_MINI: ${{ secrets.GIST_ID_MINI }}
           CONFIG_PATH: config/baiye-multiple.yaml
           GIST_FILE_MULTIPLE: baiye-multiple.yaml
-          GIST_FILE_MINI: BaiyeMini.yaml
-          COMMIT_SHORT: ${{ steps.sha.outputs.sha }}
+          GIST_FILE_MINI: baiye-mini.yaml
+          COMMIT_SHORT: ${{ github.sha }}
         run: |
           export COMMIT_SHORT="${COMMIT_SHORT:0:7}"
           node - <<'NODE'
@@ -154,11 +154,11 @@ jobs:
             console.log('✅ multiple →', r1?.files?.[process.env.GIST_FILE_MULTIPLE||'baiye-multiple.yaml']?.raw_url);
 
             const outMini=outMultiple.replace(/geodata-loader:\s*standard/g,'geodata-loader: memconservative');
-            fs.writeFileSync('BaiyeMini.generated.yaml',outMini,'utf8');
-            const r2=await patchGist({gistId:idMini, token, filename:process.env.GIST_FILE_MINI||'BaiyeMini.yaml', content:outMini});
-            console.log('✅ mini →', r2?.files?.[process.env.GIST_FILE_MINI||'BaiyeMini.yaml']?.raw_url);
+            fs.writeFileSync('baiye-mini.generated.yaml',outMini,'utf8');
+            const r2=await patchGist({gistId:idMini, token, filename:process.env.GIST_FILE_MINI||'baiye-mini.yaml', content:outMini});
+            console.log('✅ mini →', r2?.files?.[process.env.GIST_FILE_MINI||'baiye-mini.yaml']?.raw_url);
 
-            console.log(`::notice title=Gist Updated::${r1?.files?.[process.env.GIST_FILE_MULTIPLE||'baiye-multiple.yaml']?.raw_url}\n${r2?.files?.[process.env.GIST_FILE_MINI||'BaiyeMini.yaml']?.raw_url}`);
+            console.log(`::notice title=Gist Updated::${r1?.files?.[process.env.GIST_FILE_MULTIPLE||'baiye-multiple.yaml']?.raw_url}\n${r2?.files?.[process.env.GIST_FILE_MINI||'baiye-mini.yaml']?.raw_url}`);
           })().catch(e=>{console.error('❌',e.message||e);process.exit(1)});
           NODE
 
@@ -170,7 +170,7 @@ jobs:
           GIST_ID_SINGLE: ${{ secrets.GIST_ID_SINGLE }}
           CONFIG_PATH: config/baiye-single.yaml
           GIST_FILE_SINGLE: baiye-single.yaml
-          COMMIT_SHORT: ${{ steps.sha.outputs.sha }}
+          COMMIT_SHORT: ${{ github.sha }}
         run: |
           export COMMIT_SHORT="${COMMIT_SHORT:0:7}"
           node - <<'NODE'
@@ -201,5 +201,5 @@ jobs:
           name: built-configs
           path: |
             baiye-multiple.generated.yaml
-            BaiyeMini.generated.yaml
+            baiye-mini.generated.yaml
             baiye-single.generated.yaml
