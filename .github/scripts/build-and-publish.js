@@ -60,8 +60,8 @@ function patchGist({ gistId, token, filename, content }) {
   const out = raw
     .replace(/替换订阅链接1/g, sub1)
     .replace(/替换订阅链接2/g, sub2)
-    .replace(/\[替换显示A\]/g, '[Haita]')
-    .replace(/\[替换显示B\]/g, '[BoostNet]');
+    .replace(/\[显示名称A可修改\]/g, '[Haita]')
+    .replace(/\[显示名称A可修改\]/g, '[BoostNet]');
 
   fs.writeFileSync('baiye-multiple.generated.yaml', out, 'utf8');
 
