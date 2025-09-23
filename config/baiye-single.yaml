@@ -214,13 +214,13 @@ proxy-groups:
       - ♻️ 智能选择
       - 👆 手动选择
       - DIRECT
-    icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/choice.png?v=4075fbb"
+    icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/choice.png"
 
   # 手动 / Auto 顶层
   - name: 👆 手动选择
     <<: *Select
     filter: *FilterAll
-    icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/select.png?v=4075fbb"
+    icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/select.png"
 
   - name: ♻️ 智能选择
     type: url-test
@@ -228,43 +228,43 @@ proxy-groups:
     url: http://connectivitycheck.platform.hicloud.com/generate_204
     interval: 300
     tolerance: 50
-    icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/auto.png?v=4075fbb"
+    icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/auto.png"
 
 # 应用分组
-  - name: 🍼 AI  服务
+  - name: 🧩 AI  服务
     type: select
     proxies: *AppRegionWithDirect
-    icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/openai.png?v=4075fbb"
-
-  - name: 🍎 苹果服务
-    type: select
-    proxies: *AppRegionWithDirect
-    icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/apple.png?v=4075fbb"
-
-  - name: Ⓜ️ 微软服务
-    type: select
-    proxies: *AppRegionWithDirect
-    icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/microsoft.png?v=4075fbb"
-
-  - name: 🎮 游戏服务
-    type: select
-    proxies: *AppRegionWithDirect
-    icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/game.png?v=4075fbb"
+    icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/openai.png"
 
   - name: ☁️ Onedrive
     type: select
     proxies: *AppRegionWithDirect
-    icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/onedrive.png?v=4075fbb"
-
-  - name: 📺 视频规则
-    type: select
-    proxies: *FallbackWithDirect
-    icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/netflix.png?v=4075fbb"
+    icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/onedrive.png"
 
   - name: ✈️ 电报信息
     type: select
     proxies: *AppRegionWithDirect
-    icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/telegram.png?v=4075fbb"
+    icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/telegram.png"
+
+  - name: Ⓜ️ 微软服务
+    type: select
+    proxies: *AppRegionWithDirect
+    icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/microsoft.png"
+    
+  - name: 🍎 苹果服务
+    type: select
+    proxies: *AppRegionWithDirect
+    icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/apple.png"
+    
+  - name: 📺 视频规则
+    type: select
+    proxies: *FallbackWithDirect
+    icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/netflix.png"
+
+  - name: 🎮 游戏服务
+    type: select
+    proxies: *AppRegionWithDirect
+    icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/game.png"
 
 # Auto 
   # 择优节点 - 按地区
@@ -316,12 +316,12 @@ rules:
   - GEOSITE,private,DIRECT # 局域网/内网直连
   - RULE-SET,FuckAD,REJECT # 广告拦截
   - DOMAIN-SUFFIX,bing.com,DIRECT # Bing 中国直连
-  - DOMAIN-SUFFIX,oaiusercontent.com,🍼 AI  服务 # OpenAI 图片/文件域名
-  - DOMAIN-SUFFIX,oaistatic.com,🍼 AI  服务 # OpenAI 静态资源
+  - DOMAIN-SUFFIX,oaiusercontent.com,🧩 AI  服务 # OpenAI 图片/文件域名
+  - DOMAIN-SUFFIX,oaistatic.com,🧩 AI  服务 # OpenAI 静态资源
   - RULE-SET,cdn_domainset,🚀 节点选择 # 通用 CDN 域名
   - RULE-SET,cdn_non_ip,🚀 节点选择 # 通用 CDN 非 IP
   - RULE-SET,stream_non_ip,📺 视频规则 # 流媒体域名
-  - RULE-SET,ai_non_ip,🍼 AI  服务 # AI 服务域名
+  - RULE-SET,ai_non_ip,🧩 AI  服务 # AI 服务域名
   - GEOSITE,category-games@cn,DIRECT # 国内游戏平台直连
   - RULE-SET,Game,🎮 游戏服务 # 国际游戏平台
   - GEOSITE,google-cn,DIRECT # 谷歌中国服务直连
