@@ -240,31 +240,26 @@ proxy-groups:
     type: select
     proxies: *AppRegionWithDirect
     icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/onedrive.png"
-
-  - name: ✈️ 电报信息
+ 
+  - name: Ⓜ️ 微软服务
     type: select
     proxies: *AppRegionWithDirect
-    icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/telegram.png"
-  
+    icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/microsoft.png"
+
   - name: 🍎 苹果服务
     type: select
     proxies: *AppRegionWithDirect
     icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/apple.png"
 
-  - name: Ⓜ️ 微软服务
-    type: select
-    proxies: *AppRegionWithDirect
-    icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/microsoft.png"
-   
-  - name: 📺 视频规则
-    type: select
-    proxies: *FallbackWithDirect
-    icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/netflix.png"
- 
   - name: 🎮 游戏服务
     type: select
     proxies: *AppRegionWithDirect
     icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/game.png"
+    
+  - name: 📺 视频规则
+    type: select
+    proxies: *FallbackWithDirect
+    icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/netflix.png"
   
 # Auto 
   # 择优节点 - 按地区
@@ -341,6 +336,6 @@ rules:
   ## IP 类规则
   - GEOIP,private,DIRECT,no-resolve # 局域网 IP 直连
   - RULE-SET,stream_ip,📺 视频规则,no-resolve # 流媒体 IP
-  - RULE-SET,telegram_ip,✈️ 电报信息,no-resolve # Telegram IP
+  - RULE-SET,telegram_ip,🚀 节点选择,no-resolve # Telegram IP
   - GEOIP,cn,DIRECT,no-resolve # 中国大陆 IP 直连
   - MATCH,🚀 节点选择 # 兜底规则
