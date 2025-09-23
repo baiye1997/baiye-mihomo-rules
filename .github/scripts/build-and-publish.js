@@ -1,9 +1,7 @@
-// 环境变量：SUB_URL_1, SUB_URL_2, GIST_TOKEN, GIST_ID, GIST_FILE_NAME, CONFIG_PATH, COMMIT_SHORT
-// 用法：node .github/scripts/build-and-publish.js
-
 const fs = require('fs');
 const https = require('https');
 const path = require('path');
+
 const short = (process.env.COMMIT_SHORT || 'dev').slice(0, 7);
 
 function patchGist({ gistId, token, filename, content }) {
@@ -45,6 +43,8 @@ function patchGist({ gistId, token, filename, content }) {
   const gistToken = process.env.GIST_TOKEN;
   const gistId = process.env.GIST_ID;
   const gistFile = process.env.GIST_FILE_NAME || 'baiye-multiple.yaml';
+  const gistFileMini = 'BaiyeMini.yaml'; // Gist 里已经存在的文件
+
   if (!sub1 || !sub2) throw new Error('Missing SUB_URL_1 or SUB_URL_2');
   if (!gistToken || !gistId) throw new Error('Missing GIST_TOKEN or GIST_ID');
 
@@ -54,9 +54,8 @@ function patchGist({ gistId, token, filename, content }) {
 
   const raw = fs.readFileSync(srcPath, 'utf8');
 
-  // 仅对 /icons/*.(png|jpg|jpeg|webp|svg) 的 URL 覆盖/追加 v=short；保留其它 query 参数
+  // 给 icons 链接加短哈希
   function bumpIconsV(s) {
-    // 匹配整条 URL（含可选 query）
     const re = /(https?:\/\/[^\s"'<>]+\/icons\/[^\s"'<>]+\.(?:png|jpe?g|webp|svg)(?:\?[^\s"'<>]*)?)/gi;
     return s.replace(re, (full) => {
       try {
@@ -64,13 +63,12 @@ function patchGist({ gistId, token, filename, content }) {
         u.searchParams.set('v', short);
         return u.toString();
       } catch {
-        // 解析失败就原样返回，避免误伤
         return full;
       }
     });
   }
 
-  // 先补 icon 的 v，再做占位符替换
+  // 1. 生成 multiple
   const withIconV = bumpIconsV(raw);
   const out = withIconV
     .replace(/替换订阅链接1/g, sub1)
@@ -80,12 +78,19 @@ function patchGist({ gistId, token, filename, content }) {
 
   fs.writeFileSync('baiye-multiple.generated.yaml', out, 'utf8');
 
-  const res = await patchGist({ gistId, token: gistToken, filename: gistFile, content: out });
+  const res1 = await patchGist({ gistId, token: gistToken, filename: gistFile, content: out });
+  const file1 = res1?.files?.[gistFile];
+  console.log('✅ Gist updated (multiple). Raw URL:', file1?.raw_url);
 
-  const file = res?.files?.[gistFile];
-  const rawUrl = file?.raw_url || '(no raw_url returned)';
-  console.log('✅ Gist updated. Raw URL:', rawUrl);
-  console.log(`::notice title=Gist Raw URL::${rawUrl}`);
+  // 2. 生成 Mini 版本（只改 geodata-loader）
+  const outMini = out.replace(/geodata-loader:\s*standard/g, 'geodata-loader: memconservative');
+  fs.writeFileSync('BaiyeMini.generated.yaml', outMini, 'utf8');
+
+  const res2 = await patchGist({ gistId, token: gistToken, filename: gistFileMini, content: outMini });
+  const file2 = res2?.files?.[gistFileMini];
+  console.log('✅ Gist updated (mini). Raw URL:', file2?.raw_url);
+
+  console.log(`::notice title=Gist Raw URLs::${file1?.raw_url}\n${file2?.raw_url}`);
 })().catch((err) => {
   console.error('❌', err.message || err);
   process.exit(1);
