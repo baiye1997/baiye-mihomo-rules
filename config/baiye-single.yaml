@@ -214,13 +214,13 @@ proxy-groups:
       - ♻️ 智能选择
       - 👆 手动选择
       - DIRECT
-    icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@latest/icons/choice.png?v=4075fbb"
+    icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/choice.png?v=4075fbb"
 
   # 手动 / Auto 顶层
   - name: 👆 手动选择
     <<: *Select
     filter: *FilterAll
-    icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@latest/icons/select.png?v=4075fbb"
+    icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/select.png?v=4075fbb"
 
   - name: ♻️ 智能选择
     type: url-test
@@ -228,43 +228,43 @@ proxy-groups:
     url: http://connectivitycheck.platform.hicloud.com/generate_204
     interval: 300
     tolerance: 50
-    icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@latest/icons/auto.png?v=4075fbb"
+    icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/auto.png?v=4075fbb"
 
 # 应用分组
   - name: 🍼 AI  服务
     type: select
     proxies: *AppRegionWithDirect
-    icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@latest/icons/openai.png?v=4075fbb"
+    icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/openai.png?v=4075fbb"
 
   - name: 🍎 苹果服务
     type: select
     proxies: *AppRegionWithDirect
-    icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@latest/icons/apple.png?v=4075fbb"
+    icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/apple.png?v=4075fbb"
 
   - name: Ⓜ️ 微软服务
     type: select
     proxies: *AppRegionWithDirect
-    icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@latest/icons/microsoft.png?v=4075fbb"
+    icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/microsoft.png?v=4075fbb"
 
   - name: 🎮 游戏服务
     type: select
     proxies: *AppRegionWithDirect
-    icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@latest/icons/game.png?v=4075fbb"
+    icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/game.png?v=4075fbb"
 
   - name: ☁️ Onedrive
     type: select
     proxies: *AppRegionWithDirect
-    icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@latest/icons/onedrive.png?v=4075fbb"
+    icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/onedrive.png?v=4075fbb"
 
   - name: 📺 视频规则
     type: select
     proxies: *FallbackWithDirect
-    icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@latest/icons/netflix.png?v=4075fbb"
+    icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/netflix.png?v=4075fbb"
 
   - name: ✈️ 电报信息
     type: select
     proxies: *AppRegionWithDirect
-    icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@latest/icons/telegram.png?v=4075fbb"
+    icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/telegram.png?v=4075fbb"
 
 # Auto 
   # 择优节点 - 按地区
@@ -294,21 +294,21 @@ RS_cls: &RS_cls {type: http, behavior: classical, interval: 43200, format: text,
 RS_dom: &RS_dom {type: http, behavior: domain,    interval: 43200, format: text, proxy: 🚀 节点选择}
 # 规则集
 rule-providers:
-  FuckAD:                {<<: *RS_dom, format: yaml, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@latest/rules/yaml/fuckAds.yaml,      path: ./rules/yaml/fuckAds.yaml}
-  cdn_domainset:         {<<: *RS_dom, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@latest/rules/domainset/cdn.txt,                   path: ./rules/domainset/cdn.txt}
-  cdn_non_ip:            {<<: *RS_cls, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@latest/rules/non_ip/cdn.txt,                      path: ./rules/non_ip/cdn.txt}
-  Game:                  {<<: *RS_cls, format: yaml, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@latest/rules/yaml/Game.yaml,       path: ./rules/yaml/Game.yaml}
-  stream_non_ip:         {<<: *RS_cls, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@latest/rules/non_ip/stream.txt,                   path: ./rules/non_ip/stream.txt}
-  stream_ip:             {<<: *RS_cls, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@latest/rules/ip/stream.txt,                       path: ./rules/ip/stream.txt}
-  ai_non_ip:             {<<: *RS_cls, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@latest/rules/non_ip/ai.txt,                       path: ./rules/non_ip/ai.txt}
-  telegram_ip:           {<<: *RS_cls, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@latest/rules/ip/telegram.txt,                     path: ./rules/ip/telegram.txt}
-  apple_cdn:             {<<: *RS_dom, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@latest/rules/domainset/apple_cdn.txt,             path: ./rules/domainset/apple_cdn.txt}
-  apple_services:        {<<: *RS_cls, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@latest/rules/non_ip/apple_services.txt,           path: ./rules/non_ip/apple_services.txt}
-  apple_cn_non_ip:       {<<: *RS_cls, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@latest/rules/non_ip/apple_cn.txt,                 path: ./rules/non_ip/apple_cn.txt}
-  microsoft_cdn_non_ip:  {<<: *RS_cls, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@latest/rules/non_ip/microsoft_cdn.txt,            path: ./rules/non_ip/microsoft_cdn.txt}
-  microsoft_non_ip:      {<<: *RS_cls, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@latest/rules/non_ip/microsoft.txt,                path: ./rules/non_ip/microsoft.txt}
-  download_domainset:    {<<: *RS_dom, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@latest/rules/domainset/download.txt,              path: ./rules/domainset/download.txt}
-  download_non_ip:       {<<: *RS_cls, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@latest/rules/non_ip/download.txt,                 path: ./rules/non_ip/download.txt}
+  FuckAD:                {<<: *RS_dom, format: yaml, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/yaml/fuckAds.yaml,      path: ./rules/yaml/fuckAds.yaml}
+  cdn_domainset:         {<<: *RS_dom, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/domainset/cdn.txt,                   path: ./rules/domainset/cdn.txt}
+  cdn_non_ip:            {<<: *RS_cls, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/non_ip/cdn.txt,                      path: ./rules/non_ip/cdn.txt}
+  Game:                  {<<: *RS_cls, format: yaml, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/yaml/Game.yaml,       path: ./rules/yaml/Game.yaml}
+  stream_non_ip:         {<<: *RS_cls, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/non_ip/stream.txt,                   path: ./rules/non_ip/stream.txt}
+  stream_ip:             {<<: *RS_cls, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/ip/stream.txt,                       path: ./rules/ip/stream.txt}
+  ai_non_ip:             {<<: *RS_cls, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/non_ip/ai.txt,                       path: ./rules/non_ip/ai.txt}
+  telegram_ip:           {<<: *RS_cls, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/ip/telegram.txt,                     path: ./rules/ip/telegram.txt}
+  apple_cdn:             {<<: *RS_dom, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/domainset/apple_cdn.txt,             path: ./rules/domainset/apple_cdn.txt}
+  apple_services:        {<<: *RS_cls, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/non_ip/apple_services.txt,           path: ./rules/non_ip/apple_services.txt}
+  apple_cn_non_ip:       {<<: *RS_cls, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/non_ip/apple_cn.txt,                 path: ./rules/non_ip/apple_cn.txt}
+  microsoft_cdn_non_ip:  {<<: *RS_cls, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/non_ip/microsoft_cdn.txt,            path: ./rules/non_ip/microsoft_cdn.txt}
+  microsoft_non_ip:      {<<: *RS_cls, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/non_ip/microsoft.txt,                path: ./rules/non_ip/microsoft.txt}
+  download_domainset:    {<<: *RS_dom, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/domainset/download.txt,              path: ./rules/domainset/download.txt}
+  download_non_ip:       {<<: *RS_cls, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/non_ip/download.txt,                 path: ./rules/non_ip/download.txt}
 
 # 分流规则
 rules:
