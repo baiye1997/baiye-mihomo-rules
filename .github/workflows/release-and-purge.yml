@@ -31,7 +31,7 @@ jobs:
           echo "Event: ${{ github.event_name }}"
 
       - name: Debounce wait
-        run: sleep 90
+        run: sleep 30
 
       - name: Checkout (with tags)
         uses: actions/checkout@v4
