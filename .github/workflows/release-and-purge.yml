@@ -38,7 +38,7 @@ jobs:
         shell: bash
         run: |
           LASTMSG="$(git log -1 --pretty=%s)"
-          if echo "$LASTMSG" | grep -qE '^chore\(ci\): bump icon \?v='; then
+          if echo "$LASTMSG" | grep -qE '^chore\(ci\): bump icon cache-buster \?v='; then
             echo "skip=true" >> $GITHUB_OUTPUT
           else
             echo "skip=false" >> $GITHUB_OUTPUT
@@ -76,24 +76,55 @@ jobs:
 
           echo "Changed targets:"; cat changed.targets.txt || true
 
-      # 仅当 icons 下有真实文件变动时，才为 config 里的 icon 链接追加 ?v=<短哈希>，解决客户端本地缓存不刷新的问题
-      - name: Bump icon URLs in config (?v=<short>) when icons changed
+      # 仅当 icons 下有真实文件变动时，才为 config 里的 icon 链接追加 ?v=<短哈希>（rules 保持 @latest）
+      - name: Bump icon URLs in config (?v=<short>) on icons change
         if: steps.selfskip.outputs.skip == 'false' && steps.chg.outputs.icons_changed == 'true'
         shell: bash
         run: |
           set -euo pipefail
           SHORT="$(git rev-parse --short=7 HEAD)"
-          mapfile -t files < <(find config -type f \( -name "*.yaml" -o -name "*.yml" \) 2>/dev/null || true)
-          for f in "${files[@]}"; do
-            sed -i -E \
-              "s|(https://[^\"'()]+/icons/[^\"'()]+\.(png|jpg|jpeg|webp|svg))(\\?v=[^\"'()]+)?|\\1?v=${SHORT}|g" \
-              "$f"
-          done
+
+          python - <<'PY' "$SHORT"
+import sys, re, pathlib, urllib.parse
+SHORT = sys.argv[1]
+
+# 抓取行内所有 URL（不限定域名，兼容 raw/jsDelivr 等）
+url_pat = re.compile(r'https?://[^\s"\'<>]+')
+
+# 仅对 icons/*.png|jpg|jpeg|webp|svg 生效
+def is_icon_path(parsed):
+    path = parsed.path or ""
+    return re.search(r'/icons/[^/]+\.(?:png|jpe?g|webp|svg)$', path, re.I) is not None
+
+def bump_icon_url(u):
+    try:
+        p = urllib.parse.urlsplit(u)
+    except Exception:
+        return u
+    if not is_icon_path(p):
+        return u
+    # 保留原有 query，但把 v= 覆盖为 SHORT
+    q = urllib.parse.parse_qsl(p.query, keep_blank_values=True)
+    q = [(k, v) for (k, v) in q if k.lower() != 'v']
+    q.append(('v', SHORT))
+    new_q = urllib.parse.urlencode(q)
+    return urllib.parse.urlunsplit((p.scheme, p.netloc, p.path, new_q, p.fragment))
+
+changed = False
+for path in pathlib.Path("config").rglob("*.yml*"):
+    s = path.read_text(encoding="utf-8")
+    ns = url_pat.sub(lambda m: bump_icon_url(m.group(0)), s)
+    if ns != s:
+        path.write_text(ns, encoding="utf-8")
+        changed = True
+# 退出码为 0；是否提交交给外层 git diff 判断
+PY
+
           if ! git diff --quiet; then
             git config user.name  "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
             git add -A
-            git commit -m "chore(ci): bump icon ?v=${SHORT} [skip ci]"
+            git commit -m "chore(ci): bump icon cache-buster ?v=${SHORT} [skip ci]"
             git push
           else
             echo "No icon URL changes in config."
