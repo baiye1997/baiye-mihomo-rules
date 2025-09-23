@@ -3,13 +3,13 @@ name: Publish Gist Personal
 on:
   push:
     paths:
-      - "icons/**"
       - "rules/ip/**"
       - "rules/non_ip/**"
       - "rules/domainset/**"
       - "rules/yaml/**"
-      - "config/*.yml"
+      - "icons/**"
       - "config/*.yaml"
+      - "config/*.yml"
   workflow_dispatch: {}
 
 concurrency:
@@ -19,32 +19,25 @@ concurrency:
 permissions:
   contents: read
 
-env:
-  # 你要生成的 YAML 以及 Gist 文件名
-  TARGET_CONFIG: config/baiye-multiple.yaml
-  GIST_FILE_NAME: baiye-multiple.yaml
-
 jobs:
-  build_and_publish:
+  build:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout (with history)
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Decide whether to proceed (intersect with YAML references)
-        id: dec
+      - name: Decide if should build (config changed OR icons/rules changed & referenced)
+        id: decide
         shell: bash
         run: |
           set -euo pipefail
 
-          CFG="${TARGET_CONFIG}"
-
-          # 计算对比范围
           BEFORE="${{ github.event.before }}"
-          if [ -z "${BEFORE}" ]; then BEFORE="$(git rev-parse HEAD^ || echo '')"; fi
+          if [ -z "${BEFORE}" ]; then
+            BEFORE="$(git rev-parse HEAD^ || echo '')"
+          fi
 
           if [ -n "${BEFORE}" ]; then
             git diff --name-only "${BEFORE}" "${{ github.sha }}" > changed.all.txt
@@ -52,93 +45,72 @@ jobs:
             git show --name-only --pretty="" "${{ github.sha }}" > changed.all.txt
           fi
 
-          echo "== changed.all.txt ==" && cat changed.all.txt || true
+          # 是否有 config 变动
+          grep -E '^config/.*\.ya?ml$' changed.all.txt | sort -u > changed.config.txt || true
+          CONFIG_CHANGED=false
+          [ -s changed.config.txt ] && CONFIG_CHANGED=true
 
-          # 标记：YAML 自身是否被修改
-          if grep -Fxq "${CFG}" changed.all.txt; then
-            echo "cfg_changed=true"  >> $GITHUB_OUTPUT
-          else
-            echo "cfg_changed=false" >> $GITHUB_OUTPUT
-          fi
-
-          # 提取可能的 icons/rules 目标
+          # 有无 icons/rules 变动
           grep -E '^(icons/|rules/(ip|non_ip|domainset|yaml)/)' changed.all.txt | sort -u > changed.targets.txt || true
-          echo "== changed.targets.txt ==" && cat changed.targets.txt || true
 
-          # 如果没有目标且 YAML 也没变，直接退出
-          if [ ! -s changed.targets.txt ] && ! grep -Fxq "${CFG}" changed.all.txt; then
-            echo "has_refs=false" >> $GITHUB_OUTPUT
-            exit 0
-          fi
+          # 默认不继续
+          PROCEED=false
 
-          # 准备要搜索引用的 YAML（优先单个 CFG；若不存在则合并所有 config/*.y*ml）
-          if [ -f "${CFG}" ]; then
-            cat "${CFG}" > _config_scope.txt
+          # 如果 config 自己变了 -> 直接继续
+          if [ "$CONFIG_CHANGED" = "true" ]; then
+            PROCEED=true
           else
-            cat config/*.yml config/*.yaml 2>/dev/null || true > _config_scope.txt
-          fi
+            # 否则只有当 icons/rules 有变动且被 config 引用时才继续
+            shopt -s nullglob
+            CONFIGS=(config/*.yml config/*.yaml)
+            if [ -s changed.targets.txt ] && [ ${#CONFIGS[@]} -gt 0 ]; then
+              : > referenced.targets.txt
+              while read -r P; do
+                [ -n "$P" ] || continue
+                if grep -RqlF -- "$P" "${CONFIGS[@]}"; then
+                  echo "$P" >> referenced.targets.txt
+                fi
+              done < changed.targets.txt
 
-          touch purge.refs.txt
-
-          # 交集判断：只要有任一 icons/rules 被 YAML 引用，就认为需要继续（或 YAML 自身改动也继续）
-          while read -r p; do
-            [ -n "$p" ] || continue
-            if [[ "$p" == icons/* ]]; then
-              base="$(basename "$p")"
-              if grep -q "/icons/${base}" _config_scope.txt; then
-                echo "$p" >> purge.refs.txt
-              fi
-            else
-              # rules：匹配 "/rules/..."（相对路径、或 jsDelivr URL 都能命中）
-              if grep -q "/${p}" _config_scope.txt; then
-                echo "$p" >> purge.refs.txt
+              if [ -s referenced.targets.txt ]; then
+                PROCEED=true
               fi
             fi
-          done < changed.targets.txt
-
-          sort -u purge.refs.txt -o purge.refs.txt || true
-          echo "== referenced targets (intersect) ==" && cat purge.refs.txt || true
-
-          if [ -s purge.refs.txt ]; then
-            echo "has_refs=true" >> $GITHUB_OUTPUT
-          else
-            echo "has_refs=false" >> $GITHUB_OUTPUT
           fi
 
-          # 最终决策：YAML 变更 或 引用了本次改动的 icons/rules 任一成立 -> 继续
-          if grep -q "^cfg_changed=true$" <<<"$(cat $GITHUB_OUTPUT 2>/dev/null || true)" || \
-             grep -q "^has_refs=true$" <<<"$(cat $GITHUB_OUTPUT 2>/dev/null || true)"; then
-            echo "proceed=true"  >> $GITHUB_OUTPUT
-          else
-            echo "proceed=false" >> $GITHUB_OUTPUT
-          fi
+          echo "proceed=$PROCEED" >> "$GITHUB_OUTPUT"
+          echo "commit_short=$(git rev-parse --short=7 ${{ github.sha }})" >> "$GITHUB_OUTPUT"
 
-      - name: Stop early
-        if: steps.dec.outputs.proceed != 'true'
-        run: echo "No YAML change and no referenced icons/rules changed; skip."
+          echo "CONFIG_CHANGED=$CONFIG_CHANGED"
+          echo "PROCEED=$PROCEED"
+          echo "Changed config files (if any):"
+          cat changed.config.txt || true
+          echo "Referenced targets (if any):"
+          cat referenced.targets.txt || true
 
       - name: Setup Node
-        if: steps.dec.outputs.proceed == 'true'
+        if: steps.decide.outputs.proceed == 'true'
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
       - name: Build & Publish to Gist
-        if: steps.dec.outputs.proceed == 'true'
+        if: steps.decide.outputs.proceed == 'true'
         env:
           SUB_URL_1: ${{ secrets.SUB_URL_1 }}
           SUB_URL_2: ${{ secrets.SUB_URL_2 }}
           GIST_TOKEN: ${{ secrets.GIST_TOKEN }}
           GIST_ID: ${{ secrets.GIST_ID }}
-          GIST_FILE_NAME: ${{ env.GIST_FILE_NAME }}
-          CONFIG_PATH: ${{ env.TARGET_CONFIG }}
-          COMMIT_SHORT: ${{ github.sha }}
+          GIST_FILE_NAME: baiye-multiple.yaml
+          CONFIG_PATH: config/baiye-multiple.yaml
+          COMMIT_SHORT: ${{ steps.decide.outputs.commit_short }}
         run: |
-          export COMMIT_SHORT="${COMMIT_SHORT:0:7}"
+          set -euo pipefail
+          echo "Using COMMIT_SHORT=${COMMIT_SHORT}"
           node .github/scripts/build-and-publish.js
 
       - name: Upload artifact (optional)
-        if: steps.dec.outputs.proceed == 'true'
+        if: steps.decide.outputs.proceed == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: built-config
