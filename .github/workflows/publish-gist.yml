@@ -8,8 +8,8 @@ on:
       - "rules/domainset/**"
       - "rules/yaml/**"
       - "icons/**"
-      - "config/*.yaml"
-      - "config/*.yml"
+      - "config/baiye-*.yaml"
+      - "config/baiye-*.yml"
   workflow_dispatch: {}
 
 concurrency:
@@ -28,41 +28,32 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Decide if should build (config changed OR icons/rules changed & referenced)
+      - name: Decide if should build
         id: decide
         shell: bash
         run: |
           set -euo pipefail
-
           BEFORE="${{ github.event.before }}"
-          if [ -z "${BEFORE}" ]; then
-            BEFORE="$(git rev-parse HEAD^ || echo '')"
-          fi
-
+          if [ -z "${BEFORE}" ]; then BEFORE="$(git rev-parse HEAD^ || echo '')"; fi
           if [ -n "${BEFORE}" ]; then
             git diff --name-only "${BEFORE}" "${{ github.sha }}" > changed.all.txt
           else
             git show --name-only --pretty="" "${{ github.sha }}" > changed.all.txt
           fi
 
-          # 是否有 config 变动
-          grep -E '^config/.*\.ya?ml$' changed.all.txt | sort -u > changed.config.txt || true
-          CONFIG_CHANGED=false
-          [ -s changed.config.txt ] && CONFIG_CHANGED=true
+          # config 改动检测
+          grep -E '^config/baiye-(single|multiple)\.ya?ml$' changed.all.txt | sort -u > changed.config.txt || true
+          CONFIG_CHANGED=false; [ -s changed.config.txt ] && CONFIG_CHANGED=true
 
-          # 有无 icons/rules 变动
+          # icons/rules 改动检测
           grep -E '^(icons/|rules/(ip|non_ip|domainset|yaml)/)' changed.all.txt | sort -u > changed.targets.txt || true
 
-          # 默认不继续
           PROCEED=false
-
-          # 如果 config 自己变了 -> 直接继续
           if [ "$CONFIG_CHANGED" = "true" ]; then
             PROCEED=true
           else
-            # 否则只有当 icons/rules 有变动且被 config 引用时才继续
             shopt -s nullglob
-            CONFIGS=(config/*.yml config/*.yaml)
+            CONFIGS=(config/baiye-*.yml config/baiye-*.yaml)
             if [ -s changed.targets.txt ] && [ ${#CONFIGS[@]} -gt 0 ]; then
               : > referenced.targets.txt
               while read -r P; do
@@ -71,22 +62,12 @@ jobs:
                   echo "$P" >> referenced.targets.txt
                 fi
               done < changed.targets.txt
-
-              if [ -s referenced.targets.txt ]; then
-                PROCEED=true
-              fi
+              if [ -s referenced.targets.txt ]; then PROCEED=true; fi
             fi
           fi
 
           echo "proceed=$PROCEED" >> "$GITHUB_OUTPUT"
           echo "commit_short=$(git rev-parse --short=7 ${{ github.sha }})" >> "$GITHUB_OUTPUT"
-
-          echo "CONFIG_CHANGED=$CONFIG_CHANGED"
-          echo "PROCEED=$PROCEED"
-          echo "Changed config files (if any):"
-          cat changed.config.txt || true
-          echo "Referenced targets (if any):"
-          cat referenced.targets.txt || true
 
       - name: Setup Node
         if: steps.decide.outputs.proceed == 'true'
@@ -94,24 +75,27 @@ jobs:
         with:
           node-version: 20
 
-      - name: Build & Publish to Gist
+      - name: Build & Publish Gist (multiple)
         if: steps.decide.outputs.proceed == 'true'
         env:
           SUB_URL_1: ${{ secrets.SUB_URL_1 }}
           SUB_URL_2: ${{ secrets.SUB_URL_2 }}
           GIST_TOKEN: ${{ secrets.GIST_TOKEN }}
-          GIST_ID: ${{ secrets.GIST_ID }}
+          GIST_ID: ${{ secrets.GIST_ID_MULTIPLE }}
           GIST_FILE_NAME: baiye-multiple.yaml
           CONFIG_PATH: config/baiye-multiple.yaml
           COMMIT_SHORT: ${{ steps.decide.outputs.commit_short }}
         run: |
-          set -euo pipefail
-          echo "Using COMMIT_SHORT=${COMMIT_SHORT}"
           node .github/scripts/build-and-publish.js
 
-      - name: Upload artifact (optional)
+      - name: Build & Publish Gist (single)
         if: steps.decide.outputs.proceed == 'true'
-        uses: actions/upload-artifact@v4
-        with:
-          name: built-config
-          path: baiye-multiple.generated.yaml
+        env:
+          SUB_URL_1: ${{ secrets.SUB_URL_1 }}
+          GIST_TOKEN: ${{ secrets.GIST_TOKEN }}
+          GIST_ID: ${{ secrets.GIST_ID_SINGLE }}
+          GIST_FILE_NAME: baiye-single.yaml
+          CONFIG_PATH: config/baiye-single.yaml
+          COMMIT_SHORT: ${{ steps.decide.outputs.commit_short }}
+        run: |
+          node .github/scripts/build-and-publish-single.js
