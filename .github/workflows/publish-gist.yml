@@ -122,204 +122,76 @@ jobs:
           SUB_URL_1: ${{ secrets.SUB_URL_1 }}
           SUB_URL_2: ${{ secrets.SUB_URL_2 }}
           GIST_TOKEN: ${{ secrets.GIST_TOKEN }}
-          GIST_ID: ${{ secrets.GIST_ID }}
+          GIST_ID_MULTIPLE: ${{ secrets.GIST_ID_MULTIPLE }}
+          GIST_ID_MINI: ${{ secrets.GIST_ID_MINI }}
           CONFIG_PATH: config/baiye-multiple.yaml
-          COMMIT_SHORT: ${{ github.sha }}
           GIST_FILE_MULTIPLE: baiye-multiple.yaml
           GIST_FILE_MINI: BaiyeMini.yaml
+          COMMIT_SHORT: ${{ steps.sha.outputs.sha }}
         run: |
           export COMMIT_SHORT="${COMMIT_SHORT:0:7}"
           node - <<'NODE'
-          const fs = require('fs');
-          const https = require('https');
-          const path = require('path');
-
-          const short = (process.env.COMMIT_SHORT || 'dev').slice(0, 7);
-          const gistFileMultiple = process.env.GIST_FILE_MULTIPLE || 'baiye-multiple.yaml';
-          const gistFileMini = process.env.GIST_FILE_MINI || 'BaiyeMini.yaml';
-
-          function patchGist({ gistId, token, filename, content }) {
-            return new Promise((resolve, reject) => {
-              const body = JSON.stringify({ files: { [filename]: { content } } });
-              const req = https.request(
-                `https://api.github.com/gists/${gistId}`,
-                {
-                  method: 'PATCH',
-                  headers: {
-                    Authorization: `token ${token}`,
-                    'User-Agent': 'github-actions',
-                    Accept: 'application/vnd.github+json',
-                    'Content-Type': 'application/json',
-                    'Content-Length': Buffer.byteLength(body),
-                  },
-                },
-                (res) => {
-                  let data = '';
-                  res.on('data', (d) => (data += d));
-                  res.on('end', () => {
-                    if (res.statusCode >= 200 && res.statusCode < 300) {
-                      try { resolve(JSON.parse(data)); } catch { resolve({}); }
-                    } else {
-                      reject(new Error(`Gist update failed ${res.statusCode}: ${data}`));
-                    }
-                  });
-                }
-              );
-              req.on('error', reject);
-              req.write(body);
-              req.end();
-            });
-          }
-
-          function bumpIconsV(s) {
-            const re = /(https?:\/\/[^\s"'<>]+\/icons\/[^\s"'<>]+\.(?:png|jpe?g|webp|svg)(?:\?[^\s"'<>]*)?)/gi;
-            return s.replace(re, (full) => {
-              try {
-                const u = new URL(full);
-                u.searchParams.set('v', short);
-                return u.toString();
-              } catch {
-                return full;
-              }
-            });
-          }
-
-          (async () => {
-            const sub1 = process.env.SUB_URL_1;
-            const sub2 = process.env.SUB_URL_2;
-            const gistToken = process.env.GIST_TOKEN;
-            const gistId = process.env.GIST_ID;
-
-            if (!sub1 || !sub2) throw new Error('Missing SUB_URL_1 or SUB_URL_2');
-            if (!gistToken || !gistId) throw new Error('Missing GIST_TOKEN or GIST_ID');
-
-            const srcRel = process.env.CONFIG_PATH || 'config/baiye-multiple.yaml';
-            const srcPath = path.resolve(srcRel);
-            if (!fs.existsSync(srcPath)) throw new Error(`${srcRel} not found`);
-
-            const raw = fs.readFileSync(srcPath, 'utf8');
-
-            const withIconV = bumpIconsV(raw);
-            const outMultiple = withIconV
+          const fs=require('fs');const https=require('https');const path=require('path');
+          const short=(process.env.COMMIT_SHORT||'dev').slice(0,7);
+          function patchGist({gistId,token,filename,content}){return new Promise((resolve,reject)=>{const body=JSON.stringify({files:{[filename]:{content}}});const req=https.request(`https://api.github.com/gists/${gistId}`,{method:'PATCH',headers:{Authorization:`token ${token}`,'User-Agent':'github-actions',Accept:'application/vnd.github+json','Content-Type':'application/json','Content-Length':Buffer.byteLength(body)}},res=>{let data='';res.on('data',d=>data+=d);res.on('end',()=>{if(res.statusCode>=200&&res.statusCode<300){try{resolve(JSON.parse(data))}catch{resolve({})}}else{reject(new Error(`Gist update failed ${res.statusCode}: ${data}`))}})});req.on('error',reject);req.write(body);req.end()})}
+          function bumpIconsV(s){const re=/(https?:\/\/[^\s"'<>]+\/icons\/[^\s"'<>]+\.(?:png|jpe?g|webp|svg)(?:\?[^\s"'<>]*)?)/gi;return s.replace(re,(full)=>{try{const u=new URL(full);u.searchParams.set('v',short);return u.toString()}catch{return full}})}
+          (async()=>{
+            const sub1=process.env.SUB_URL_1, sub2=process.env.SUB_URL_2;
+            const token=process.env.GIST_TOKEN, idMulti=process.env.GIST_ID_MULTIPLE, idMini=process.env.GIST_ID_MINI;
+            if(!sub1||!sub2) throw new Error('Missing SUB_URL_1 or SUB_URL_2');
+            if(!token||!idMulti||!idMini) throw new Error('Missing Gist IDs or token');
+            const srcRel=process.env.CONFIG_PATH||'config/baiye-multiple.yaml';
+            const srcPath=path.resolve(srcRel);
+            if(!fs.existsSync(srcPath)) throw new Error(`${srcRel} not found`);
+            const raw=fs.readFileSync(srcPath,'utf8');
+            const outMultiple=bumpIconsV(raw)
               .replace(/替换订阅链接1/g, sub1)
               .replace(/替换订阅链接2/g, sub2)
-              .replace(/\[显示名称A可修改\]/g, '[Haita]')
-              .replace(/\[显示名称B可修改\]/g, '[BoostNet]');
+              .replace(/\[显示名称A可修改\]/g,'[Haita]')
+              .replace(/\[显示名称B可修改\]/g,'[BoostNet]');
+            fs.writeFileSync('baiye-multiple.generated.yaml',outMultiple,'utf8');
+            const r1=await patchGist({gistId:idMulti, token, filename:process.env.GIST_FILE_MULTIPLE||'baiye-multiple.yaml', content:outMultiple});
+            console.log('✅ multiple →', r1?.files?.[process.env.GIST_FILE_MULTIPLE||'baiye-multiple.yaml']?.raw_url);
 
-            fs.writeFileSync('baiye-multiple.generated.yaml', outMultiple, 'utf8');
-            const res1 = await patchGist({
-              gistId, token: gistToken, filename: gistFileMultiple, content: outMultiple
-            });
-            console.log('✅ multiple updated:', res1?.files?.[gistFileMultiple]?.raw_url);
+            const outMini=outMultiple.replace(/geodata-loader:\s*standard/g,'geodata-loader: memconservative');
+            fs.writeFileSync('BaiyeMini.generated.yaml',outMini,'utf8');
+            const r2=await patchGist({gistId:idMini, token, filename:process.env.GIST_FILE_MINI||'BaiyeMini.yaml', content:outMini});
+            console.log('✅ mini →', r2?.files?.[process.env.GIST_FILE_MINI||'BaiyeMini.yaml']?.raw_url);
 
-            const outMini = outMultiple.replace(/geodata-loader:\s*standard/g, 'geodata-loader: memconservative');
-            fs.writeFileSync('BaiyeMini.generated.yaml', outMini, 'utf8');
-            const res2 = await patchGist({
-              gistId, token: gistToken, filename: gistFileMini, content: outMini
-            });
-            console.log('✅ mini updated:', res2?.files?.[gistFileMini]?.raw_url);
-
-            console.log(`::notice title=Gist Updated::${res1?.files?.[gistFileMultiple]?.raw_url}\n${res2?.files?.[gistFileMini]?.raw_url}`);
-          })().catch((err) => {
-            console.error('❌', err.message || err);
-            process.exit(1);
-          });
+            console.log(`::notice title=Gist Updated::${r1?.files?.[process.env.GIST_FILE_MULTIPLE||'baiye-multiple.yaml']?.raw_url}\n${r2?.files?.[process.env.GIST_FILE_MINI||'BaiyeMini.yaml']?.raw_url}`);
+          })().catch(e=>{console.error('❌',e.message||e);process.exit(1)});
           NODE
 
-      # single：替换订阅 & icon 短哈希，发布
       - name: Build & Publish (single)
         if: steps.need_single.outputs.need == 'true'
         env:
           SUB_URL_1: ${{ secrets.SUB_URL_1 }}
           GIST_TOKEN: ${{ secrets.GIST_TOKEN }}
-          GIST_ID: ${{ secrets.GIST_ID }}
+          GIST_ID_SINGLE: ${{ secrets.GIST_ID_SINGLE }}
           CONFIG_PATH: config/baiye-single.yaml
-          COMMIT_SHORT: ${{ github.sha }}
           GIST_FILE_SINGLE: baiye-single.yaml
+          COMMIT_SHORT: ${{ steps.sha.outputs.sha }}
         run: |
           export COMMIT_SHORT="${COMMIT_SHORT:0:7}"
           node - <<'NODE'
-          const fs = require('fs');
-          const https = require('https');
-          const path = require('path');
-
-          const short = (process.env.COMMIT_SHORT || 'dev').slice(0, 7);
-          const gistFileSingle = process.env.GIST_FILE_SINGLE || 'baiye-single.yaml';
-
-          function patchGist({ gistId, token, filename, content }) {
-            return new Promise((resolve, reject) => {
-              const body = JSON.stringify({ files: { [filename]: { content } } });
-              const req = https.request(
-                `https://api.github.com/gists/${gistId}`,
-                {
-                  method: 'PATCH',
-                  headers: {
-                    Authorization: `token ${token}`,
-                    'User-Agent': 'github-actions',
-                    Accept: 'application/vnd.github+json',
-                    'Content-Type': 'application/json',
-                    'Content-Length': Buffer.byteLength(body),
-                  },
-                },
-                (res) => {
-                  let data = '';
-                  res.on('data', (d) => (data += d));
-                  res.on('end', () => {
-                    if (res.statusCode >= 200 && res.statusCode < 300) {
-                      try { resolve(JSON.parse(data)); } catch { resolve({}); }
-                    } else {
-                      reject(new Error(`Gist update failed ${res.statusCode}: ${data}`));
-                    }
-                  });
-                }
-              );
-              req.on('error', reject);
-              req.write(body);
-              req.end();
-            });
-          }
-
-          function bumpIconsV(s) {
-            const re = /(https?:\/\/[^\s"'<>]+\/icons\/[^\s"'<>]+\.(?:png|jpe?g|webp|svg)(?:\?[^\s"'<>]*)?)/gi;
-            return s.replace(re, (full) => {
-              try {
-                const u = new URL(full);
-                u.searchParams.set('v', short);
-                return u.toString();
-              } catch {
-                return full;
-              }
-            });
-          }
-
-          (async () => {
-            const sub1 = process.env.SUB_URL_1;
-            const gistToken = process.env.GIST_TOKEN;
-            const gistId = process.env.GIST_ID;
-
-            if (!sub1) throw new Error('Missing SUB_URL_1');
-            if (!gistToken || !gistId) throw new Error('Missing GIST_TOKEN or GIST_ID');
-
-            const srcRel = process.env.CONFIG_PATH || 'config/baiye-single.yaml';
-            const srcPath = path.resolve(srcRel);
-            if (!fs.existsSync(srcPath)) throw new Error(`${srcRel} not found`);
-
-            const raw = fs.readFileSync(srcPath, 'utf8');
-
-            const withIconV = bumpIconsV(raw);
-            const outSingle = withIconV.replace(/替换订阅链接1/g, sub1);
-
+          const fs=require('fs');const https=require('https');const path=require('path');
+          const short=(process.env.COMMIT_SHORT||'dev').slice(0,7);
+          function patchGist({gistId,token,filename,content}){return new Promise((resolve,reject)=>{const body=JSON.stringify({files:{[filename]:{content}}});const req=https.request(`https://api.github.com/gists/${gistId}`,{method:'PATCH',headers:{Authorization:`token ${token}`,'User-Agent':'github-actions',Accept:'application/vnd.github+json','Content-Type':'application/json','Content-Length':Buffer.byteLength(body)}},res=>{let data='';res.on('data',d=>data+=d);res.on('end',()=>{if(res.statusCode>=200&&res.statusCode<300){try{resolve(JSON.parse(data))}catch{resolve({})}}else{reject(new Error(`Gist update failed ${res.statusCode}: ${data}`))}})});req.on('error',reject);req.write(body);req.end()})}
+          function bumpIconsV(s){const re=/(https?:\/\/[^\s"'<>]+\/icons\/[^\s"'<>]+\.(?:png|jpe?g|webp|svg)(?:\?[^\s"'<>]*)?)/gi;return s.replace(re,(full)=>{try{const u=new URL(full);u.searchParams.set('v',short);return u.toString()}catch{return full}})}
+          ;(async()=>{
+            const sub1=process.env.SUB_URL_1, token=process.env.GIST_TOKEN, id=process.env.GIST_ID_SINGLE;
+            if(!sub1) throw new Error('Missing SUB_URL_1');
+            if(!token||!id) throw new Error('Missing GIST_TOKEN or GIST_ID_SINGLE');
+            const srcRel=process.env.CONFIG_PATH||'config/baiye-single.yaml';
+            const srcPath=path.resolve(srcRel);
+            if(!fs.existsSync(srcPath)) throw new Error(`${srcRel} not found`);
+            const raw=fs.readFileSync(srcPath,'utf8');
+            const outSingle=bumpIconsV(raw).replace(/替换订阅链接1/g, sub1);
             fs.writeFileSync('baiye-single.generated.yaml', outSingle, 'utf8');
-            const res = await patchGist({
-              gistId, token: gistToken, filename: gistFileSingle, content: outSingle
-            });
-
-            console.log('✅ single updated:', res?.files?.[gistFileSingle]?.raw_url);
-            console.log(`::notice title=Gist Updated (single)::${res?.files?.[gistFileSingle]?.raw_url}`);
-          })().catch((err) => {
-            console.error('❌', err.message || err);
-            process.exit(1);
-          });
+            const r=await patchGist({gistId:id, token, filename:process.env.GIST_FILE_SINGLE||'baiye-single.yaml', content: outSingle});
+            console.log('✅ single →', r?.files?.[process.env.GIST_FILE_SINGLE||'baiye-single.yaml']?.raw_url);
+            console.log(`::notice title=Gist Updated (single)::${r?.files?.[process.env.GIST_FILE_SINGLE||'baiye-single.yaml']?.raw_url}`);
+          })().catch(e=>{console.error('❌',e.message||e);process.exit(1)});
           NODE
 
       - name: Upload artifacts (optional)
