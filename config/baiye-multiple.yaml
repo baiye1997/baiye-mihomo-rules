@@ -174,13 +174,13 @@ proxy-providers:
     <<: *NodeParam
     path: './proxy_provider/providers-1.yaml'
     override:
-      additional-prefix: "[替换显示A] "
+      additional-prefix: "[显示名称A可修改] "
   Node-2:
     url: "替换订阅链接2"
     <<: *NodeParam
     path: './proxy_provider/providers-2.yaml'
     override:
-      additional-prefix: "[替换显示B] "
+      additional-prefix: "[显示名称B可修改] "
       
 # ===================== 节点筛选 =====================
 # 按地区筛选
@@ -352,6 +352,7 @@ rules:
   - GEOIP,cn,DIRECT,no-resolve # 中国大陆 IP 直连
 
   - MATCH,🚀 节点选择 # 兜底规则
+
 
 
 
