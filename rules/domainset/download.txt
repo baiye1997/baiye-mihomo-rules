@@ -1,7 +1,7 @@
 #########################################
 # Sukka's Ruleset - Large Files Hosting Domains
-# Last Updated: 2025-09-19T13:19:13.546Z
-# Size: 1181
+# Last Updated: 2025-09-23T10:55:38.712Z
+# Size: 1183
 # License: AGPL 3.0
 # Homepage: https://ruleset.skk.moe
 # GitHub: https://github.com/SukkaW/Surge
@@ -205,6 +205,8 @@ apache.mivzakim.net
 mirror.macomnet.net
 mirror.nl.leaseweb.net
 mirror.de.leaseweb.net
+mediafilez.forgecdn.net
+maven.fabricmc.net
 mirror.datapipe.net
 +.download.cdp.bethesda.net
 +.content.cdp.bethesda.net
