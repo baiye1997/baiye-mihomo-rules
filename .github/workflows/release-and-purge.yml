@@ -1,6 +1,6 @@
 name: Release and Purge CDN
 
-"on":
+on:
   push:
     paths:
       - "rules/ip/**"
@@ -12,7 +12,6 @@ name: Release and Purge CDN
       - "config/*.yml"
   workflow_dispatch: {}
 
-# 防抖 + 并发：短时间多次 push 仅保留最后一次
 concurrency:
   group: release-and-purge
   cancel-in-progress: true
@@ -39,7 +38,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      # 如果是我们上一轮“只为图标 ?v= 碰了 config”的提交，直接跳过，避免自触发循环
       - name: Self-skip if last commit is icon bump
         id: selfskip
         shell: bash
@@ -72,7 +70,7 @@ jobs:
           # 仅供精准 purge 的目标（rules/icons）
           grep -E '^(icons/|rules/(ip|non_ip|domainset|yaml)/)' changed.all.txt | sort -u > changed.targets.txt || true
 
-          # 标记是否变更了 icons 或 config（用于后续逻辑）
+          # 标记 flags
           if grep -qE '^icons/' changed.all.txt; then echo "icons_changed=true" >> $GITHUB_OUTPUT; else echo "icons_changed=false" >> $GITHUB_OUTPUT; fi
           if grep -qE '^config/.*\.ya?ml$' changed.all.txt; then echo "config_changed=true" >> $GITHUB_OUTPUT; else echo "config_changed=false" >> $GITHUB_OUTPUT; fi
           if [ -s changed.targets.txt ]; then echo "has_targets=true" >> $GITHUB_OUTPUT; else echo "has_targets=false" >> $GITHUB_OUTPUT; fi
@@ -86,47 +84,69 @@ jobs:
 
           echo "Changed targets:"; cat changed.targets.txt || true
 
-      # 仅当 icons 下有真实文件变动时，才为 config 里的 icon 链接追加 ?v=<短哈希>（rules 保持 @latest）
-      - name: Bump icon URLs in config (?v=<short>) on icons change
+      # 仅当 icons 有变更时，才在 config 里为 icon URL 追加/更新 ?v=<short>
+      - name: Bump icon URLs in config (?v=<short>) on icons change (with logs)
         if: steps.selfskip.outputs.skip == 'false' && steps.chg.outputs.icons_changed == 'true'
         shell: bash
         run: |
           set -euo pipefail
           SHORT="$(git rev-parse --short=7 HEAD)"
+          echo "SHORT for this run = $SHORT"
+
+          echo "[preview-before] icons URLs in config:"
+          grep -RnoE 'https?://[^"'"'"'<>[:space:]]+/icons/[^"'"'"'<>[:space:]]+\.(png|jpe?g|webp|svg)(\?[^"'"'"'<>[:space:]]*)?' config || true
 
           python - <<'PY' "$SHORT"
-          import sys, re, pathlib, urllib.parse
-          SHORT = sys.argv[1]
+import sys, re, pathlib, urllib.parse
+SHORT = sys.argv[1]
 
-          url_pat = re.compile(r'https?://[^\s"\'<>]+')
+url_pat = re.compile(r'https?://[^\s"\'<>]+')
 
-          def is_icon_path(parsed):
-              path = parsed.path or ""
-              return re.search(r'/icons/[^/]+\.(?:png|jpe?g|webp|svg)$', path, re.I) is not None
+def is_icon_path(parsed):
+    path = parsed.path or ""
+    return re.search(r'/icons/[^/]+\.(?:png|jpe?g|webp|svg)$', path, re.I) is not None
 
-          def bump_icon_url(u):
-              try:
-                  p = urllib.parse.urlsplit(u)
-              except Exception:
-                  return u
-              if not is_icon_path(p):
-                  return u
-              q = urllib.parse.parse_qsl(p.query, keep_blank_values=True)
-              q = [(k, v) for (k, v) in q if k.lower() != 'v']
-              q.append(('v', SHORT))
-              new_q = urllib.parse.urlencode(q)
-              return urllib.parse.urlunsplit((p.scheme, p.netloc, p.path, new_q, p.fragment))
+def bump_icon_url(u):
+    try:
+        p = urllib.parse.urlsplit(u)
+    except Exception:
+        return u, False
+    if not is_icon_path(p):
+        return u, False
+    q = urllib.parse.parse_qsl(p.query, keep_blank_values=True)
+    q = [(k, v) for (k, v) in q if k.lower() != 'v']
+    q.append(('v', SHORT))
+    new_q = urllib.parse.urlencode(q)
+    new_u = urllib.parse.urlunsplit((p.scheme, p.netloc, p.path, new_q, p.fragment))
+    return new_u, (new_u != u)
 
-          changed = False
-          for path in pathlib.Path("config").rglob("*.yml*"):
-              s = path.read_text(encoding="utf-8")
-              ns = url_pat.sub(lambda m: bump_icon_url(m.group(0)), s)
-              if ns != s:
-                  path.write_text(ns, encoding="utf-8")
-                  changed = True
-          PY
+total_hits = 0
+total_changed = 0
+for path in pathlib.Path("config").rglob("*.yml*"):
+    s = path.read_text(encoding="utf-8")
+    changed_here = 0
+    def repl(m):
+        nonlocal total_hits, total_changed, changed_here
+        new, changed = bump_icon_url(m.group(0))
+        total_hits += 1
+        if changed:
+            total_changed += 1
+            changed_here += 1
+        return new
+    ns = url_pat.sub(repl, s)
+    if ns != s:
+        path.write_text(ns, encoding="utf-8")
+        print(f"[icon-bump] changed {path} (+{changed_here})")
+    else:
+        print(f"[icon-bump] no change in {path}")
+print(f"[icon-bump] summary: url_hits={total_hits}, replacements={total_changed}")
+PY
+
+          echo "[preview-after] icons URLs in config:"
+          grep -RnoE 'https?://[^"'"'"'<>[:space:]]+/icons/[^"'"'"'<>[:space:]]+\.(png|jpe?g|webp|svg)(\?[^"'"'"'<>[:space:]]*)?' config || true
 
           if ! git diff --quiet; then
+            echo "[git] diff detected, committing..."
             git config user.name  "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
             git add -A
