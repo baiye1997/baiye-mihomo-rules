@@ -95,36 +95,36 @@ jobs:
           SHORT="$(git rev-parse --short=7 HEAD)"
 
           python - <<'PY' "$SHORT"
-import sys, re, pathlib, urllib.parse
-SHORT = sys.argv[1]
+          import sys, re, pathlib, urllib.parse
+          SHORT = sys.argv[1]
 
-url_pat = re.compile(r'https?://[^\s"\'<>]+')
+          url_pat = re.compile(r'https?://[^\s"\'<>]+')
 
-def is_icon_path(parsed):
-    path = parsed.path or ""
-    return re.search(r'/icons/[^/]+\.(?:png|jpe?g|webp|svg)$', path, re.I) is not None
+          def is_icon_path(parsed):
+              path = parsed.path or ""
+              return re.search(r'/icons/[^/]+\.(?:png|jpe?g|webp|svg)$', path, re.I) is not None
 
-def bump_icon_url(u):
-    try:
-        p = urllib.parse.urlsplit(u)
-    except Exception:
-        return u
-    if not is_icon_path(p):
-        return u
-    q = urllib.parse.parse_qsl(p.query, keep_blank_values=True)
-    q = [(k, v) for (k, v) in q if k.lower() != 'v']
-    q.append(('v', SHORT))
-    new_q = urllib.parse.urlencode(q)
-    return urllib.parse.urlunsplit((p.scheme, p.netloc, p.path, new_q, p.fragment))
+          def bump_icon_url(u):
+              try:
+                  p = urllib.parse.urlsplit(u)
+              except Exception:
+                  return u
+              if not is_icon_path(p):
+                  return u
+              q = urllib.parse.parse_qsl(p.query, keep_blank_values=True)
+              q = [(k, v) for (k, v) in q if k.lower() != 'v']
+              q.append(('v', SHORT))
+              new_q = urllib.parse.urlencode(q)
+              return urllib.parse.urlunsplit((p.scheme, p.netloc, p.path, new_q, p.fragment))
 
-changed = False
-for path in pathlib.Path("config").rglob("*.yml*"):
-    s = path.read_text(encoding="utf-8")
-    ns = url_pat.sub(lambda m: bump_icon_url(m.group(0)), s)
-    if ns != s:
-        path.write_text(ns, encoding="utf-8")
-        changed = True
-PY
+          changed = False
+          for path in pathlib.Path("config").rglob("*.yml*"):
+              s = path.read_text(encoding="utf-8")
+              ns = url_pat.sub(lambda m: bump_icon_url(m.group(0)), s)
+              if ns != s:
+                  path.write_text(ns, encoding="utf-8")
+                  changed = True
+          PY
 
           if ! git diff --quiet; then
             git config user.name  "github-actions[bot]"
