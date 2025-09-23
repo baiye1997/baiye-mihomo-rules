@@ -1,2 +1,4 @@
 # 忽略生成的临时 YAML
 baiye-multiple.generated.yaml
+baiye-single.generated.yaml
+baiye-mini.generated.yaml
