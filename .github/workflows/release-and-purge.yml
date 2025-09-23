@@ -1,4 +1,4 @@
-name: "Release & Purge CDN on rules/icons/config change"
+name: Release and Purge CDN
 
 "on":
   push:
