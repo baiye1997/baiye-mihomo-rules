@@ -1,4 +1,5 @@
 name: Purge CDN
+
 on:
   push:
     paths:
@@ -9,12 +10,7 @@ on:
       - "icons/**"
       - "config/*.yaml"
       - "config/*.yml"
-  workflow_dispatch:
-    inputs:
-      force_purge:
-        description: "即使没有发现被 config 引用，也执行全量 purge（icons + rules）"
-        type: boolean
-        default: false
+  workflow_dispatch: {}
 
 concurrency:
   group: release-and-purge
@@ -24,107 +20,82 @@ permissions:
   contents: read
 
 jobs:
-  purge_only_if_referenced:
+  release_purge:
     runs-on: ubuntu-latest
-    env:
-      FORCE_PURGE: ${{ inputs.force_purge && 'true' || 'false' }}
-
     steps:
-      - name: Show trigger info
-        if: always()
-        run: |
-          echo "Head: ${{ github.sha }}"
-          echo "Ref:  ${{ github.ref }}"
-          echo "Event: ${{ github.event_name }}"
-          echo "FORCE_PURGE=${FORCE_PURGE}"
-
-      - name: Debounce wait
-        run: sleep 10
-
       - name: Checkout (with history)
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Collect changed files
-        id: chg
+      - name: Detect changed files & map to referenced targets
+        id: detect
         shell: bash
         run: |
           set -euo pipefail
 
+          # 1) 算出对比基线（上一个提交）
           BEFORE="${{ github.event.before }}"
-          if [ -z "${BEFORE}" ]; then BEFORE="$(git rev-parse HEAD^ || echo '')"; fi
+          if [ -z "${BEFORE}" ]; then
+            BEFORE="$(git rev-parse HEAD^ || echo '')"
+          fi
 
+          # 2) 列出这次 push 变动的所有文件
           if [ -n "${BEFORE}" ]; then
             git diff --name-only "${BEFORE}" "${{ github.sha }}" > changed.all.txt
           else
             git show --name-only --pretty="" "${{ github.sha }}" > changed.all.txt
           fi
 
-          # 仅保留 icons 与 rules 这两类目标
+          # 3) 只保留 icons/** 和 rules/** 的目标
           grep -E '^(icons/|rules/(ip|non_ip|domainset|yaml)/)' changed.all.txt | sort -u > changed.targets.txt || true
 
-          echo "== changed.all.txt ==" && cat changed.all.txt || true
-          echo "== changed.targets.txt ==" && cat changed.targets.txt || true
-
-          if [ "${FORCE_PURGE}" = "true" ]; then
-            echo "force purge on: collecting full targets..."
-            { git ls-files "icons/*" "rules/ip/**" "rules/non_ip/**" "rules/domainset/**" "rules/yaml/**" || true; } | sort -u > changed.targets.txt
-            echo "== changed.targets.txt (forced) ==" && cat changed.targets.txt || true
-          fi
-
-          # 合并所有 config 内容，便于一次性搜索
-          mkdir -p _tmp
-          cat config/*.yml config/*.yaml 2>/dev/null || true > _tmp/all-config.txt
-
-          touch purge.targets.txt
-
-          # 若 config 为空，除非 force，否则不会继续
-          if [ ! -s _tmp/all-config.txt ] && [ "${FORCE_PURGE}" != "true" ]; then
-            echo "has_refs=false" >> $GITHUB_OUTPUT
+          # 4) 如果没有目标，提前退出
+          if [ ! -s changed.targets.txt ]; then
+            echo "has_ref=false" >> "$GITHUB_OUTPUT"
+            echo "No icons/rules changed."
             exit 0
           fi
 
-          while read -r p; do
-            [ -n "$p" ] || continue
-            # 对于 icons：检查 config 里是否出现 "/icons/<文件名>"
-            if [[ "$p" == icons/* ]]; then
-              base="$(basename "$p")"
-              if [ "${FORCE_PURGE}" = "true" ] || grep -q "/icons/${base}" _tmp/all-config.txt; then
-                echo "$p" >> purge.targets.txt
-              fi
-            else
-              # 对于 rules：检查是否出现 "/rules/<相对路径>"（既匹配相对路径，也匹配 jsDelivr URL）
-              if [ "${FORCE_PURGE}" = "true" ] || grep -q "/${p}" _tmp/all-config.txt; then
-                echo "$p" >> purge.targets.txt
-              fi
+          # 5) 仅当这些目标被 config/*.yml(yaml) 引用时才认为需要 Purge
+          shopt -s nullglob
+          CONFIGS=(config/*.yml config/*.yaml)
+          : > referenced.targets.txt
+          if [ ${#CONFIGS[@]} -eq 0 ]; then
+            echo "has_ref=false" >> "$GITHUB_OUTPUT"
+            echo "No config YAML files exist; skip."
+            exit 0
+          fi
+
+          while read -r P; do
+            [ -n "$P" ] || continue
+            # 只匹配相对路径片段（例如 "icons/xxx.png" 或 "rules/non_ip/xxx.txt"）
+            if grep -RqlF -- "$P" "${CONFIGS[@]}"; then
+              echo "$P" >> referenced.targets.txt
             fi
           done < changed.targets.txt
 
-          sort -u purge.targets.txt -o purge.targets.txt || true
-          echo "== purge.targets.txt (referenced) ==" && cat purge.targets.txt || true
-
-          if [ -s purge.targets.txt ]; then
-            echo "has_refs=true"  >> $GITHUB_OUTPUT
-          else
-            echo "has_refs=false" >> $GITHUB_OUTPUT
+          if [ ! -s referenced.targets.txt ]; then
+            echo "has_ref=false" >> "$GITHUB_OUTPUT"
+            echo "Changed icons/rules are NOT referenced in config; skip."
+            exit 0
           fi
 
-      - name: Purge jsDelivr for referenced files (@main + @latest)
-        if: steps.chg.outputs.has_refs == 'true'
+          echo "has_ref=true" >> "$GITHUB_OUTPUT"
+          echo "Referenced targets:"
+          cat referenced.targets.txt
+
+      - name: Purge jsDelivr for referenced targets (@latest + @main)
+        if: steps.detect.outputs.has_ref == 'true'
         shell: bash
         run: |
           set -euo pipefail
           REPO="${{ github.repository }}"
           while read -r p; do
             [ -n "$p" ] || continue
-            for REF in main latest; do
+            for REF in latest main; do
               URL="https://purge.jsdelivr.net/gh/${REPO}@${REF}/${p}"
               echo "Purging $URL"
               curl -fsS "$URL" >/dev/null || true
             done
-          done < purge.targets.txt
-
-      - name: Nothing to purge (no referenced targets)
-        if: steps.chg.outputs.has_refs != 'true'
-        run: echo "No referenced icons/rules changed; skip purge."
+          done < referenced.targets.txt
