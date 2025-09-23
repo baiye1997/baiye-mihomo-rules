@@ -245,27 +245,27 @@ proxy-groups:
     type: select
     proxies: *AppRegionWithDirect
     icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/telegram.png"
+  
+  - name: 🍎 苹果服务
+    type: select
+    proxies: *AppRegionWithDirect
+    icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/apple.png"
 
   - name: Ⓜ️ 微软服务
     type: select
     proxies: *AppRegionWithDirect
     icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/microsoft.png"
-    
-  - name: 🍎 苹果服务
-    type: select
-    proxies: *AppRegionWithDirect
-    icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/apple.png"
-    
+   
   - name: 📺 视频规则
     type: select
     proxies: *FallbackWithDirect
     icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/netflix.png"
-
+ 
   - name: 🎮 游戏服务
     type: select
     proxies: *AppRegionWithDirect
     icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/game.png"
-
+  
 # Auto 
   # 择优节点 - 按地区
   - {name: 🇭🇰 - 择优节点, <<: *UrlTest, filter: *FilterHK}
