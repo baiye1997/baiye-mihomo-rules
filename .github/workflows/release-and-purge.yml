@@ -125,7 +125,7 @@ jobs:
           SHORT = sys.argv[1]
 
           # 宽松匹配 URL，然后在回调里精确过滤
-          url_pat = re.compile(r'https?://\S+')
+          url_pat = re.compile(r'https?://[^\s"\'<>]+')
 
           def is_icon_url(u: str) -> bool:
               try:
