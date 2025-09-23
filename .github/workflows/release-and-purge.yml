@@ -151,7 +151,11 @@ jobs:
 
           counts = {"hits": 0, "changed_total": 0}
 
-          for path in pathlib.Path("config").rglob("*.yml*"):
+          files = [*pathlib.Path("config").rglob("*.yaml"), *pathlib.Path("config").rglob("*.yml")]
+          if not files:
+              print("[icon-bump] no config yaml/yml files found under config/")
+
+          for path in files:
               s = path.read_text(encoding="utf-8")
               changed_here = {"n": 0}
 
