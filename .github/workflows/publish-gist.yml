@@ -1,101 +1,150 @@
-name: Publish Gist Personal
+name: Publish Gists
 
 on:
   push:
     paths:
-      - "rules/ip/**"
-      - "rules/non_ip/**"
-      - "rules/domainset/**"
-      - "rules/yaml/**"
       - "icons/**"
-      - "config/baiye-*.yaml"
-      - "config/baiye-*.yml"
+      - "rules/**"
+      - "config/baiye-multiple.yaml"
+      - "config/baiye-single.yaml"
   workflow_dispatch: {}
 
 concurrency:
   group: build-and-publish
   cancel-in-progress: true
 
-permissions:
-  contents: read
-
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout (with history)
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Decide if should build
-        id: decide
+      - name: Compute diff and build target list
+        id: diff
         shell: bash
         run: |
           set -euo pipefail
           BEFORE="${{ github.event.before }}"
-          if [ -z "${BEFORE}" ]; then BEFORE="$(git rev-parse HEAD^ || echo '')"; fi
-          if [ -n "${BEFORE}" ]; then
-            git diff --name-only "${BEFORE}" "${{ github.sha }}" > changed.all.txt
+          [ -z "$BEFORE" ] && BEFORE="$(git rev-parse HEAD^ || echo '')"
+          if [ -n "$BEFORE" ]; then
+            git diff --name-only "$BEFORE" "${{ github.sha }}" > changed.all.txt
           else
             git show --name-only --pretty="" "${{ github.sha }}" > changed.all.txt
           fi
+          sort -u changed.all.txt > changed.all.uniq.txt
 
-          # config 改动检测
-          grep -E '^config/baiye-(single|multiple)\.ya?ml$' changed.all.txt | sort -u > changed.config.txt || true
-          CONFIG_CHANGED=false; [ -s changed.config.txt ] && CONFIG_CHANGED=true
+          # 仅保留 icons/** 和 rules/** 的明细
+          grep -E '^(icons/|rules/)' changed.all.uniq.txt | sort -u > changed.targets.txt || true
 
-          # icons/rules 改动检测
-          grep -E '^(icons/|rules/(ip|non_ip|domainset|yaml)/)' changed.all.txt | sort -u > changed.targets.txt || true
+          # 标记 config 是否直接变更
+          MULTI_CHANGED=false
+          SINGLE_CHANGED=false
+          grep -qx "config/baiye-multiple.yaml" changed.all.uniq.txt && MULTI_CHANGED=true
+          grep -qx "config/baiye-single.yaml"   changed.all.uniq.txt && SINGLE_CHANGED=true
 
-          PROCEED=false
-          if [ "$CONFIG_CHANGED" = "true" ]; then
-            PROCEED=true
+          echo "multi_changed=${MULTI_CHANGED}"   >> $GITHUB_OUTPUT
+          echo "single_changed=${SINGLE_CHANGED}" >> $GITHUB_OUTPUT
+
+          echo "Changed files:" && cat changed.all.uniq.txt || true
+          echo "Changed targets (icons/rules):" && cat changed.targets.txt || true
+
+      - name: Decide whether multiple.yaml needs rebuild
+        id: need_multi
+        shell: bash
+        run: |
+          set -euo pipefail
+          NEED=false
+          if [ "${{ steps.diff.outputs.multi_changed }}" = "true" ]; then
+            NEED=true
           else
-            shopt -s nullglob
-            CONFIGS=(config/baiye-*.yml config/baiye-*.yaml)
-            if [ -s changed.targets.txt ] && [ ${#CONFIGS[@]} -gt 0 ]; then
-              : > referenced.targets.txt
-              while read -r P; do
-                [ -n "$P" ] || continue
-                if grep -RqlF -- "$P" "${CONFIGS[@]}"; then
-                  echo "$P" >> referenced.targets.txt
+            if [ -s changed.targets.txt ] && [ -f config/baiye-multiple.yaml ]; then
+              while IFS= read -r p; do
+                [ -z "$p" ] && continue
+                # 只要配置里包含该相对路径（如 icons/xxx 或 rules/xxx），就认为被引用
+                if grep -Fq "$p" config/baiye-multiple.yaml; then
+                  NEED=true
+                  break
                 fi
               done < changed.targets.txt
-              if [ -s referenced.targets.txt ]; then PROCEED=true; fi
             fi
           fi
+          echo "need=${NEED}" >> $GITHUB_OUTPUT
+          echo "need-multiple=${NEED}"
 
-          echo "proceed=$PROCEED" >> "$GITHUB_OUTPUT"
-          echo "commit_short=$(git rev-parse --short=7 ${{ github.sha }})" >> "$GITHUB_OUTPUT"
+      - name: Decide whether single.yaml needs rebuild
+        id: need_single
+        shell: bash
+        run: |
+          set -euo pipefail
+          NEED=false
+          if [ "${{ steps.diff.outputs.single_changed }}" = "true" ]; then
+            NEED=true
+          else
+            if [ -s changed.targets.txt ] && [ -f config/baiye-single.yaml ]; then
+              while IFS= read -r p; do
+                [ -z "$p" ] && continue
+                if grep -Fq "$p" config/baiye-single.yaml; then
+                  NEED=true
+                  break
+                fi
+              done < changed.targets.txt
+            fi
+          fi
+          echo "need=${NEED}" >> $GITHUB_OUTPUT
+          echo "need-single=${NEED}"
 
       - name: Setup Node
-        if: steps.decide.outputs.proceed == 'true'
+        if: steps.need_multi.outputs.need == 'true' || steps.need_single.outputs.need == 'true'
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
-      - name: Build & Publish Gist (multiple)
-        if: steps.decide.outputs.proceed == 'true'
+      # ── multiple + mini ────────────────────────────────────────────────────────
+      - name: Build & Publish (multiple + mini)
+        if: steps.need_multi.outputs.need == 'true'
         env:
           SUB_URL_1: ${{ secrets.SUB_URL_1 }}
           SUB_URL_2: ${{ secrets.SUB_URL_2 }}
           GIST_TOKEN: ${{ secrets.GIST_TOKEN }}
-          GIST_ID: ${{ secrets.GIST_ID_MULTIPLE }}
-          GIST_FILE_NAME: baiye-multiple.yaml
+          GIST_ID: ${{ secrets.GIST_ID }}
           CONFIG_PATH: config/baiye-multiple.yaml
-          COMMIT_SHORT: ${{ steps.decide.outputs.commit_short }}
+          COMMIT_SHORT: ${{ github.sha }}
+          GIST_FILE_MULTIPLE: baiye-multiple.yaml
+          GIST_FILE_MINI: BaiyeMini.yaml
         run: |
-          node .github/scripts/build-and-publish.js
+          export COMMIT_SHORT="${COMMIT_SHORT:0:7}"
+          node .github/scripts/build-and-publish-multiple.js
 
-      - name: Build & Publish Gist (single)
-        if: steps.decide.outputs.proceed == 'true'
+      - name: Upload artifacts (multiple + mini)
+        if: steps.need_multi.outputs.need == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: multiple-and-mini-generated
+          path: |
+            baiye-multiple.generated.yaml
+            BaiyeMini.generated.yaml
+
+      # ── single ────────────────────────────────────────────────────────────────
+      - name: Build & Publish (single)
+        if: steps.need_single.outputs.need == 'true'
         env:
           SUB_URL_1: ${{ secrets.SUB_URL_1 }}
           GIST_TOKEN: ${{ secrets.GIST_TOKEN }}
-          GIST_ID: ${{ secrets.GIST_ID_SINGLE }}
-          GIST_FILE_NAME: baiye-single.yaml
+          GIST_ID: ${{ secrets.GIST_ID }}
           CONFIG_PATH: config/baiye-single.yaml
-          COMMIT_SHORT: ${{ steps.decide.outputs.commit_short }}
+          COMMIT_SHORT: ${{ github.sha }}
+          GIST_FILE_SINGLE: baiye-single.yaml
         run: |
+          export COMMIT_SHORT="${COMMIT_SHORT:0:7}"
           node .github/scripts/build-and-publish-single.js
+
+      - name: Upload artifact (single)
+        if: steps.need_single.outputs.need == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: single-generated
+          path: baiye-single.generated.yaml
