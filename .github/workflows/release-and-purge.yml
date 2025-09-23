@@ -116,7 +116,6 @@ jobs:
           SHORT="$(git rev-parse --short=7 HEAD)"
           echo "SHORT for this run = $SHORT"
 
-          # 预览替换前：列出 config 中的 icons URL
           echo "[preview-before] icons URLs in config:"
           grep -RnoE 'https?://[^"'"'"'<>[:space:]]+/icons/[^"'"'"'<>[:space:]]+\.(png|jpe?g|webp|svg)(\?[^"'"'"'<>[:space:]]*)?' config || true
 
@@ -124,18 +123,23 @@ jobs:
           import sys, re, pathlib, urllib.parse
           SHORT = sys.argv[1]
 
-          url_pat = re.compile(r'https?://[^\s"\'<>]+')
+          # 宽松匹配 URL，然后在回调里精确过滤
+          url_pat = re.compile(r'https?://\S+')
 
-          def is_icon_path(parsed):
-              path = parsed.path or ""
+          def is_icon_url(u: str) -> bool:
+              try:
+                  p = urllib.parse.urlsplit(u)
+              except Exception:
+                  return False
+              path = p.path or ""
               return re.search(r'/icons/[^/]+\.(?:png|jpe?g|webp|svg)$', path, re.I) is not None
 
-          def bump_icon_url(u, short):
+          def bump_icon(u: str, short: str):
               try:
                   p = urllib.parse.urlsplit(u)
               except Exception:
                   return u, False
-              if not is_icon_path(p):
+              if not is_icon_url(u):
                   return u, False
               q = urllib.parse.parse_qsl(p.query, keep_blank_values=True)
               q = [(k, v) for (k, v) in q if k.lower() != 'v']
@@ -144,29 +148,33 @@ jobs:
               new_u = urllib.parse.urlunsplit((p.scheme, p.netloc, p.path, new_q, p.fragment))
               return new_u, (new_u != u)
 
-          # 计数用字典，避免 nonlocal 报错
-          counters = {"hits": 0, "changed": 0}
+          hits = 0
+          changed_total = 0
 
           for path in pathlib.Path("config").rglob("*.yml*"):
               s = path.read_text(encoding="utf-8")
-              changed_here = [0]  # 用列表包装成可变对象
+              changed_here = 0
 
-              def repl(m, counters=counters, changed_here=changed_here):
-                  counters["hits"] += 1
-                  new, changed = bump_icon_url(m.group(0), SHORT)
+              def repl(m):
+                  nonlocal hits, changed_total, changed_here
+                  url = m.group(0)
+                  if not is_icon_url(url):
+                      return url
+                  hits += 1
+                  new_u, changed = bump_icon(url, SHORT)
                   if changed:
-                      counters["changed"] += 1
-                      changed_here[0] += 1
-                  return new
+                      changed_total += 1
+                      changed_here += 1
+                  return new_u
 
               ns = url_pat.sub(repl, s)
               if ns != s:
                   path.write_text(ns, encoding="utf-8")
-                  print(f"[icon-bump] changed {path} (+{changed_here[0]})")
+                  print(f"[icon-bump] changed {path} (+{changed_here})")
               else:
                   print(f"[icon-bump] no change in {path}")
 
-          print(f"[icon-bump] summary: url_hits={counters['hits']}, replacements={counters['changed']}")
+          print(f"[icon-bump] summary: url_hits={hits}, replacements={changed_total}")
           PY
 
           echo "[preview-after] icons URLs in config:"
