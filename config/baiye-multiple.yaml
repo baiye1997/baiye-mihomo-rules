@@ -221,13 +221,13 @@ proxy-groups:
       - ♻️ 智能选择
       - 👆 手动选择
       - DIRECT
-    icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@latest/icons/choice.png?v=e1b58db"
+    icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@latest/icons/choice.png?v=4075fbb"
 
   # 手动 / Auto 顶层
   - name: 👆 手动选择
     <<: *Select
     filter: *FilterAll
-    icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@latest/icons/select.png?v=e1b58db"
+    icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@latest/icons/select.png?v=4075fbb"
 
   - name: ♻️ 智能选择
     type: url-test
@@ -235,43 +235,43 @@ proxy-groups:
     url: http://connectivitycheck.platform.hicloud.com/generate_204
     interval: 300
     tolerance: 50
-    icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@latest/icons/auto.png?v=e1b58db"
+    icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@latest/icons/auto.png?v=4075fbb"
 
 # 应用分组
   - name: 🍼 AI  服务
     type: select
     proxies: *AppRegionWithDirect
-    icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@latest/icons/openai.png?v=e1b58db"
+    icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@latest/icons/openai.png?v=4075fbb"
 
   - name: 🍎 苹果服务
     type: select
     proxies: *AppRegionWithDirect
-    icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@latest/icons/apple.png?v=e1b58db"
+    icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@latest/icons/apple.png?v=4075fbb"
 
   - name: Ⓜ️ 微软服务
     type: select
     proxies: *AppRegionWithDirect
-    icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@latest/icons/microsoft.png?v=e1b58db"
+    icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@latest/icons/microsoft.png?v=4075fbb"
 
   - name: 🎮 游戏服务
     type: select
     proxies: *AppRegionWithDirect
-    icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@latest/icons/game.png?v=e1b58db"
+    icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@latest/icons/game.png?v=4075fbb"
 
   - name: ☁️ Onedrive
     type: select
     proxies: *AppRegionWithDirect
-    icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@latest/icons/onedrive.png?v=e1b58db"
+    icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@latest/icons/onedrive.png?v=4075fbb"
 
   - name: 📺 视频规则
     type: select
     proxies: *FallbackWithDirect
-    icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@latest/icons/netflix.png?v=e1b58db"
+    icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@latest/icons/netflix.png?v=4075fbb"
 
   - name: ✈️ 电报信息
     type: select
     proxies: *AppRegionWithDirect
-    icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@latest/icons/telegram.png?v=e1b58db"
+    icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@latest/icons/telegram.png?v=4075fbb"
 
 # Auto 
   # 择优节点 - 按地区

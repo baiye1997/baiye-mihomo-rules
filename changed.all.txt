@@ -1,1 +1,1 @@
-.github/workflows/release-and-purge.yml
+.github/workflows/publish-gist.yml
