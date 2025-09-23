@@ -93,54 +93,55 @@ jobs:
           SHORT="$(git rev-parse --short=7 HEAD)"
           echo "SHORT for this run = $SHORT"
 
+          # 预览替换前
           echo "[preview-before] icons URLs in config:"
           grep -RnoE 'https?://[^"'"'"'<>[:space:]]+/icons/[^"'"'"'<>[:space:]]+\.(png|jpe?g|webp|svg)(\?[^"'"'"'<>[:space:]]*)?' config || true
 
           python - <<'PY' "$SHORT"
-import sys, re, pathlib, urllib.parse
-SHORT = sys.argv[1]
+          import sys, re, pathlib, urllib.parse
+          SHORT = sys.argv[1]
 
-url_pat = re.compile(r'https?://[^\s"\'<>]+')
+          url_pat = re.compile(r'https?://[^\s"\'<>]+')
 
-def is_icon_path(parsed):
-    path = parsed.path or ""
-    return re.search(r'/icons/[^/]+\.(?:png|jpe?g|webp|svg)$', path, re.I) is not None
+          def is_icon_path(parsed):
+              path = parsed.path or ""
+              return re.search(r'/icons/[^/]+\.(?:png|jpe?g|webp|svg)$', path, re.I) is not None
 
-def bump_icon_url(u):
-    try:
-        p = urllib.parse.urlsplit(u)
-    except Exception:
-        return u, False
-    if not is_icon_path(p):
-        return u, False
-    q = urllib.parse.parse_qsl(p.query, keep_blank_values=True)
-    q = [(k, v) for (k, v) in q if k.lower() != 'v']
-    q.append(('v', SHORT))
-    new_q = urllib.parse.urlencode(q)
-    new_u = urllib.parse.urlunsplit((p.scheme, p.netloc, p.path, new_q, p.fragment))
-    return new_u, (new_u != u)
+          def bump_icon_url(u):
+              try:
+                  p = urllib.parse.urlsplit(u)
+              except Exception:
+                  return u, False
+              if not is_icon_path(p):
+                  return u, False
+              q = urllib.parse.parse_qsl(p.query, keep_blank_values=True)
+              q = [(k, v) for (k, v) in q if k.lower() != 'v']
+              q.append(('v', SHORT))
+              new_q = urllib.parse.urlencode(q)
+              new_u = urllib.parse.urlunsplit((p.scheme, p.netloc, p.path, new_q, p.fragment))
+              return new_u, (new_u != u)
 
-total_hits = 0
-total_changed = 0
-for path in pathlib.Path("config").rglob("*.yml*"):
-    s = path.read_text(encoding="utf-8")
-    changed_here = 0
-    def repl(m):
-        nonlocal total_hits, total_changed, changed_here
-        new, changed = bump_icon_url(m.group(0))
-        total_hits += 1
-        if changed:
-            total_changed += 1
-            changed_here += 1
-        return new
-    ns = url_pat.sub(repl, s)
-    if ns != s:
-        path.write_text(ns, encoding="utf-8")
-        print(f"[icon-bump] changed {path} (+{changed_here})")
-    else:
-        print(f"[icon-bump] no change in {path}")
-print(f"[icon-bump] summary: url_hits={total_hits}, replacements={total_changed}")
-PY
+          total_hits = 0
+          total_changed = 0
+          for path in pathlib.Path("config").rglob("*.yml*"):
+              s = path.read_text(encoding="utf-8")
+              changed_here = 0
+              def repl(m):
+                  nonlocal total_hits, total_changed, changed_here
+                  new, changed = bump_icon_url(m.group(0))
+                  total_hits += 1
+                  if changed:
+                      total_changed += 1
+                      changed_here += 1
+                  return new
+              ns = url_pat.sub(repl, s)
+              if ns != s:
+                  path.write_text(ns, encoding="utf-8")
+                  print(f"[icon-bump] changed {path} (+{changed_here})")
+              else:
+                  print(f"[icon-bump] no change in {path}")
+          print(f"[icon-bump] summary: url_hits={total_hits}, replacements={total_changed}")
+          PY
 
           echo "[preview-after] icons URLs in config:"
           grep -RnoE 'https?://[^"'"'"'<>[:space:]]+/icons/[^"'"'"'<>[:space:]]+\.(png|jpe?g|webp|svg)(\?[^"'"'"'<>[:space:]]*)?' config || true
