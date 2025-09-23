@@ -1,30 +1,29 @@
-// 环境变量：SUB_URL_1, SUB_URL_2, GIST_TOKEN, GIST_ID, GIST_FILE_NAME
+// 环境变量：SUB_URL_1, SUB_URL_2, GIST_TOKEN, GIST_ID, GIST_FILE_NAME, CONFIG_PATH, COMMIT_SHORT
 // 用法：node .github/scripts/build-and-publish.js
 
 const fs = require('fs');
 const https = require('https');
 const path = require('path');
+const short = (process.env.COMMIT_SHORT || 'dev').slice(0, 7);
 
 function patchGist({ gistId, token, filename, content }) {
   return new Promise((resolve, reject) => {
-    const body = JSON.stringify({
-      files: { [filename]: { content } }
-    });
+    const body = JSON.stringify({ files: { [filename]: { content } } });
     const req = https.request(
       `https://api.github.com/gists/${gistId}`,
       {
         method: 'PATCH',
         headers: {
-          'Authorization': `token ${token}`,
+          Authorization: `token ${token}`,
           'User-Agent': 'github-actions',
-          'Accept': 'application/vnd.github+json',
+          Accept: 'application/vnd.github+json',
           'Content-Type': 'application/json',
-          'Content-Length': Buffer.byteLength(body)
-        }
+          'Content-Length': Buffer.byteLength(body),
+        },
       },
-      res => {
+      (res) => {
         let data = '';
-        res.on('data', d => (data += d));
+        res.on('data', (d) => (data += d));
         res.on('end', () => {
           if (res.statusCode >= 200 && res.statusCode < 300) {
             try { resolve(JSON.parse(data)); } catch { resolve({}); }
@@ -46,18 +45,34 @@ function patchGist({ gistId, token, filename, content }) {
   const gistToken = process.env.GIST_TOKEN;
   const gistId = process.env.GIST_ID;
   const gistFile = process.env.GIST_FILE_NAME || 'baiye-multiple.yaml';
-
   if (!sub1 || !sub2) throw new Error('Missing SUB_URL_1 or SUB_URL_2');
   if (!gistToken || !gistId) throw new Error('Missing GIST_TOKEN or GIST_ID');
-  
-  const srcRel = process.env.CONFIG_PATH || 'baiye-multiple.yaml'; // 新增：可用环境变量覆盖
+
+  const srcRel = process.env.CONFIG_PATH || 'baiye-multiple.yaml';
   const srcPath = path.resolve(srcRel);
-  if (!fs.existsSync(srcPath)) throw new Error(`${srcRel} not found at repo root`);
+  if (!fs.existsSync(srcPath)) throw new Error(`${srcRel} not found`);
 
   const raw = fs.readFileSync(srcPath, 'utf8');
 
-  // 占位符替换（可按需扩展）
-  const out = raw
+  // 仅对 /icons/*.(png|jpg|jpeg|webp|svg) 的 URL 覆盖/追加 v=short；保留其它 query 参数
+  function bumpIconsV(s) {
+    // 匹配整条 URL（含可选 query）
+    const re = /(https?:\/\/[^\s"'<>]+\/icons\/[^\s"'<>]+\.(?:png|jpe?g|webp|svg)(?:\?[^\s"'<>]*)?)/gi;
+    return s.replace(re, (full) => {
+      try {
+        const u = new URL(full);
+        u.searchParams.set('v', short);
+        return u.toString();
+      } catch {
+        // 解析失败就原样返回，避免误伤
+        return full;
+      }
+    });
+  }
+
+  // 先补 icon 的 v，再做占位符替换
+  const withIconV = bumpIconsV(raw);
+  const out = withIconV
     .replace(/替换订阅链接1/g, sub1)
     .replace(/替换订阅链接2/g, sub2)
     .replace(/\[显示名称A可修改\]/g, '[Haita]')
@@ -65,20 +80,13 @@ function patchGist({ gistId, token, filename, content }) {
 
   fs.writeFileSync('baiye-multiple.generated.yaml', out, 'utf8');
 
-  const res = await patchGist({
-    gistId,
-    token: gistToken,
-    filename: gistFile,
-    content: out
-  });
+  const res = await patchGist({ gistId, token: gistToken, filename: gistFile, content: out });
 
-  // 打印 Raw 地址，方便你复制
   const file = res?.files?.[gistFile];
   const rawUrl = file?.raw_url || '(no raw_url returned)';
   console.log('✅ Gist updated. Raw URL:', rawUrl);
-  // 也给个 GitHub Actions notice
   console.log(`::notice title=Gist Raw URL::${rawUrl}`);
-})().catch(err => {
+})().catch((err) => {
   console.error('❌', err.message || err);
   process.exit(1);
 });
