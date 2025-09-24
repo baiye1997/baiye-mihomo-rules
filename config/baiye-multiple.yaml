@@ -1,11 +1,11 @@
-# ======================= 建议仅修改此部分内容======================
-# ========================= 订阅 Providers =======================
-
 # 基础锚点
 url:  &url  "http://connectivitycheck.platform.hicloud.com/generate_204"   # 健康检查 URL
 blk:  &blk '^(?!.*(?i:(回国|校园|网站|地址|剩余|过期|时间|有效|网址|禁止|邮箱|发布|客服|订阅|节点|群|邀请|返利|循环|获取|流量|到期|下次|版本|官址|备用|已用|联系|工单|贩卖|通知|倒卖|国内|频道|说明|提示|作者|加入|USE|USED|TOTAL|EXPIRE|EMAIL|Panel|Channel|Author|\d{4}-\d{2}-\d{2}|\d+G))).*$'
 prov: &prov {type: http, interval: 86400, health-check: {enable: true, url: *url, interval: 300}}
 
+
+# ======================= 建议仅修改此部分内容======================
+# ========================= 订阅 Providers =======================
 # "替换订阅链接1"里填入你的机场订阅链接
 # [显示名称可修改]即客户端中可显示的节点前缀，可根据喜好自行更改，如：[🐂🍺] -香港节点1 #需保留括号
 
@@ -109,28 +109,11 @@ dns:
     - "tls://[2606:4700:4700::1111]"
     - "tls://[2001:4860:4860::8888]"
 
-  # fake-ip 例外
+  # fake-ip （ruleset 引用 + 仍可追加零星域名）
   fake-ip-filter:
-    - geosite:private
-    - geosite:connectivity-check
-    - geosite:cn
-    - '*.lan'
-    - '*.local'
-    - '*.localdomain'
-    - '*.home.arpa'
-    - '*.localhost'
-    - '*.msftncsi.com'
-    - '*.msftconnecttest.com'
-    - 'time.*'
-    - 'ntp.*'
-    - 'pool.ntp.org'
-    - '*.ntp.org.cn'
-    - 'stun.*'
-    - 'stun.*.*'
-    - 'stun.*.*.*'
-    - 'Mijia Cloud'
-    - 'dig.io.mi.com'
-    - 'localhost.ptlogin2.qq.com'
+    - rule-set:fake_ip   #  规则集引用
+    # 也可继续追加：
+    # - 'example.local'
 
 
 # ========================== 嗅探设置 ==========================
@@ -141,35 +124,9 @@ sniffer:
     TLS:  {ports: [443, 8443]}
     QUIC: {ports: [443, 8443]}
   skip-domain:
-    # Apple Push
-    - "courier.push.apple.com"
-    - "api.push.apple.com"
-    - "+.push.apple.com"
-    # Microsoft Push (WNS)
-    - "wns.windows.com"
-    - "*.wns.windows.com"
-    - "*.notify.windows.com"
-    - "+.push.microsoft.com"
-    # Google FCM
-    - "mtalk.google.com"
-    - "fcm.googleapis.com"
-    - "+.push.google.com"
-    # Xiaomi / Mijia
-    - "Mijia Cloud"
-    - "miot-spec.org"
-    - "api.io.mi.com"
-    - "push.xiaomi.com"
-    # 常见服务
-    - "push.hicloud.com"
-    - "push.oppomobile.com"
-    - "+.zoom.us"
-    - "+.teams.microsoft.com"
-    - "+.skype.com"
-    - "+.live.com"
-    - "+.office.com"
-    - "+.outlook.com"
-    - "+.discord.com"
-    - "+.steamcontent.com"
+    - rule-set:sniff_skip   #  规则集引用
+    # 也可继续追加：
+    # - "+.example.com"
 
 
 # ============================ TUN ============================
@@ -267,10 +224,12 @@ cls: &cls {type: http, behavior: classical, interval: 43200, format: text, proxy
 dom: &dom {type: http, behavior: domain,    interval: 43200, format: text, proxy: "🚀 节点选择"}
 
 rule-providers:
-  FuckAD:               {<<: *dom, format: yaml, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/yaml/fuckAds.yaml,      path: ./rules/yaml/fuckAds.yaml}
+  FuckAD:               {<<: *dom, format: yaml, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/yaml/fuckAds.yaml,     path: ./rules/yaml/fuckAds.yaml}
+  Game:                 {<<: *cls, format: yaml, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/yaml/Game.yaml,        path: ./rules/yaml/Game.yaml}
+  sniff_skip:           {<<: *dom, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/domainset/sniff-skip.list,           path: ./rules/domainset/sniff-skip.list}
+  fake_ip:              {<<: *dom, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/domainset/fake_ip.list,              path: ./rules/domainset/fake_ip.list}
   cdn_domainset:        {<<: *dom, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/domainset/cdn.txt,                   path: ./rules/domainset/cdn.txt}
   cdn_non_ip:           {<<: *cls, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/non_ip/cdn.txt,                      path: ./rules/non_ip/cdn.txt}
-  Game:                 {<<: *cls, format: yaml, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/yaml/Game.yaml,        path: ./rules/yaml/Game.yaml}
   stream_non_ip:        {<<: *cls, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/non_ip/stream.txt,                   path: ./rules/non_ip/stream.txt}
   stream_ip:            {<<: *cls, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/ip/stream.txt,                       path: ./rules/ip/stream.txt}
   ai_non_ip:            {<<: *cls, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/non_ip/ai.txt,                       path: ./rules/non_ip/ai.txt}
