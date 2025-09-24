@@ -2,15 +2,15 @@ name: Sync External Rules
 
 on:
   schedule:
-    - cron: "0 22 * * *"   
-  workflow_dispatch: {}     
+    - cron: "0 22 * * *"   # UTC 22:00（东八区次日 06:00）
+  workflow_dispatch: {}
 
 concurrency:
   group: sync-external-rules
   cancel-in-progress: true
 
 permissions:
-  contents: read                 # 拉取上游用；push 我们用 PAT，不需要给 actions token 写权限
+  contents: read   # 读取够了；写入用 PAT
 
 jobs:
   sync:
@@ -20,7 +20,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          persist-credentials: false   # 重要！
+          persist-credentials: false   # 关键：不用 GITHUB_TOKEN
 
       - name: Update rule files
         run: bash scripts/update_rules.sh
@@ -39,7 +39,7 @@ jobs:
       - name: Commit & Push (PAT)
         if: steps.diff.outputs.changed == 'true'
         env:
-          GH_PAT: ${{ secrets.ACTIONS_PAT }}     # 你刚保存的 secret
+          GH_PAT: ${{ secrets.ACTIONS_PAT }}   # 你在 Secrets 里保存的 PAT
         shell: bash
         run: |
           set -euo pipefail
@@ -47,7 +47,8 @@ jobs:
           git config user.email "baiye-bot@users.noreply.github.com"
 
           git add -A
-          git commit -m "chore(sync): update external rules from upstream [ci skip]"
+          # ⚠️ 不要写 [ci skip]，否则 push 不会触发其它工作流
+          git commit -m "chore(sync): update external rules from upstream"
 
-          # 用 PAT 直连 https remote 推 main（如默认分支不是 main 请改名）
-          git push "https://x-access-token:${GH_PAT}@github.com/${{ github.repository }}.git" HEAD:main
+          # 推送到当前工作流的分支（通常是默认分支）
+          git push "https://x-access-token:${GH_PAT}@github.com/${{ github.repository }}.git" HEAD:${{ github.ref_name }}
