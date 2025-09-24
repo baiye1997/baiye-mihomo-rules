@@ -5,27 +5,49 @@ on:
     - cron: "0 22 * * *"   
   workflow_dispatch: {}     
 
+concurrency:
+  group: sync-external-rules
+  cancel-in-progress: true
+
 permissions:
-  contents: write
+  contents: read                 # 拉取上游用；push 我们用 PAT，不需要给 actions token 写权限
 
 jobs:
   sync:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout (no GITHUB_TOKEN creds)
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false   # 重要！
 
       - name: Update rule files
         run: bash scripts/update_rules.sh
 
-      - name: Commit & push if changed
+      - name: Detect changes
+        id: diff
+        shell: bash
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          if [[ -n "$(git status --porcelain)" ]]; then
-            git add -A
-            git commit -m "chore: daily rules sync $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
-            git push
+          set -euo pipefail
+          if git status --porcelain | grep .; then
+            echo "changed=true" >>"$GITHUB_OUTPUT"
           else
-            echo "No changes to commit."
+            echo "changed=false" >>"$GITHUB_OUTPUT"
           fi
+
+      - name: Commit & Push (PAT)
+        if: steps.diff.outputs.changed == 'true'
+        env:
+          GH_PAT: ${{ secrets.ACTIONS_PAT }}     # 你刚保存的 secret
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name  "baiye-bot"
+          git config user.email "baiye-bot@users.noreply.github.com"
+
+          git add -A
+          git commit -m "chore(sync): update external rules from upstream [ci skip]"
+
+          # 用 PAT 直连 https remote 推 main（如默认分支不是 main 请改名）
+          git push "https://x-access-token:${GH_PAT}@github.com/${{ github.repository }}.git" HEAD:main
