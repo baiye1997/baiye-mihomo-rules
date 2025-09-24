@@ -1,0 +1,33 @@
+# Apple Push
++.push.apple.com
+courier.push.apple.com
+api.push.apple.com
+
+# Microsoft Push (WNS)
++.push.microsoft.com
+wns.windows.com
+*.wns.windows.com
+*.notify.windows.com
+
+# Google FCM
++.push.google.com
+mtalk.google.com
+fcm.googleapis.com
+
+# Xiaomi / Mijia
+Mijia Cloud
+miot-spec.org
+api.io.mi.com
+push.xiaomi.com
+
+# 常见服务
+push.hicloud.com
+push.oppomobile.com
++.zoom.us
++.teams.microsoft.com
++.skype.com
++.live.com
++.office.com
++.outlook.com
++.discord.com
++.steamcontent.com
