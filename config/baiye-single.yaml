@@ -1,18 +1,25 @@
 # ======================= 建议仅修改此部分内容======================
-# 🌟🌟🌟🌟🌟🌟🌟🌟🌟 订阅 Providers 🌟🌟🌟🌟🌟🌟🌟🌟🌟
+# ========================= 订阅 Providers =======================
+# 基础锚点
+
 url:  &url  "http://connectivitycheck.platform.hicloud.com/generate_204"   # 健康检查 URL
 blk:  &blk '^(?!.*(?i:(回国|校园|网站|地址|剩余|过期|时间|有效|网址|禁止|邮箱|发布|客服|订阅|节点|群|邀请|返利|循环|获取|流量|到期|下次|版本|官址|备用|已用|联系|工单|贩卖|通知|倒卖|国内|频道|说明|提示|作者|加入|USE|USED|TOTAL|EXPIRE|EMAIL|Panel|Channel|Author|\d{4}-\d{2}-\d{2}|\d+G))).*$'
 prov: &prov {type: http, interval: 86400, health-check: {enable: true, url: *url, interval: 300}}
+
 # "替换订阅链接1"里填入你的机场订阅链接
-# [显示名称A可修改]及客户端中的节点前缀，可根据喜好自行更改，如：[🐂🍺]
+
 proxy-providers:
   Node:
     url: "替换订阅链接1"
     <<: *NodeParam
     path: './proxy_provider/providers.yaml'
     filter: *blk
+
+
 # ======================  ⬆️⬆️⬆️⬆️⬆️  ========================
 
+
+# ======================= 以下内容建议小白勿修改 =======================
 # ========================== 基础配置 ==========================
 mixed-port: 7897
 allow-lan: true
