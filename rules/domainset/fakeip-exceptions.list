@@ -1,0 +1,28 @@
+# 基础类
+geosite:private
+geosite:connectivity-check
+geosite:cn
+*.lan
+*.local
+*.localdomain
+*.home.arpa
+*.localhost
+
+# NTP / 时间同步
+time.*
+ntp.*
+pool.ntp.org
+*.ntp.org.cn
+
+# STUN / 打洞
+stun.*
+stun.*.*
+stun.*.*.*
+
+# IoT / 设备
++.mi.com
+Mijia Cloud
+dig.io.mi.com
+
+# 特殊站点
+localhost.ptlogin2.qq.com
