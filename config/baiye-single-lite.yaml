@@ -101,7 +101,7 @@ dns:
 
   # fake-ip （ruleset 引用 + 仍可追加零星域名）
   fake-ip-filter:
-    - geosite,fakeip-filter   #  规则集引用
+    - rule-set:fake_ip   #  规则集引用
     # 也可继续追加：
     # - 'example.local'
 
@@ -138,10 +138,10 @@ geodata-loader: standard
 geo-auto-update: true
 geo-update-interval: 24
 geox-url:
-  geosite: "https://github.com/DustinWin/ruleset_geodata/releases/download/mihomo-geodata/geosite-all.dat"
-  geoip: "https://github.com/DustinWin/ruleset_geodata/releases/download/mihomo-geodata/geoip.dat"
-  mmdb: "hhttps://github.com/DustinWin/ruleset_geodata/releases/download/mihomo-geodata/Country.mmdb"
-  asn: "https://github.com/DustinWin/ruleset_geodata/releases/download/mihomo-geodata/Country-ASN.mmdb"
+  geoip:   "https://cdn.jsdelivr.net/gh/Loyalsoldier/v2ray-rules-dat@release/geoip.dat"
+  geosite: "https://cdn.jsdelivr.net/gh/Loyalsoldier/v2ray-rules-dat@release/geosite.dat"
+  mmdb:    "https://cdn.jsdelivr.net/gh/Loyalsoldier/geoip@release/Country.mmdb"
+  asn:     "https://cdn.jsdelivr.net/gh/Loyalsoldier/geoip@release/GeoLite2-ASN.mmdb"
 
 
 # ============================ 锚点 ============================
@@ -176,21 +176,21 @@ proxy-groups:
   # 入口与基础
   - {name: "🚀 节点选择", <<: *entr, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/choice.png"}
   - {name: "👆 手动选择", <<: *manu, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/select.png"}
-  - {name: "♻️ 智能选择", <<: *test, proxies: ["🇭🇰 - 择优节点","🇹🇼 - 择优节点","🇯🇵 - 择优节点","🇸🇬 - 择优节点"], icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/auto.png"}
+  - {name: "♻️ 智能选择", type: url-test, proxies: ["🇭🇰 - 择优节点","🇹🇼 - 择优节点","🇯🇵 - 择优节点","🇸🇬 - 择优节点"], url: *url, interval: 300, tolerance: 50, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/auto.png"}
 
   # 应用分组
-  - {name: "🧩 AI  服务", <<: *app,  icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/openai.png"}
+  - {name: "🌐 全球直连", <<: *app,  icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/link.png"}
+  - {name: "🤖 AI  平台", <<: *app,  icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/openai.png"}
   - {name: "☁️ Onedrive", <<: *app,  icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/onedrive.png"}
-  - {name: "🦴 谷歌直连", <<: *app,  icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/google.png"}
-  - {name: "Ⓜ️ 微软直连", <<: *app,  icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/microsoft.png"}
-  - {name: "🍎 苹果直连", <<: *app,  icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/apple.png"}
-  - {name: "🎮 游戏直连", <<: *app,  icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/gamecn.png"}
+  - {name: "Ⓜ️ 微软服务", <<: *app,  icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/microsoft.png"}
+  - {name: "🍎 苹果服务", <<: *app,  icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/apple.png"}
   - {name: "🎮 游戏平台", <<: *app,  icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/game.png"}
+  - {name: "🎵 Spotify", <<: *strm, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/spotify.png"} 
   - {name: "📺 视频媒体", <<: *strm, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/netflix.png"}
-  - {name: "🔗 网络测试", <<: *app, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/link.png"}
 
   # 自动优选（地区）
   - {name: "🇭🇰 - 择优节点", <<: *test, filter: *hk}
+  - {name: "🇹🇼 - 择优节点", <<: *test, filter: *tw}
   - {name: "🇯🇵 - 择优节点", <<: *test, filter: *jp}
   - {name: "🇰🇷 - 择优节点", <<: *test, filter: *kr}
   - {name: "🇸🇬 - 择优节点", <<: *test, filter: *sg}
@@ -198,10 +198,10 @@ proxy-groups:
   - {name: "🇬🇧 - 择优节点", <<: *test, filter: *uk}
   - {name: "🇫🇷 - 择优节点", <<: *test, filter: *fr}
   - {name: "🇩🇪 - 择优节点", <<: *test, filter: *de}
-  - {name: "🇹🇼 - 择优节点", <<: *test, filter: *tw}
 
   # 自动回退（地区）
   - {name: "🇭🇰 - 自动回退", <<: *fall, filter: *hk}
+  - {name: "🇹🇼 - 自动回退", <<: *fall, filter: *tw}
   - {name: "🇯🇵 - 自动回退", <<: *fall, filter: *jp}
   - {name: "🇰🇷 - 自动回退", <<: *fall, filter: *kr}
   - {name: "🇸🇬 - 自动回退", <<: *fall, filter: *sg}
@@ -209,7 +209,6 @@ proxy-groups:
   - {name: "🇬🇧 - 自动回退", <<: *fall, filter: *uk}
   - {name: "🇫🇷 - 自动回退", <<: *fall, filter: *fr}
   - {name: "🇩🇪 - 自动回退", <<: *fall, filter: *de}
-  - {name: "🇹🇼 - 自动回退", <<: *fall, filter: *tw}
 
 
 # =========================== 规则集 ===========================
@@ -219,6 +218,9 @@ dom: &dom {type: http, behavior: domain,    interval: 43200, format: text, proxy
 rule-providers:
   FuckAD:               {<<: *dom, format: yaml, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/yaml/fuckAds.yaml,     path: ./rules/yaml/fuckAds.yaml}
   sniff_skip:           {<<: *dom, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/domainset/sniff-skip.list,           path: ./rules/domainset/sniff-skip.list}
+  fake_ip:              {<<: *dom, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/domainset/fake_ip.list,              path: ./rules/domainset/fake_ip.list}
+  stream_non_ip:        {<<: *cls, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/non_ip/stream.txt,                   path: ./rules/non_ip/stream.txt}
+  stream_ip:            {<<: *cls, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/ip/stream.txt,                       path: ./rules/ip/stream.txt}
 
 # =========================== 分流规则 ==========================
 rules:
@@ -226,25 +228,29 @@ rules:
   - GEOSITE,private,DIRECT
   - RULE-SET,FuckAD,REJECT
   - DOMAIN-SUFFIX,bing.com,DIRECT
+  - DOMAIN-SUFFIX,oaiusercontent.com,🤖 AI  平台
   - GEOSITE,onedrive,☁️ Onedrive
-  - GEOSITE,games-cn,🎮 游戏直连 #一般境内可直连
-  - GEOSITE,google-cn,🦴 谷歌直连 #一般境内可直连
-  - GEOSITE,microsoft-cn,Ⓜ️ 微软直连 #一般境内可直连
-  - GEOSITE,apple-cn,🍎 苹果直连 #一般境内可直连
-  - GEOSITE,media,📺 视频媒体
-  - GEOSITE,games,🎮 游戏平台
-  - GEOSITE,ai,🧩 AI  服务
-  - GEOSITE,networktest,🔗 网络测试
-  - GEOSITE,tld-proxy,🚀 节点选择
-  - GEOSITE,gfw,🚀 节点选择
+  - GEOSITE,category-ai-cn,🌐 全球直连
+  - GEOSITE,category-ai-!cn,🤖 AI  平台
+  - GEOSITE,category-games@cn,🌐 全球直连
+  - GEOSITE,category-games,🎮 游戏平台
+  - GEOSITE,google-cn,🌐 全球直连
+  - GEOSITE,microsoft@cn,🌐 全球直连
+  - GEOSITE,microsoft,Ⓜ️ 微软服务
+  - GEOSITE,apple-cn,🌐 全球直连
+  - GEOSITE,apple,🍎 苹果服务
+  - GEOSITE,category-media-cn,🌐 全球直连
+  - GEOSITE,spotify,🎵 Spotify
+  - RULE-SET,stream_non_ip,📺 视频媒体
+  - GEOSITE,category-ai-cn,🌐 全球直连
   - GEOSITE,cn,DIRECT
+  - GEOSITE,geolocation-!cn,🚀 节点选择
 
   # IP 类
-  - GEOIP,privateip,DIRECT,no-resolve
+  - GEOIP,private,DIRECT,no-resolve
+  - RULE-SET,stream_ip,📺 视频媒体,no-resolve
+  - GEOIP,telegram,🚀 节点选择,no-resolve
   - GEOIP,cn,DIRECT,no-resolve
-  - GEOIP,media,📺 视频媒体,no-resolve
-  - GEOIP,games,🎮 游戏平台,no-resolve
-  - GEOIP,telegram_ip,🚀 节点选择,no-resolve
 
   # 兜底
   - MATCH,🚀 节点选择
