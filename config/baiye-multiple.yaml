@@ -273,7 +273,7 @@ rules:
   # IP 类
   - GEOIP,private,DIRECT,no-resolve
   - RULE-SET,stream_ip,📺 视频媒体,no-resolve
-  - RULE-SET,telegram_ip,✈️ 电报信息,no-resolve
+  - RULE-SET,telegram_ip,🚀 节点选择,no-resolve
   - GEOIP,cn,DIRECT,no-resolve
 
   # 兜底
