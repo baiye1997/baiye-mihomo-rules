@@ -95,7 +95,7 @@ dns:
       - "180.184.1.1"
       - "[2400:3200::1]"
       - "[2402:4e00::]"
-    'geosite:geolocation-!cn':
+    'geosite:proxy':
       - "tls://1.1.1.1"
       - "tls://8.8.8.8"
       - "tls://[2606:4700:4700::1111]"
@@ -148,10 +148,10 @@ geodata-loader: standard
 geo-auto-update: true
 geo-update-interval: 24
 geox-url:
-  geoip:   "https://cdn.jsdelivr.net/gh/Loyalsoldier/v2ray-rules-dat@release/geoip.dat"
-  geosite: "https://cdn.jsdelivr.net/gh/Loyalsoldier/v2ray-rules-dat@release/geosite.dat"
-  mmdb:    "https://cdn.jsdelivr.net/gh/Loyalsoldier/geoip@release/Country.mmdb"
-  asn:     "https://cdn.jsdelivr.net/gh/Loyalsoldier/geoip@release/GeoLite2-ASN.mmdb"
+  geosite: "https://github.com/DustinWin/ruleset_geodata/releases/download/mihomo-geodata/geosite-all.dat"
+  geoip: "https://github.com/DustinWin/ruleset_geodata/releases/download/mihomo-geodata/geoip.dat"
+  mmdb: "hhttps://github.com/DustinWin/ruleset_geodata/releases/download/mihomo-geodata/Country.mmdb"
+  asn: "https://github.com/DustinWin/ruleset_geodata/releases/download/mihomo-geodata/Country-ASN.mmdb"
 
 
 # ============================ 锚点 ============================
@@ -191,10 +191,15 @@ proxy-groups:
   # 应用分组
   - {name: "🧩 AI  服务", <<: *app,  icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/openai.png"}
   - {name: "☁️ Onedrive", <<: *app,  icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/onedrive.png"}
+  - {name: "🦴 谷歌直连", <<: *app,  icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/google.png"}
+  - {name: "Ⓜ️ 微软直连", <<: *app,  icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/microsoft.png"}
   - {name: "Ⓜ️ 微软服务", <<: *app,  icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/microsoft.png"}
+  - {name: "🍎 苹果直连", <<: *app,  icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/apple.png"}
   - {name: "🍎 苹果服务", <<: *app,  icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/apple.png"}
+  - {name: "🎮 游戏直连", <<: *app,  icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/gamecn.png"}
   - {name: "🎮 游戏服务", <<: *app,  icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/game.png"}
   - {name: "📺 视频规则", <<: *strm, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/netflix.png"}
+  - {name: "🔗 网络测试", <<: *app, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/link.png"}
 
   # 自动优选（地区）
   - {name: "🇭🇰 - 择优节点", <<: *test, filter: *hk}
@@ -253,26 +258,27 @@ rules:
   - DOMAIN-SUFFIX,oaistatic.com,🧩 AI  服务
   - RULE-SET,cdn_domainset,🚀 节点选择
   - RULE-SET,cdn_non_ip,🚀 节点选择
-  - RULE-SET,stream_non_ip,📺 视频规则
+  - RULE-SET,stream_non_ip,📺 视频媒体
   - RULE-SET,ai_non_ip,🧩 AI  服务
-  - GEOSITE,category-games@cn,DIRECT
-  - RULE-SET,Game,🎮 游戏服务
-  - GEOSITE,google-cn,DIRECT
-  - RULE-SET,apple_cdn,DIRECT
-  - RULE-SET,apple_cn_non_ip,DIRECT
+  - GEOSITE,games-cn,🎮 游戏直连 #一般境内可直连
+  - RULE-SET,Game,🎮 游戏平台
+  - GEOSITE,google-cn,🦴 谷歌直连 #一般境内可直连
+  - RULE-SET,apple_cdn,🍎 苹果直连 #一般境内可直连
+  - RULE-SET,apple_cn_non_ip,🍎 苹果直连 #一般境内可直连
   - RULE-SET,apple_services,🍎 苹果服务
-  - RULE-SET,microsoft_cdn_non_ip,DIRECT
+  - RULE-SET,microsoft_cdn_non_ip,Ⓜ️ 微软直连 #一般境内可直连
   - GEOSITE,onedrive,☁️ Onedrive
   - RULE-SET,microsoft_non_ip,Ⓜ️ 微软服务
   - RULE-SET,download_domainset,🚀 节点选择
   - RULE-SET,download_non_ip,🚀 节点选择
+  - GEOSITE,networktest,🔗 网络测试
+  - GEOSITE,tld-proxy,🚀 节点选择
+  - GEOSITE,proxy,🚀 节点选择
   - GEOSITE,cn,DIRECT
-  - GEOSITE,gfw,🚀 节点选择
-  - GEOSITE,geolocation-!cn,🚀 节点选择
 
   # IP 类
-  - GEOIP,private,DIRECT,no-resolve
-  - RULE-SET,stream_ip,📺 视频规则,no-resolve
+  - GEOIP,privateip,DIRECT,no-resolve
+  - RULE-SET,stream_ip,📺 视频媒体,no-resolve
   - RULE-SET,telegram_ip,🚀 节点选择,no-resolve
   - GEOIP,cn,DIRECT,no-resolve
 

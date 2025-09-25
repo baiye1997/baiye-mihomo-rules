@@ -85,7 +85,7 @@ dns:
       - "180.184.1.1"
       - "[2400:3200::1]"
       - "[2402:4e00::]"
-    'geosite:proxy':
+    'geosite:geolocation-!cn':
       - "tls://1.1.1.1"
       - "tls://8.8.8.8"
       - "tls://[2606:4700:4700::1111]"
@@ -101,7 +101,7 @@ dns:
 
   # fake-ip （ruleset 引用 + 仍可追加零星域名）
   fake-ip-filter:
-    - rule-set:fake_ip   #  规则集引用
+    - geosite,fakeip-filter   #  规则集引用
     # 也可继续追加：
     # - 'example.local'
 
@@ -183,12 +183,10 @@ proxy-groups:
   - {name: "☁️ Onedrive", <<: *app,  icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/onedrive.png"}
   - {name: "🦴 谷歌直连", <<: *app,  icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/google.png"}
   - {name: "Ⓜ️ 微软直连", <<: *app,  icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/microsoft.png"}
-  - {name: "Ⓜ️ 微软服务", <<: *app,  icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/microsoft.png"}
   - {name: "🍎 苹果直连", <<: *app,  icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/apple.png"}
-  - {name: "🍎 苹果服务", <<: *app,  icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/apple.png"}
   - {name: "🎮 游戏直连", <<: *app,  icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/gamecn.png"}
-  - {name: "🎮 游戏服务", <<: *app,  icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/game.png"}
-  - {name: "📺 视频规则", <<: *strm, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/netflix.png"}
+  - {name: "🎮 游戏平台", <<: *app,  icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/game.png"}
+  - {name: "📺 视频媒体", <<: *strm, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/netflix.png"}
   - {name: "🔗 网络测试", <<: *app, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/link.png"}
 
   # 自动优选（地区）
@@ -220,23 +218,7 @@ dom: &dom {type: http, behavior: domain,    interval: 43200, format: text, proxy
 
 rule-providers:
   FuckAD:               {<<: *dom, format: yaml, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/yaml/fuckAds.yaml,     path: ./rules/yaml/fuckAds.yaml}
-  Game:                 {<<: *cls, format: yaml, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/yaml/Game.yaml,        path: ./rules/yaml/Game.yaml}
   sniff_skip:           {<<: *dom, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/domainset/sniff-skip.list,           path: ./rules/domainset/sniff-skip.list}
-  fake_ip:              {<<: *dom, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/domainset/fake_ip.list,              path: ./rules/domainset/fake_ip.list}
-  cdn_domainset:        {<<: *dom, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/domainset/cdn.txt,                   path: ./rules/domainset/cdn.txt}
-  cdn_non_ip:           {<<: *cls, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/non_ip/cdn.txt,                      path: ./rules/non_ip/cdn.txt}
-  stream_non_ip:        {<<: *cls, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/non_ip/stream.txt,                   path: ./rules/non_ip/stream.txt}
-  stream_ip:            {<<: *cls, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/ip/stream.txt,                       path: ./rules/ip/stream.txt}
-  ai_non_ip:            {<<: *cls, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/non_ip/ai.txt,                       path: ./rules/non_ip/ai.txt}
-  telegram_ip:          {<<: *cls, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/ip/telegram.txt,                     path: ./rules/ip/telegram.txt}
-  apple_cdn:            {<<: *dom, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/domainset/apple_cdn.txt,             path: ./rules/domainset/apple_cdn.txt}
-  apple_services:       {<<: *cls, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/non_ip/apple_services.txt,           path: ./rules/non_ip/apple_services.txt}
-  apple_cn_non_ip:      {<<: *cls, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/non_ip/apple_cn.txt,                 path: ./rules/non_ip/apple_cn.txt}
-  microsoft_cdn_non_ip: {<<: *cls, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/non_ip/microsoft_cdn.txt,            path: ./rules/non_ip/microsoft_cdn.txt}
-  microsoft_non_ip:     {<<: *cls, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/non_ip/microsoft.txt,                path: ./rules/non_ip/microsoft.txt}
-  download_domainset:   {<<: *dom, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/domainset/download.txt,              path: ./rules/domainset/download.txt}
-  download_non_ip:      {<<: *cls, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/non_ip/download.txt,                 path: ./rules/non_ip/download.txt}
-
 
 # =========================== 分流规则 ==========================
 rules:
@@ -244,33 +226,25 @@ rules:
   - GEOSITE,private,DIRECT
   - RULE-SET,FuckAD,REJECT
   - DOMAIN-SUFFIX,bing.com,DIRECT
-  - DOMAIN-SUFFIX,oaiusercontent.com,🧩 AI  服务
-  - DOMAIN-SUFFIX,oaistatic.com,🧩 AI  服务
-  - RULE-SET,cdn_domainset,🚀 节点选择
-  - RULE-SET,cdn_non_ip,🚀 节点选择
-  - RULE-SET,stream_non_ip,📺 视频媒体
-  - RULE-SET,ai_non_ip,🧩 AI  服务
-  - GEOSITE,games-cn,🎮 游戏直连 #一般境内可直连
-  - RULE-SET,Game,🎮 游戏平台
-  - GEOSITE,google-cn,🦴 谷歌直连 #一般境内可直连
-  - RULE-SET,apple_cdn,🍎 苹果直连 #一般境内可直连
-  - RULE-SET,apple_cn_non_ip,🍎 苹果直连 #一般境内可直连
-  - RULE-SET,apple_services,🍎 苹果服务
-  - RULE-SET,microsoft_cdn_non_ip,Ⓜ️ 微软直连 #一般境内可直连
   - GEOSITE,onedrive,☁️ Onedrive
-  - RULE-SET,microsoft_non_ip,Ⓜ️ 微软服务
-  - RULE-SET,download_domainset,🚀 节点选择
-  - RULE-SET,download_non_ip,🚀 节点选择
+  - GEOSITE,games-cn,🎮 游戏直连 #一般境内可直连
+  - GEOSITE,google-cn,🦴 谷歌直连 #一般境内可直连
+  - GEOSITE,microsoft-cn,Ⓜ️ 微软直连 #一般境内可直连
+  - GEOSITE,apple-cn,🍎 苹果直连 #一般境内可直连
+  - GEOSITE,media,📺 视频媒体
+  - GEOSITE,games,🎮 游戏平台
+  - GEOSITE,ai,🧩 AI  服务
   - GEOSITE,networktest,🔗 网络测试
   - GEOSITE,tld-proxy,🚀 节点选择
-  - GEOSITE,proxy,🚀 节点选择
+  - GEOSITE,gfw,🚀 节点选择
   - GEOSITE,cn,DIRECT
 
   # IP 类
   - GEOIP,privateip,DIRECT,no-resolve
-  - RULE-SET,stream_ip,📺 视频媒体,no-resolve
-  - RULE-SET,telegram_ip,🚀 节点选择,no-resolve
   - GEOIP,cn,DIRECT,no-resolve
+  - GEOIP,media,📺 视频媒体,no-resolve
+  - GEOIP,games,🎮 游戏平台,no-resolve
+  - GEOIP,telegram_ip,🚀 节点选择,no-resolve
 
   # 兜底
   - MATCH,🚀 节点选择

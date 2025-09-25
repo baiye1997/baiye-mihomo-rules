@@ -55,11 +55,11 @@ function bumpIconsV(s) {
 
 (async () => {
   const sub1 = process.env.SUB_URL_1;
-  const gistToken = process.env.GIST_TOKEN;
+  const token = process.env.GIST_TOKEN;
   const gistId = process.env.GIST_ID;
 
   if (!sub1) throw new Error('Missing SUB_URL_1');
-  if (!gistToken || !gistId) throw new Error('Missing GIST_TOKEN or GIST_ID');
+  if (!token || !gistId) throw new Error('Missing GIST_TOKEN or GIST_ID');
 
   const srcRel = process.env.CONFIG_PATH || 'config/baiye-single.yaml';
   const srcPath = path.resolve(srcRel);
@@ -67,17 +67,18 @@ function bumpIconsV(s) {
 
   const raw = fs.readFileSync(srcPath, 'utf8');
 
-  // 1) 加 icon v=short；2) 只替换订阅链接1
   const withIconV = bumpIconsV(raw);
   const outSingle = withIconV.replace(/替换订阅链接1/g, sub1);
 
-  fs.writeFileSync('baiye-single.generated.yaml', outSingle, 'utf8');
-  const res = await patchGist({
-    gistId, token: gistToken, filename: gistFileSingle, content: outSingle
+  const genSingle = (gistFileSingle.replace(/\.ya?ml$/, '') + '.generated.yaml');
+  fs.writeFileSync(genSingle, outSingle, 'utf8');
+
+  const r = await patchGist({
+    gistId, token, filename: gistFileSingle, content: outSingle
   });
 
-  console.log('✅ single updated:', res?.files?.[gistFileSingle]?.raw_url);
-  console.log(`::notice title=Gist Updated (single)::${res?.files?.[gistFileSingle]?.raw_url}`);
+  console.log('✅ single →', r?.files?.[gistFileSingle]?.raw_url);
+  console.log(`::notice title=Gist Updated (single)::${r?.files?.[gistFileSingle]?.raw_url}`);
 })().catch((err) => {
   console.error('❌', err.message || err);
   process.exit(1);

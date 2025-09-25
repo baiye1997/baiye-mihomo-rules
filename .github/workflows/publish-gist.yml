@@ -7,10 +7,12 @@ on:
       - 'rules/**'
       - 'config/baiye-multiple.yaml'
       - 'config/baiye-single.yaml'
+      - 'config/baiye-multiple-lite.yaml'
+      - 'config/baiye-single-lite.yaml'
   workflow_dispatch:
     inputs:
       force_full:
-        description: 'Run full publish: always update multiple + mini + single, even if no changes'
+        description: 'Run full publish: always update all variants (multiple/mini/single + lite)'
         type: boolean
         default: false
 
@@ -32,7 +34,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      # 取对比基准（push 事件有 before；手动触发就回退一个提交作比对，取不到就只看当前）
       - name: Detect changed files
         id: chg
         shell: bash
@@ -48,22 +49,25 @@ jobs:
             git ls-files | sort -u > changed.all.txt
           fi
 
-          # 仅保留 icons/** 和 rules/** 明细（用于“被引用”判断）
           grep -E '^(icons/|rules/)' changed.all.txt | sort -u > changed.targets.txt || true
 
-          # 标记两个 config 是否直接变更
           MULTI_CHANGED=false
           SINGLE_CHANGED=false
-          grep -qx "config/baiye-multiple.yaml" changed.all.txt && MULTI_CHANGED=true
-          grep -qx "config/baiye-single.yaml"   changed.all.txt && SINGLE_CHANGED=true
+          MULTI_LITE_CHANGED=false
+          SINGLE_LITE_CHANGED=false
+          grep -qx "config/baiye-multiple.yaml"       changed.all.txt && MULTI_CHANGED=true
+          grep -qx "config/baiye-single.yaml"         changed.all.txt && SINGLE_CHANGED=true
+          grep -qx "config/baiye-multiple-lite.yaml"  changed.all.txt && MULTI_LITE_CHANGED=true
+          grep -qx "config/baiye-single-lite.yaml"    changed.all.txt && SINGLE_LITE_CHANGED=true
 
-          echo "multi_changed=${MULTI_CHANGED}"   >> $GITHUB_OUTPUT
-          echo "single_changed=${SINGLE_CHANGED}" >> $GITHUB_OUTPUT
+          echo "multi_changed=${MULTI_CHANGED}"         >> $GITHUB_OUTPUT
+          echo "single_changed=${SINGLE_CHANGED}"       >> $GITHUB_OUTPUT
+          echo "multi_lite_changed=${MULTI_LITE_CHANGED}"   >> $GITHUB_OUTPUT
+          echo "single_lite_changed=${SINGLE_LITE_CHANGED}" >> $GITHUB_OUTPUT
 
           echo "Changed files:" && cat changed.all.txt || true
           echo "Changed targets (icons/rules):" && cat changed.targets.txt || true
 
-      # 是否需要发布 multiple（规则：force_full=true || config直接改 || icons/rules有改且在该config中被引用）
       - name: Decide need (multiple)
         id: need_multi
         shell: bash
@@ -77,16 +81,12 @@ jobs:
           elif [ -s changed.targets.txt ] && [ -f config/baiye-multiple.yaml ]; then
             while IFS= read -r p; do
               [ -z "$p" ] && continue
-              if grep -Fq "$p" config/baiye-multiple.yaml; then
-                NEED=true
-                break
-              fi
+              if grep -Fq "$p" config/baiye-multiple.yaml; then NEED=true; break; fi
             done < changed.targets.txt
           fi
           echo "need=${NEED}" >> $GITHUB_OUTPUT
           echo "need-multiple=${NEED}"
 
-      # 是否需要发布 single（同理）
       - name: Decide need (single)
         id: need_single
         shell: bash
@@ -100,28 +100,69 @@ jobs:
           elif [ -s changed.targets.txt ] && [ -f config/baiye-single.yaml ]; then
             while IFS= read -r p; do
               [ -z "$p" ] && continue
-              if grep -Fq "$p" config/baiye-single.yaml; then
-                NEED=true
-                break
-              fi
+              if grep -Fq "$p" config/baiye-single.yaml; then NEED=true; break; fi
             done < changed.targets.txt
           fi
           echo "need=${NEED}" >> $GITHUB_OUTPUT
           echo "need-single=${NEED}"
 
+      - name: Decide need (multiple-lite)
+        id: need_multi_lite
+        shell: bash
+        run: |
+          set -euo pipefail
+          NEED=false
+          if [ "${FORCE_FULL}" = "true" ]; then
+            NEED=true
+          elif [ "${{ steps.chg.outputs.multi_lite_changed }}" = "true" ]; then
+            NEED=true
+          elif [ -s changed.targets.txt ] && [ -f config/baiye-multiple-lite.yaml ]; then
+            while IFS= read -r p; do
+              [ -z "$p" ] && continue
+              if grep -Fq "$p" config/baiye-multiple-lite.yaml; then NEED=true; break; fi
+            done < changed.targets.txt
+          fi
+          echo "need=${NEED}" >> $GITHUB_OUTPUT
+          echo "need-multiple-lite=${NEED}"
+
+      - name: Decide need (single-lite)
+        id: need_single_lite
+        shell: bash
+        run: |
+          set -euo pipefail
+          NEED=false
+          if [ "${FORCE_FULL}" = "true" ]; then
+            NEED=true
+          elif [ "${{ steps.chg.outputs.single_lite_changed }}" = "true" ]; then
+            NEED=true
+          elif [ -s changed.targets.txt ] && [ -f config/baiye-single-lite.yaml ]; then
+            while IFS= read -r p; do
+              [ -z "$p" ] && continue
+              if grep -Fq "$p" config/baiye-single-lite.yaml; then NEED=true; break; fi
+            done < changed.targets.txt
+          fi
+          echo "need=${NEED}" >> $GITHUB_OUTPUT
+          echo "need-single-lite=${NEED}"
+
       - name: Setup Node
-        if: steps.need_multi.outputs.need == 'true' || steps.need_single.outputs.need == 'true'
+        if: |
+          steps.need_multi.outputs.need == 'true' ||
+          steps.need_single.outputs.need == 'true' ||
+          steps.need_multi_lite.outputs.need == 'true' ||
+          steps.need_single_lite.outputs.need == 'true'
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
-      # multiple + mini：先替换订阅&加 icon 短哈希，发布 multiple；再把 geodata-loader: standard -> memconservative 得到 mini 一起发
+      # multiple + mini
       - name: Build & Publish (multiple + mini)
         if: steps.need_multi.outputs.need == 'true'
         env:
           SUB_URL_1: ${{ secrets.SUB_URL_1 }}
           SUB_URL_2: ${{ secrets.SUB_URL_2 }}
           GIST_TOKEN: ${{ secrets.GIST_TOKEN }}
+          # 允许同/不同 Gist：若分别提供 *_MULTIPLE / *_MINI，就用各自；否则回退到旧的 GIST_ID_MULTIPLE
+          GIST_ID: ${{ secrets.GIST_ID_MULTIPLE }}
           GIST_ID_MULTIPLE: ${{ secrets.GIST_ID_MULTIPLE }}
           GIST_ID_MINI: ${{ secrets.GIST_ID_MINI }}
           CONFIG_PATH: config/baiye-multiple.yaml
@@ -130,72 +171,60 @@ jobs:
           COMMIT_SHORT: ${{ github.sha }}
         run: |
           export COMMIT_SHORT="${COMMIT_SHORT:0:7}"
-          node - <<'NODE'
-          const fs=require('fs');const https=require('https');const path=require('path');
-          const short=(process.env.COMMIT_SHORT||'dev').slice(0,7);
-          function patchGist({gistId,token,filename,content}){return new Promise((resolve,reject)=>{const body=JSON.stringify({files:{[filename]:{content}}});const req=https.request(`https://api.github.com/gists/${gistId}`,{method:'PATCH',headers:{Authorization:`token ${token}`,'User-Agent':'github-actions',Accept:'application/vnd.github+json','Content-Type':'application/json','Content-Length':Buffer.byteLength(body)}},res=>{let data='';res.on('data',d=>data+=d);res.on('end',()=>{if(res.statusCode>=200&&res.statusCode<300){try{resolve(JSON.parse(data))}catch{resolve({})}}else{reject(new Error(`Gist update failed ${res.statusCode}: ${data}`))}})});req.on('error',reject);req.write(body);req.end()})}
-          function bumpIconsV(s){const re=/(https?:\/\/[^\s"'<>]+\/icons\/[^\s"'<>]+\.(?:png|jpe?g|webp|svg)(?:\?[^\s"'<>]*)?)/gi;return s.replace(re,(full)=>{try{const u=new URL(full);u.searchParams.set('v',short);return u.toString()}catch{return full}})}
-          (async()=>{
-            const sub1=process.env.SUB_URL_1, sub2=process.env.SUB_URL_2;
-            const token=process.env.GIST_TOKEN, idMulti=process.env.GIST_ID_MULTIPLE, idMini=process.env.GIST_ID_MINI;
-            if(!sub1||!sub2) throw new Error('Missing SUB_URL_1 or SUB_URL_2');
-            if(!token||!idMulti||!idMini) throw new Error('Missing Gist IDs or token');
-            const srcRel=process.env.CONFIG_PATH||'config/baiye-multiple.yaml';
-            const srcPath=path.resolve(srcRel);
-            if(!fs.existsSync(srcPath)) throw new Error(`${srcRel} not found`);
-            const raw=fs.readFileSync(srcPath,'utf8');
-            const outMultiple=bumpIconsV(raw)
-              .replace(/替换订阅链接1/g, sub1)
-              .replace(/替换订阅链接2/g, sub2)
-              .replace(/\[显示名称A可修改\]/g,'[Haita]')
-              .replace(/\[显示名称B可修改\]/g,'[BoostNet]');
-            fs.writeFileSync('baiye-multiple.generated.yaml',outMultiple,'utf8');
-            const r1=await patchGist({gistId:idMulti, token, filename:process.env.GIST_FILE_MULTIPLE||'baiye-multiple.yaml', content:outMultiple});
-            console.log('✅ multiple →', r1?.files?.[process.env.GIST_FILE_MULTIPLE||'baiye-multiple.yaml']?.raw_url);
+          node .github/scripts/build-multi.js
 
-            const outMini=outMultiple.replace(/geodata-loader:\s*standard/g,'geodata-loader: memconservative');
-            fs.writeFileSync('baiye-mini.generated.yaml',outMini,'utf8');
-            const r2=await patchGist({gistId:idMini, token, filename:process.env.GIST_FILE_MINI||'baiye-mini.yaml', content:outMini});
-            console.log('✅ mini →', r2?.files?.[process.env.GIST_FILE_MINI||'baiye-mini.yaml']?.raw_url);
-
-            console.log(`::notice title=Gist Updated::${r1?.files?.[process.env.GIST_FILE_MULTIPLE||'baiye-multiple.yaml']?.raw_url}\n${r2?.files?.[process.env.GIST_FILE_MINI||'baiye-mini.yaml']?.raw_url}`);
-          })().catch(e=>{console.error('❌',e.message||e);process.exit(1)});
-          NODE
-
+      # single
       - name: Build & Publish (single)
         if: steps.need_single.outputs.need == 'true'
         env:
           SUB_URL_1: ${{ secrets.SUB_URL_1 }}
           GIST_TOKEN: ${{ secrets.GIST_TOKEN }}
-          GIST_ID_SINGLE: ${{ secrets.GIST_ID_SINGLE }}
+          GIST_ID: ${{ secrets.GIST_ID_SINGLE }}
           CONFIG_PATH: config/baiye-single.yaml
           GIST_FILE_SINGLE: baiye-single.yaml
           COMMIT_SHORT: ${{ github.sha }}
         run: |
           export COMMIT_SHORT="${COMMIT_SHORT:0:7}"
-          node - <<'NODE'
-          const fs=require('fs');const https=require('https');const path=require('path');
-          const short=(process.env.COMMIT_SHORT||'dev').slice(0,7);
-          function patchGist({gistId,token,filename,content}){return new Promise((resolve,reject)=>{const body=JSON.stringify({files:{[filename]:{content}}});const req=https.request(`https://api.github.com/gists/${gistId}`,{method:'PATCH',headers:{Authorization:`token ${token}`,'User-Agent':'github-actions',Accept:'application/vnd.github+json','Content-Type':'application/json','Content-Length':Buffer.byteLength(body)}},res=>{let data='';res.on('data',d=>data+=d);res.on('end',()=>{if(res.statusCode>=200&&res.statusCode<300){try{resolve(JSON.parse(data))}catch{resolve({})}}else{reject(new Error(`Gist update failed ${res.statusCode}: ${data}`))}})});req.on('error',reject);req.write(body);req.end()})}
-          function bumpIconsV(s){const re=/(https?:\/\/[^\s"'<>]+\/icons\/[^\s"'<>]+\.(?:png|jpe?g|webp|svg)(?:\?[^\s"'<>]*)?)/gi;return s.replace(re,(full)=>{try{const u=new URL(full);u.searchParams.set('v',short);return u.toString()}catch{return full}})}
-          ;(async()=>{
-            const sub1=process.env.SUB_URL_1, token=process.env.GIST_TOKEN, id=process.env.GIST_ID_SINGLE;
-            if(!sub1) throw new Error('Missing SUB_URL_1');
-            if(!token||!id) throw new Error('Missing GIST_TOKEN or GIST_ID_SINGLE');
-            const srcRel=process.env.CONFIG_PATH||'config/baiye-single.yaml';
-            const srcPath=path.resolve(srcRel);
-            if(!fs.existsSync(srcPath)) throw new Error(`${srcRel} not found`);
-            const raw=fs.readFileSync(srcPath,'utf8');
-            const outSingle=bumpIconsV(raw).replace(/替换订阅链接1/g, sub1);
-            fs.writeFileSync('baiye-single.generated.yaml', outSingle, 'utf8');
-            const r=await patchGist({gistId:id, token, filename:process.env.GIST_FILE_SINGLE||'baiye-single.yaml', content: outSingle});
-            console.log('✅ single →', r?.files?.[process.env.GIST_FILE_SINGLE||'baiye-single.yaml']?.raw_url);
-            console.log(`::notice title=Gist Updated (single)::${r?.files?.[process.env.GIST_FILE_SINGLE||'baiye-single.yaml']?.raw_url}`);
-          })().catch(e=>{console.error('❌',e.message||e);process.exit(1)});
-          NODE
+          node .github/scripts/build-single.js
+
+      # multiple-lite + mini-lite
+      - name: Build & Publish (multiple-lite + mini-lite)
+        if: steps.need_multi_lite.outputs.need == 'true'
+        env:
+          SUB_URL_1: ${{ secrets.SUB_URL_1 }}
+          SUB_URL_2: ${{ secrets.SUB_URL_2 }}
+          GIST_TOKEN: ${{ secrets.GIST_TOKEN }}
+          GIST_ID: ${{ secrets.GIST_ID_MULTIPLE_LITE }}
+          GIST_ID_MULTIPLE: ${{ secrets.GIST_ID_MULTIPLE_LITE }}
+          GIST_ID_MINI: ${{ secrets.GIST_ID_MINI_LITE }}
+          CONFIG_PATH: config/baiye-multiple-lite.yaml
+          GIST_FILE_MULTIPLE: baiye-multiple-lite.yaml
+          GIST_FILE_MINI: baiye-mini-lite.yaml
+          COMMIT_SHORT: ${{ github.sha }}
+        run: |
+          export COMMIT_SHORT="${COMMIT_SHORT:0:7}"
+          node .github/scripts/build-multi.js
+
+      # single-lite
+      - name: Build & Publish (single-lite)
+        if: steps.need_single_lite.outputs.need == 'true'
+        env:
+          SUB_URL_1: ${{ secrets.SUB_URL_1 }}
+          GIST_TOKEN: ${{ secrets.GIST_TOKEN }}
+          GIST_ID: ${{ secrets.GIST_ID_SINGLE_LITE }}
+          CONFIG_PATH: config/baiye-single-lite.yaml
+          GIST_FILE_SINGLE: baiye-single-lite.yaml
+          COMMIT_SHORT: ${{ github.sha }}
+        run: |
+          export COMMIT_SHORT="${COMMIT_SHORT:0:7}"
+          node .github/scripts/build-single.js
 
       - name: Upload artifacts (optional)
-        if: steps.need_multi.outputs.need == 'true' || steps.need_single.outputs.need == 'true'
+        if: |
+          steps.need_multi.outputs.need == 'true' ||
+          steps.need_single.outputs.need == 'true' ||
+          steps.need_multi_lite.outputs.need == 'true' ||
+          steps.need_single_lite.outputs.need == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: built-configs
@@ -203,3 +232,6 @@ jobs:
             baiye-multiple.generated.yaml
             baiye-mini.generated.yaml
             baiye-single.generated.yaml
+            baiye-multiple-lite.generated.yaml
+            baiye-mini-lite.generated.yaml
+            baiye-single-lite.generated.yaml
