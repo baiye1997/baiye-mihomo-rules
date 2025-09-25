@@ -1,22 +1,30 @@
 # Baiye Mihomo Rules
 
-本仓库用于集中维护和同步个人使用的 **Clash / Mihomo 规则文件**。  
-每天 **北京时间早上 6 点** 自动抓取上游最新规则文件并更新到仓库，保证规则持续可用。
+集中维护和同步个人使用的 **Clash / Mihomo** 规则与配置。  
+每日 **北京时间 06:00** 自动从上游同步，保证规则持续可用。
 
 ---
 
-## ✈️ 支持的代理内核/工具
-
+## ✈️ 支持内核 / 工具
 - 🌸 Mihomo（Clash 内核）
 
 ---
 
-## 😄 使用方法
+## 📦 配置总览
 
-1. 对于 Mihomo 用户 → 进入 `/config` 目录
-2. `baiye-multiple.yaml` 为「多订阅合一」使用
-3. `baiye-single.yaml` 为「单一订阅」使用
-4. 也可直接在 Clash / Mihomo 配置文件中引用本仓库的规则文件，例如：
+| 文件 | 用途 | 特点 |
+|---|---|---|
+| `config/baiye-multiple.yaml` | 多订阅合一 | 标准版（RULE-SET） |
+| `config/baiye-single.yaml` | 单一订阅 | 标准版（RULE-SET） |
+| `config/baiye-multiple-lite.yaml` | 多订阅合一（Lite） | **全部使用 GEO 上游** |
+| `config/baiye-single-lite.yaml` | 单一订阅（Lite） | **全部使用 GEO 上游** |
+
+---
+
+## 🚀 使用方法
+
+1. 直接下载（或复制） `config/` 下对应 YAML 导入 Mihomo 并在 YAML 中填入你持有的✈️订阅链接；  
+2. 或在你的主配置里 **引用本仓库的规则文件**（示例）：
 
 ```yaml
 rule-providers:
@@ -28,34 +36,49 @@ rule-providers:
     path: ./rules/yaml/fuckAds.yaml
     interval: 86400
 ```
-PS：如IOS等限制内存的设备最好将geodata-loader改为：memconservative
 
+**内存优化（可选，iOS 推荐）**
 ```yaml
 geodata-loader: memconservative
 ```
+
+> 说明：本仓库内的图标和规则每次更新会自动purge缓存，无需担心更新问题。
+
+---
+
+## 🧩 Lite 版说明（GEO 上游）
+
+Lite 版将所有规则上游统一为 GEO 系列，规则效果保持一致，不影响使用。
+
+---
+
+## 🛠 更新与自动化
+
+- 每日定时同步上游规则（北京时间 06:00）  
+- 变更触发：`icons/**`、`rules/**`、`config/*.yaml`  
+- 自动 purge icons & rules 的缓存
+
 ---
 
 ## 🤝 帮助与支持
-
-如果在使用过程中遇到任何问题，欢迎提交 Issue！
+使用中遇到问题，欢迎提交 Issue。
 
 ---
 
 ## ⚠️ 免责声明
-
-- 本项目仅供学习和技术交流使用，请遵守当地法律法规，不得用于非法用途。  
-- 本项目仅作个人学习与研究使用，不对使用效果负责。  
-- 规则来源均来自上游开源项目，请遵循各自的开源许可证。  
-- 如有侵权或问题，请联系我删除。
+- 本项目仅供学习与技术交流，请遵守当地法律法规，不得用于非法用途。  
+- 规则来源均来自上游开源项目，请遵循各自许可证。  
+- 如有侵权或其他问题，请联系我移除。
 
 ---
 
-## 🙌 鸣谢
+## 🙌 鸣谢（Thanks）
 
 本项目部分规则和思路来自以下优秀开源项目，在此致谢：
 
 - [yyhhyyyyyy/selfproxy](https://github.com/yyhhyyyyyy/selfproxy)  
 - [SukkaW/Surge](https://github.com/SukkaW/Surge)  
-- [Loyalsoldier/clash-rules](https://github.com/Loyalsoldier/clash-rules)
-- [blackmatrix7/ios_rule_script](https://github.com/blackmatrix7/ios_rule_script)
-- [TG-Twilight/AWAvenue-Ads-Rule](https://github.com/TG-Twilight/AWAvenue-Ads-Rule)
+- [Loyalsoldier/clash-rules](https://github.com/Loyalsoldier/clash-rules)  
+- [blackmatrix7/ios_rule_script](https://github.com/blackmatrix7/ios_rule_script)  
+- [TG-Twilight/AWAvenue-Ads-Rule](https://github.com/TG-Twilight/AWAvenue-Ads-Rule)  
+- [DustinWin/ruleset_geodata](https://github.com/DustinWin/ruleset_geodata)

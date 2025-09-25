@@ -67,16 +67,14 @@ function bumpIconsV(s) {
 
   const raw = fs.readFileSync(srcPath, 'utf8');
 
+  // 加 icon v=short；替换订阅1
   const withIconV = bumpIconsV(raw);
   const outSingle = withIconV.replace(/替换订阅链接1/g, sub1);
 
   const genSingle = (gistFileSingle.replace(/\.ya?ml$/, '') + '.generated.yaml');
   fs.writeFileSync(genSingle, outSingle, 'utf8');
 
-  const r = await patchGist({
-    gistId, token, filename: gistFileSingle, content: outSingle
-  });
-
+  const r = await patchGist({ gistId, token, filename: gistFileSingle, content: outSingle });
   console.log('✅ single →', r?.files?.[gistFileSingle]?.raw_url);
   console.log(`::notice title=Gist Updated (single)::${r?.files?.[gistFileSingle]?.raw_url}`);
 })().catch((err) => {
