@@ -169,7 +169,7 @@ jobs:
           COMMIT_SHORT: ${{ github.sha }}
         run: |
           export COMMIT_SHORT="${COMMIT_SHORT:0:7}"
-          node .github/scripts/build-and-publish-multiple.js
+          node .github/scripts/build-multi.js
 
       # —— 标准版 single —— #
       - name: Build & Publish (single)
@@ -183,7 +183,7 @@ jobs:
           COMMIT_SHORT: ${{ github.sha }}
         run: |
           export COMMIT_SHORT="${COMMIT_SHORT:0:7}"
-          node .github/scripts/build-and-publish-single.js
+          node .github/scripts/build-single.js
 
       # —— Lite 版 multiple + mini —— #
       - name: Build & Publish (multiple-lite + mini-lite)
@@ -199,7 +199,7 @@ jobs:
           COMMIT_SHORT: ${{ github.sha }}
         run: |
           export COMMIT_SHORT="${COMMIT_SHORT:0:7}"
-          node .github/scripts/build-and-publish-multiple.js
+          node .github/scripts/build-multi.js
 
       # —— Lite 版 single —— #
       - name: Build & Publish (single-lite)
@@ -213,7 +213,7 @@ jobs:
           COMMIT_SHORT: ${{ github.sha }}
         run: |
           export COMMIT_SHORT="${COMMIT_SHORT:0:7}"
-          node .github/scripts/build-and-publish-single.js
+          node .github/scripts/build-single.js
 
       - name: Upload artifacts (optional)
         if: |
