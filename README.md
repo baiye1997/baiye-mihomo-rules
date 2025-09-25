@@ -16,8 +16,8 @@
 |---|---|---|
 | `config/baiye-multiple.yaml` | 多订阅合一 | 标准版（RULE-SET） |
 | `config/baiye-single.yaml` | 单一订阅 | 标准版（RULE-SET） |
-| `config/baiye-multiple-lite.yaml` | 多订阅合一（Lite） | **全部使用 GEO 上游** |
-| `config/baiye-single-lite.yaml` | 单一订阅（Lite） | **全部使用 GEO 上游** |
+| `config/baiye-multiple-lite.yaml` | 多订阅合一（Lite） | 全部使用 GEO 上游 |
+| `config/baiye-single-lite.yaml` | 单一订阅（Lite） | 全部使用 GEO 上游 |
 
 ---
 
@@ -42,7 +42,7 @@ rule-providers:
 geodata-loader: memconservative
 ```
 
-> 说明：本仓库内的图标和规则每次更新会自动purge缓存，无需担心更新问题。
+> 说明：本仓库内的图标和规则每次更新会自动purge缓存，无需担心缓存问题。
 
 ---
 
