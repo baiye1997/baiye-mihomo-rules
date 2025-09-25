@@ -1,7 +1,7 @@
 #########################################
 # Sukka's Ruleset - CDN Domains
-# Last Updated: 2025-09-23T10:55:38.712Z
-# Size: 3926
+# Last Updated: 2025-09-25T07:18:22.868Z
+# Size: 3931
 # License: AGPL 3.0
 # Homepage: https://ruleset.skk.moe
 # GitHub: https://github.com/SukkaW/Surge
@@ -742,6 +742,7 @@ todoist.b-cdn.net
 divhunt.b-cdn.net
 dh-site.b-cdn.net
 cdntube.b-cdn.net
+r34xyz.b-cdn.net
 c-bin.b-cdn.net
 amp.azure.net
 s3.arkjp.net
@@ -791,6 +792,7 @@ objects.hit.moe
 static.coinall.ltd
 image.acg.lol
 cdn.cbd.int
+tile2.intervals.icu
 +.cthd.icu
 time-a.nist.gov
 images-assets.nasa.gov
@@ -3302,6 +3304,7 @@ vbmspic.video.friday.tw
 megapx-assets.dcard.tw
 +.pimg.tw
 news-data.pts.org.tw
+img-fnc.ebc.net.tw
 cw-image-resizer.cwg.tw
 cdn.ready-market.com.tw
 avatar2.bahamut.com.tw
@@ -3897,6 +3900,8 @@ images.tg.cc
 img.tg.cc
 +.1passwordusercontent.ca
 cdn.adsninja.ca
+components.cyclingfactory.be
+images.cyclingfactory.be
 +.abc-cdn.net.au
 res.abc.net.au
 styleguide-assets.shannons.com.au
