@@ -16,8 +16,8 @@
 |---|---|---|
 | `config/baiye-multiple.yaml` | 多订阅合一 | 标准版（RULE-SET） |
 | `config/baiye-single.yaml` | 单一订阅 | 标准版（RULE-SET） |
-| `config/baiye-multiple-lite.yaml` | 多订阅合一（Lite） | 全部使用 GEO 上游 |
-| `config/baiye-single-lite.yaml` | 单一订阅（Lite） | 全部使用 GEO 上游 |
+| `config/baiye-multiple-lite.yaml` | 多订阅合一（Lite） | 主要使用 GEO 上游 |
+| `config/baiye-single-lite.yaml` | 单一订阅（Lite） | 主要使用 GEO 上游 |
 
 ---
 
