@@ -1,7 +1,7 @@
 #########################################
 # Sukka's Ruleset - Large Files Hosting Domains
-# Last Updated: 2025-09-23T10:55:38.712Z
-# Size: 1183
+# Last Updated: 2025-09-25T19:30:13.128Z
+# Size: 1184
 # License: AGPL 3.0
 # Homepage: https://ruleset.skk.moe
 # GitHub: https://github.com/SukkaW/Surge
@@ -885,6 +885,7 @@ mirror.ufs.ac.za
 ftp.leg.uct.ac.za
 ftp.sun.ac.za
 mac-release-static.stash.ws
+releases.stash.ws
 espejito.fder.edu.uy
 cdn.zoom.us
 mirrors.xtom.us
