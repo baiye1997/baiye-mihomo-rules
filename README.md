@@ -48,7 +48,7 @@ geodata-loader: memconservative
 
 ## 🧩 Lite 版说明（GEO 上游）
 
-Lite 版将所有规则上游统一为 GEO 系列，规则效果保持一致，不影响使用。
+Lite 版将主要规则统一为 GEO 系列，规则效果保持一致，不影响使用。
 
 ---
 
