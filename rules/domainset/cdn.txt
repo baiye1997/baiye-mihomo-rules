@@ -1,7 +1,7 @@
 #########################################
 # Sukka's Ruleset - CDN Domains
-# Last Updated: 2025-09-25T19:30:13.128Z
-# Size: 3932
+# Last Updated: 2025-09-28T17:16:11.496Z
+# Size: 3937
 # License: AGPL 3.0
 # Homepage: https://ruleset.skk.moe
 # GitHub: https://github.com/SukkaW/Surge
@@ -2176,6 +2176,7 @@ app.chatwoot.com
 js.chargify.com
 +.cdnfonts.com
 +.cartocdn.com
+reviews-badge.capterra.com
 assets.capterra.com
 cdn.camweara.com
 assets.calendly.com
@@ -2382,6 +2383,7 @@ image.mgstage.com
 static.maxmind.com
 img-cos.mandaoo.com
 assets.mailgun.com
+i.magecdn.com
 +.lzzypic.com
 +.lzzyimg.com
 +.lulucdn.com
@@ -3077,6 +3079,7 @@ assets.play.xbox.com
 livemap-tiles1.waze.com
 web-assets.waze.com
 cdnstatic.w1mp.com
+cdn.vnoc.com
 tn.vjav.com
 vice-web-statics-cdn.vice.com
 video-images.vice.com
@@ -3259,6 +3262,7 @@ e.linear.app
 +.tauri.app
 +.xlog.app
 cdn.rive.app
+web-cdn.bsky.app
 video.bsky.app
 +.cdn.bsky.app
 +.web.app
@@ -3864,6 +3868,7 @@ v.w-x.co
 s.w-x.co
 image.ibb.co
 i.ibb.co
+assets.dub.co
 +.cdn-lfs-us-1.hf.co
 +.cdn-lfs-eu-1.hf.co
 +.cdn-lfs.hf.co
