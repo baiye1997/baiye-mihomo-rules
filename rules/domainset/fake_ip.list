@@ -1,28 +1,129 @@
-# 基础类
-geosite:private
-geosite:connectivity-check
-geosite:cn
+# =====================================
+# fake-ip-filter.txt
+# 作用：绕过 fake-ip，用真实 DNS
+# 场景：CN 境内 + 国外办公 + 游戏 + IoT
+# =====================================
+
+# ------ 内网 / 本地域名 ------
 *.lan
 *.local
 *.localdomain
 *.home.arpa
 *.localhost
 
-# NTP / 时间同步
-time.*
-ntp.*
+# ------ 时间同步 / NTP ------
 pool.ntp.org
 *.ntp.org.cn
+ntp.aliyun.com
+ntp1.aliyun.com
 
-# STUN / 打洞
+# ------ STUN / NAT 打洞（会议、语音） ------
 stun.*
-stun.*.*
-stun.*.*.*
 
-# IoT / 设备
-+.mi.com
-Mijia Cloud
+# ------ IoT / 小米生态 ------
+*.mi.com
+*.xiaomi.com
+api.io.mi.com
 dig.io.mi.com
+push.xiaomi.com
+miot-spec.org
 
-# 特殊站点
-localhost.ptlogin2.qq.com
+# ------ Microsoft（Outlook / Teams / Office 365） ------
+*.outlook.com
+outlook.office365.com
+outlook.office.com
+outlook.live.com
+smtp.office365.com
+imap.outlook.com
+smtp-mail.outlook.com
+login.microsoftonline.com
+autodiscover.outlook.com
+*.office.com
+*.office365.com
+*.live.com
+*.microsoft.com
+*.microsoftonline.com
+*.teams.microsoft.com
+
+# ------ Google（Gmail / Meet / Drive / Workspace） ------
+mail.google.com
+meet.google.com
+drive.google.com
+*.google.com
+*.gstatic.com
+
+# ------ Apple（iCloud / Push / Facetime） ------
+*.icloud.com
+*.icloud-content.com
+*.apple.com
+*.push.apple.com
+courier.push.apple.com
+api.push.apple.com
+
+# ------ 协作 & 项目管理 ------
+*.zoom.us
+*.slack.com
+*.webex.com
+*.cisco.com
+*.gotomeeting.com
+*.notion.so
+*.figma.com
+*.github.com
+*.githubusercontent.com
+*.gitlab.com
+*.atlassian.com
+*.jira.com
+*.bitbucket.org
+
+# ------ 即时通讯 / 社交 ------
+*.telegram.org
+*.whatsapp.com
+*.whatsapp.net
+*.signal.org
+*.line.me
+*.skype.com
+*.discord.com
+*.wechat.com
+
+# ------ 远程工作 / 外包平台 ------
+*.upwork.com
+*.upworkglobal.com
+*.freelancer.com
+*.fiverr.com
+*.toptal.com
+
+# ------ CDN / 静态资源 ------
+*.akamaihd.net
+*.akamai.net
+*.cloudfront.net
+*.fastly.net
+*.cdn-telegram.org
+*.steamcontent.com
+*.cdn-apple.com
+
+# ------ 游戏平台 / 联机服务 ------
+# Steam
+store.steampowered.com
+api.steampowered.com
+*.steamcommunity.com
+*.steamcontent.com
+# Battle.net
+*.battle.net
+*.blizzard.com
+# Epic
+*.epicgames.com
+*.unrealengine.com
+# Riot（LOL/VAL）
+*.riotgames.com
+*.riotcdn.net
+# EA / Origin
+*.ea.com
+*.origin.com
+# Ubisoft
+*.ubisoft.com
+*.uplay.com
+# PlayStation / Xbox
+*.playstation.net
+*.playstation.com
+*.xboxlive.com
+*.xboxservices.com
