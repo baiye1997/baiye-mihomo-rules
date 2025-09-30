@@ -2,6 +2,8 @@ name: Purge CDN
 
 on:
   push:
+    branches: ['**']
+    tags-ignore: ['**']   # 忽略 tag push，避免 Release 触发
     paths:
       - "rules/ip/**"
       - "rules/non_ip/**"
@@ -21,43 +23,53 @@ permissions:
 
 jobs:
   release_purge:
+    if: ${{ github.event_name != 'push' || startsWith(github.ref, 'refs/heads/') }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout (with history)
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          ref: ${{ startsWith(github.ref, 'refs/tags/') && 'main' || github.ref }}
 
-      - name: Detect changed files & map to referenced targets
+      - name: Detect changed files & map to referenced targets (safe)
         id: detect
         shell: bash
         run: |
           set -euo pipefail
 
-          # 1) 算出对比基线（上一个提交）
+          # tag 再保险：直接早退
+          if [ "${{ github.ref_type }}" = "tag" ] || [[ "${GITHUB_REF:-}" == refs/tags/* ]]; then
+            echo "has_ref=false" >> "$GITHUB_OUTPUT"
+            echo "Skip on tag ref: ${GITHUB_REF}"
+            exit 0
+          fi
+
           BEFORE="${{ github.event.before }}"
           if [ -z "${BEFORE}" ]; then
-            BEFORE="$(git rev-parse HEAD^ || echo '')"
+            BEFORE="$(git rev-parse HEAD^ 2>/dev/null || echo '')"
           fi
 
-          # 2) 列出这次 push 变动的所有文件
           if [ -n "${BEFORE}" ]; then
-            git diff --name-only "${BEFORE}" "${{ github.sha }}" > changed.all.txt
+            git diff --name-only "${BEFORE}" "${{ github.sha }}" | sort -u > changed.all.txt
           else
-            git show --name-only --pretty="" "${{ github.sha }}" > changed.all.txt
+            : > changed.all.txt
           fi
 
-          # 3) 只保留 icons/** 和 rules/** 的目标
+          if [ ! -s changed.all.txt ]; then
+            echo "has_ref=false" >> "$GITHUB_OUTPUT"
+            echo "No file changes; skip."
+            exit 0
+          fi
+
           grep -E '^(icons/|rules/(ip|non_ip|domainset|yaml)/)' changed.all.txt | sort -u > changed.targets.txt || true
 
-          # 4) 如果没有目标，提前退出
           if [ ! -s changed.targets.txt ]; then
             echo "has_ref=false" >> "$GITHUB_OUTPUT"
             echo "No icons/rules changed."
             exit 0
           fi
 
-          # 5) 仅当这些目标被 config/*.yml(yaml) 引用时才认为需要 Purge
           shopt -s nullglob
           CONFIGS=(config/*.yml config/*.yaml)
           : > referenced.targets.txt
@@ -69,7 +81,6 @@ jobs:
 
           while read -r P; do
             [ -n "$P" ] || continue
-            # 只匹配相对路径片段（例如 "icons/xxx.png" 或 "rules/non_ip/xxx.txt"）
             if grep -RqlF -- "$P" "${CONFIGS[@]}"; then
               echo "$P" >> referenced.targets.txt
             fi
