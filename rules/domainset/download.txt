@@ -1,7 +1,7 @@
 #########################################
 # Sukka's Ruleset - Large Files Hosting Domains
-# Last Updated: 2025-09-25T19:30:13.128Z
-# Size: 1184
+# Last Updated: 2025-09-29T18:18:49.966Z
+# Size: 1183
 # License: AGPL 3.0
 # Homepage: https://ruleset.skk.moe
 # GitHub: https://github.com/SukkaW/Surge
@@ -1122,7 +1122,6 @@ mirrors.ae-online.de
 mirror.informatik.hs-fulda.de
 mirror.23media.de
 mirror.dogado.de
-cpan.noris.de
 ftp.agdsn.de
 mirrors.xtom.de
 mirror.xtom.de
