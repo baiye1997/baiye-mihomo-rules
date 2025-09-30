@@ -2,6 +2,8 @@ name: Publish Gists
 
 on:
   push:
+    branches: ['**']
+    tags-ignore: ['**']     # 忽略 tag push
     paths:
       - 'icons/**'
       - 'rules/**'
@@ -25,6 +27,7 @@ permissions:
 
 jobs:
   build:
+    if: ${{ github.event_name != 'push' || startsWith(github.ref, 'refs/heads/') }}
     runs-on: ubuntu-latest
     env:
       FORCE_FULL: ${{ inputs.force_full && 'true' || 'false' }}
@@ -33,21 +36,48 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          # 手动触发时，如 ref 指向 tag，则强制回落到 main 防止检出 tag
+          ref: ${{ startsWith(github.ref, 'refs/tags/') && 'main' || github.ref }}
 
-      # 变更侦测：push 用 before，对手动触发回退一个提交，否则全量
-      - name: Detect changed files
+      - name: Detect changed files (safe on tag/initial)
         id: chg
         shell: bash
         run: |
           set -euo pipefail
+
+          # 若为 tag（理论上已被上层拦截），再保险：直接空变更退出
+          if [ "${{ github.ref_type }}" = "tag" ] || [[ "${GITHUB_REF:-}" == refs/tags/* ]]; then
+            : > changed.all.txt
+            : > changed.targets.txt
+            echo "multi_changed=false"             >> $GITHUB_OUTPUT
+            echo "single_changed=false"            >> $GITHUB_OUTPUT
+            echo "multi_lite_changed=false"        >> $GITHUB_OUTPUT
+            echo "single_lite_changed=false"       >> $GITHUB_OUTPUT
+            echo "No-op on tag ref."
+            exit 0
+          fi
+
           AFTER="${{ github.sha }}"
           BEFORE="${{ github.event.before }}"
-          if [ -z "$BEFORE" ]; then BEFORE="$(git rev-parse "${AFTER}^" 2>/dev/null || echo '')"; fi
+          if [ -z "${BEFORE}" ]; then
+            BEFORE="$(git rev-parse "${AFTER}^" 2>/dev/null || echo '')"
+          fi
 
-          if [ -n "$BEFORE" ]; then
-            git diff --name-only "$BEFORE" "$AFTER" | sort -u > changed.all.txt
+          if [ -n "${BEFORE}" ]; then
+            git diff --name-only "${BEFORE}" "${AFTER}" | sort -u > changed.all.txt
           else
-            git ls-files | sort -u > changed.all.txt
+            # 没有基线时，判定为无变更（防止把全仓当变更）
+            : > changed.all.txt
+          fi
+
+          if [ ! -s changed.all.txt ]; then
+            : > changed.targets.txt
+            echo "multi_changed=false"             >> $GITHUB_OUTPUT
+            echo "single_changed=false"            >> $GITHUB_OUTPUT
+            echo "multi_lite_changed=false"        >> $GITHUB_OUTPUT
+            echo "single_lite_changed=false"       >> $GITHUB_OUTPUT
+            echo "No file changes; skip."
+            exit 0
           fi
 
           grep -E '^(icons/|rules/)' changed.all.txt | sort -u > changed.targets.txt || true
@@ -61,9 +91,9 @@ jobs:
           grep -qx "config/baiye-multiple-lite.yaml"  changed.all.txt && MULTI_LITE_CHANGED=true
           grep -qx "config/baiye-single-lite.yaml"    changed.all.txt && SINGLE_LITE_CHANGED=true
 
-          echo "multi_changed=${MULTI_CHANGED}"           >> $GITHUB_OUTPUT
-          echo "single_changed=${SINGLE_CHANGED}"         >> $GITHUB_OUTPUT
-          echo "multi_lite_changed=${MULTI_LITE_CHANGED}" >> $GITHUB_OUTPUT
+          echo "multi_changed=${MULTI_CHANGED}"             >> $GITHUB_OUTPUT
+          echo "single_changed=${SINGLE_CHANGED}"           >> $GITHUB_OUTPUT
+          echo "multi_lite_changed=${MULTI_LITE_CHANGED}"   >> $GITHUB_OUTPUT
           echo "single_lite_changed=${SINGLE_LITE_CHANGED}" >> $GITHUB_OUTPUT
 
           echo "Changed files:" && cat changed.all.txt || true
@@ -155,7 +185,6 @@ jobs:
         with:
           node-version: 20
 
-      # —— 标准版 multiple + mini —— #
       - name: Build & Publish (multiple + mini)
         if: steps.need_multi.outputs.need == 'true'
         env:
@@ -171,7 +200,6 @@ jobs:
           export COMMIT_SHORT="${COMMIT_SHORT:0:7}"
           node .github/scripts/build-multi.js
 
-      # —— 标准版 single —— #
       - name: Build & Publish (single)
         if: steps.need_single.outputs.need == 'true'
         env:
@@ -185,7 +213,6 @@ jobs:
           export COMMIT_SHORT="${COMMIT_SHORT:0:7}"
           node .github/scripts/build-single.js
 
-      # —— Lite 版 multiple + mini —— #
       - name: Build & Publish (multiple-lite + mini-lite)
         if: steps.need_multi_lite.outputs.need == 'true'
         env:
@@ -201,7 +228,6 @@ jobs:
           export COMMIT_SHORT="${COMMIT_SHORT:0:7}"
           node .github/scripts/build-multi.js
 
-      # —— Lite 版 single —— #
       - name: Build & Publish (single-lite)
         if: steps.need_single_lite.outputs.need == 'true'
         env:
