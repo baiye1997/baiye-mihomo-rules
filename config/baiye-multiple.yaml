@@ -111,10 +111,10 @@ dns:
     
   # fake-ip （ruleset 引用 + 仍可追加零星域名）
   fake-ip-filter:
-    - rule-set:fake-ip
+    - rule-set:fake-ip #  规则集引用
     - geosite:cn
     - geosite:connectivity-check
-    - geosite:private   #  规则集引用
+    - geosite:private
     # 也可继续追加：
     # - 'example.local'
 
