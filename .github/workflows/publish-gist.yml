@@ -11,13 +11,28 @@ on:
         description: "Force full publish (ignore change detection)"
         type: boolean
         default: false
+  push:
+    branches: ['**']
+    tags-ignore: ['**']
+    paths:
+      - 'icons/**'
+      - 'rules/**'
+      - 'config/baiye-multiple.yaml'
+      - 'config/baiye-single.yaml'
+      - 'config/baiye-multiple-lite.yaml'
+      - 'config/baiye-single-lite.yaml'
+      - '.github/scripts/build-and-publish.js'
+      - '.github/workflows/publish-gist.yml'
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v4
         with:
+      # 取完整历史，便于 diff
           fetch-depth: 0
 
       - name: Detect changes
@@ -33,10 +48,10 @@ jobs:
             : > changed.all.txt
           fi
           M=false; S=false; ML=false; SL=false
-          grep -qx "config/baiye-multiple.yaml"       changed.all.txt && M=true
-          grep -qx "config/baiye-single.yaml"         changed.all.txt && S=true
-          grep -qx "config/baiye-multiple-lite.yaml"  changed.all.txt && ML=true
-          grep -qx "config/baiye-single-lite.yaml"    changed.all.txt && SL=true
+          grep -qx "config/baiye-multiple.yaml"       changed.all.txt && M=true || true
+          grep -qx "config/baiye-single.yaml"         changed.all.txt && S=true || true
+          grep -qx "config/baiye-multiple-lite.yaml"  changed.all.txt && ML=true || true
+          grep -qx "config/baiye-single-lite.yaml"    changed.all.txt && SL=true || true
           echo "m=${M}"  >> $GITHUB_OUTPUT
           echo "s=${S}"  >> $GITHUB_OUTPUT
           echo "ml=${ML}" >> $GITHUB_OUTPUT
@@ -46,9 +61,9 @@ jobs:
         with:
           node-version: 20
 
-      # 标准版
-      - name: Publish STANDARD gist
-        if: ${{ inputs.force_full || steps.chg.outputs.m == 'true' || steps.chg.outputs.s == 'true' }}
+      # 标准版（multiple/single/mini）
+      - name: Publish STANDARD gist (quiet)
+        if: ${{ inputs.force_full || steps.chg.outputs.m == 'true' || steps.chg.outputs.s == 'true' || github.event_name == 'workflow_dispatch' }}
         env:
           GIST_TOKEN: ${{ secrets.GIST_TOKEN }}
           GIST_ID:    ${{ secrets.GIST_ID_STANDARD }}
@@ -62,16 +77,12 @@ jobs:
           COMMIT_SHORT: ${{ github.sha }}
           DRY_RUN:      ${{ inputs.dry_run && 'true' || 'false' }}
           QUIET:        "true"
-          STATUS_FILE:  ".status-standard.txt"
+          STATUS_FILE:  "status-standard.txt"  # 非隐藏
         run: node .github/scripts/build-and-publish.js
 
-      - name: Ensure status placeholder (standard)
-        if: always()
-        run: test -f .status-standard.txt || echo UNKNOWN > .status-standard.txt
-
-      # Lite 版
-      - name: Publish LITE gist
-        if: ${{ inputs.force_full || steps.chg.outputs.ml == 'true' || steps.chg.outputs.sl == 'true' }}
+      # Lite 版（multiple/single/mini）
+      - name: Publish LITE gist (quiet)
+        if: ${{ inputs.force_full || steps.chg.outputs.ml == 'true' || steps.chg.outputs.sl == 'true' || github.event_name == 'workflow_dispatch' }}
         env:
           GIST_TOKEN: ${{ secrets.GIST_TOKEN }}
           GIST_ID:    ${{ secrets.GIST_ID_LITE }}
@@ -85,18 +96,25 @@ jobs:
           COMMIT_SHORT: ${{ github.sha }}
           DRY_RUN:      ${{ inputs.dry_run && 'true' || 'false' }}
           QUIET:        "true"
-          STATUS_FILE:  ".status-lite.txt"
+          STATUS_FILE:  "status-lite.txt"      # 非隐藏
         run: node .github/scripts/build-and-publish.js
 
-      - name: Ensure status placeholder (lite)
+      # 兜底：如果前面步骤被条件跳过或异常没写入状态，则补 UNKNOWN
+      - name: Ensure status files
         if: always()
-        run: test -f .status-lite.txt || echo UNKNOWN > .status-lite.txt
+        shell: bash
+        run: |
+          test -f status-standard.txt || echo UNKNOWN > status-standard.txt
+          test -f status-lite.txt     || echo UNKNOWN > status-lite.txt
 
-      # 上传极小的状态 artifact
+      # 只上传状态文件（不会泄露任何地址）
       - name: Upload status
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: publish-status
-          path: .status-*.txt
-          if-no-files-found: ignore
+          path: |
+            status-standard.txt
+            status-lite.txt
+          if-no-files-found: warn
+          overwrite: false
