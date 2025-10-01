@@ -3,7 +3,7 @@ name: Publish Gists
 on:
   push:
     branches: ['**']
-    tags-ignore: ['**']     # 忽略 tag push
+    tags-ignore: ['**']
     paths:
       - 'icons/**'
       - 'rules/**'
@@ -11,12 +11,18 @@ on:
       - 'config/baiye-single.yaml'
       - 'config/baiye-multiple-lite.yaml'
       - 'config/baiye-single-lite.yaml'
+      - '.github/scripts/build-and-publish.js'
+      - '.github/workflows/publish-gist.yml'
   workflow_dispatch:
     inputs:
-      force_full:
-        description: 'Run full publish: update all variants regardless of changes'
+      dry_run:
         type: boolean
         default: false
+        description: 'Build only, skip publishing to Gist'
+      force_full:
+        type: boolean
+        default: false
+        description: 'Ignore path-diff and rebuild all'
 
 concurrency:
   group: build-and-publish
@@ -31,12 +37,12 @@ jobs:
     runs-on: ubuntu-latest
     env:
       FORCE_FULL: ${{ inputs.force_full && 'true' || 'false' }}
+      DRY_RUN:    ${{ inputs.dry_run && 'true' || 'false' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          # 手动触发时，如 ref 指向 tag，则强制回落到 main 防止检出 tag
           ref: ${{ startsWith(github.ref, 'refs/tags/') && 'main' || github.ref }}
 
       - name: Detect changed files (safe on tag/initial)
@@ -44,216 +50,87 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-
-          # 若为 tag（理论上已被上层拦截），再保险：直接空变更退出
-          if [ "${{ github.ref_type }}" = "tag" ] || [[ "${GITHUB_REF:-}" == refs/tags/* ]]; then
-            : > changed.all.txt
-            : > changed.targets.txt
-            echo "multi_changed=false"             >> $GITHUB_OUTPUT
-            echo "single_changed=false"            >> $GITHUB_OUTPUT
-            echo "multi_lite_changed=false"        >> $GITHUB_OUTPUT
-            echo "single_lite_changed=false"       >> $GITHUB_OUTPUT
-            echo "No-op on tag ref."
-            exit 0
-          fi
-
           AFTER="${{ github.sha }}"
           BEFORE="${{ github.event.before }}"
           if [ -z "${BEFORE}" ]; then
             BEFORE="$(git rev-parse "${AFTER}^" 2>/dev/null || echo '')"
           fi
-
           if [ -n "${BEFORE}" ]; then
             git diff --name-only "${BEFORE}" "${AFTER}" | sort -u > changed.all.txt
           else
-            # 没有基线时，判定为无变更（防止把全仓当变更）
             : > changed.all.txt
           fi
-
-          if [ ! -s changed.all.txt ]; then
-            : > changed.targets.txt
-            echo "multi_changed=false"             >> $GITHUB_OUTPUT
-            echo "single_changed=false"            >> $GITHUB_OUTPUT
-            echo "multi_lite_changed=false"        >> $GITHUB_OUTPUT
-            echo "single_lite_changed=false"       >> $GITHUB_OUTPUT
-            echo "No file changes; skip."
-            exit 0
-          fi
-
           grep -E '^(icons/|rules/)' changed.all.txt | sort -u > changed.targets.txt || true
 
-          MULTI_CHANGED=false
-          SINGLE_CHANGED=false
-          MULTI_LITE_CHANGED=false
-          SINGLE_LITE_CHANGED=false
-          grep -qx "config/baiye-multiple.yaml"       changed.all.txt && MULTI_CHANGED=true
-          grep -qx "config/baiye-single.yaml"         changed.all.txt && SINGLE_CHANGED=true
-          grep -qx "config/baiye-multiple-lite.yaml"  changed.all.txt && MULTI_LITE_CHANGED=true
-          grep -qx "config/baiye-single-lite.yaml"    changed.all.txt && SINGLE_LITE_CHANGED=true
+          M_CHANGED=false; S_CHANGED=false; ML_CHANGED=false; SL_CHANGED=false
+          grep -qx "config/baiye-multiple.yaml"       changed.all.txt && M_CHANGED=true
+          grep -qx "config/baiye-single.yaml"         changed.all.txt && S_CHANGED=true
+          grep -qx "config/baiye-multiple-lite.yaml"  changed.all.txt && ML_CHANGED=true
+          grep -qx "config/baiye-single-lite.yaml"    changed.all.txt && SL_CHANGED=true
 
-          echo "multi_changed=${MULTI_CHANGED}"             >> $GITHUB_OUTPUT
-          echo "single_changed=${SINGLE_CHANGED}"           >> $GITHUB_OUTPUT
-          echo "multi_lite_changed=${MULTI_LITE_CHANGED}"   >> $GITHUB_OUTPUT
-          echo "single_lite_changed=${SINGLE_LITE_CHANGED}" >> $GITHUB_OUTPUT
+          echo "m=${M_CHANGED}"       >> $GITHUB_OUTPUT
+          echo "s=${S_CHANGED}"       >> $GITHUB_OUTPUT
+          echo "ml=${ML_CHANGED}"     >> $GITHUB_OUTPUT
+          echo "sl=${SL_CHANGED}"     >> $GITHUB_OUTPUT
 
           echo "Changed files:" && cat changed.all.txt || true
           echo "Changed targets (icons/rules):" && cat changed.targets.txt || true
 
-      - name: Decide need (multiple)
-        id: need_multi
-        shell: bash
-        run: |
-          set -euo pipefail
-          NEED=false
-          if [ "${FORCE_FULL}" = "true" ]; then
-            NEED=true
-          elif [ "${{ steps.chg.outputs.multi_changed }}" = "true" ]; then
-            NEED=true
-          elif [ -s changed.targets.txt ] && [ -f config/baiye-multiple.yaml ]; then
-            while IFS= read -r p; do
-              [ -z "$p" ] && continue
-              if grep -Fq "$p" config/baiye-multiple.yaml; then NEED=true; break; fi
-            done < changed.targets.txt
-          fi
-          echo "need=${NEED}" >> $GITHUB_OUTPUT
-          echo "need-multiple=${NEED}"
-
-      - name: Decide need (single)
-        id: need_single
-        shell: bash
-        run: |
-          set -euo pipefail
-          NEED=false
-          if [ "${FORCE_FULL}" = "true" ]; then
-            NEED=true
-          elif [ "${{ steps.chg.outputs.single_changed }}" = "true" ]; then
-            NEED=true
-          elif [ -s changed.targets.txt ] && [ -f config/baiye-single.yaml ]; then
-            while IFS= read -r p; do
-              [ -z "$p" ] && continue
-              if grep -Fq "$p" config/baiye-single.yaml; then NEED=true; break; fi
-            done < changed.targets.txt
-          fi
-          echo "need=${NEED}" >> $GITHUB_OUTPUT
-          echo "need-single=${NEED}"
-
-      - name: Decide need (multiple-lite)
-        id: need_multi_lite
-        shell: bash
-        run: |
-          set -euo pipefail
-          NEED=false
-          if [ "${FORCE_FULL}" = "true" ]; then
-            NEED=true
-          elif [ "${{ steps.chg.outputs.multi_lite_changed }}" = "true" ]; then
-            NEED=true
-          elif [ -s changed.targets.txt ] && [ -f config/baiye-multiple-lite.yaml ]; then
-            while IFS= read -r p; do
-              [ -z "$p" ] && continue
-              if grep -Fq "$p" config/baiye-multiple-lite.yaml; then NEED=true; break; fi
-            done < changed.targets.txt
-          fi
-          echo "need=${NEED}" >> $GITHUB_OUTPUT
-          echo "need-multiple-lite=${NEED}"
-
-      - name: Decide need (single-lite)
-        id: need_single_lite
-        shell: bash
-        run: |
-          set -euo pipefail
-          NEED=false
-          if [ "${FORCE_FULL}" = "true" ]; then
-            NEED=true
-          elif [ "${{ steps.chg.outputs.single_lite_changed }}" = "true" ]; then
-            NEED=true
-          elif [ -s changed.targets.txt ] && [ -f config/baiye-single-lite.yaml ]; then
-            while IFS= read -r p; do
-              [ -z "$p" ] && continue
-              if grep -Fq "$p" config/baiye-single-lite.yaml; then NEED=true; break; fi
-            done < changed.targets.txt
-          fi
-          echo "need=${NEED}" >> $GITHUB_OUTPUT
-          echo "need-single-lite=${NEED}"
-
-      - name: Setup Node
-        if: |
-          steps.need_multi.outputs.need == 'true' ||
-          steps.need_single.outputs.need == 'true' ||
-          steps.need_multi_lite.outputs.need == 'true' ||
-          steps.need_single_lite.outputs.need == 'true'
+      - name: Setup Node (if needed)
+        if: ${{ inputs.force_full || steps.chg.outputs.m == 'true' || steps.chg.outputs.s == 'true' || steps.chg.outputs.ml == 'true' || steps.chg.outputs.sl == 'true' }}
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
-      - name: Build & Publish (multiple + mini)
-        if: steps.need_multi.outputs.need == 'true'
+      # —— 标准 Gist：一次写入 multiple/single/mini ——
+      - name: Publish STANDARD gist (one PATCH)
+        if: ${{ inputs.force_full || steps.chg.outputs.m == 'true' || steps.chg.outputs.s == 'true' }}
         env:
-          SUB_URL_1: ${{ secrets.SUB_URL_1 }}
-          SUB_URL_2: ${{ secrets.SUB_URL_2 }}
           GIST_TOKEN: ${{ secrets.GIST_TOKEN }}
-          GIST_ID: ${{ secrets.GIST_ID_STANDARD }}
-          CONFIG_PATH: config/baiye-multiple.yaml
+          GIST_ID:    ${{ secrets.GIST_ID_STANDARD }}
+
+          SUB_URL_1:  ${{ secrets.SUB_URL_1 }}
+          SUB_URL_2:  ${{ secrets.SUB_URL_2 }}
+
+          CONFIG_MULTIPLE: config/baiye-multiple.yaml
+          CONFIG_SINGLE:   config/baiye-single.yaml
+
           GIST_FILE_MULTIPLE: baiye-multiple.yaml
-          GIST_FILE_MINI: baiye-mini.yaml
-          COMMIT_SHORT: ${{ github.sha }}
-        run: |
-          export COMMIT_SHORT="${COMMIT_SHORT:0:7}"
-          node .github/scripts/build-multi.js
+          GIST_FILE_SINGLE:   baiye-single.yaml
+          GIST_FILE_MINI:     baiye-mini.yaml
 
-      - name: Build & Publish (single)
-        if: steps.need_single.outputs.need == 'true'
-        env:
-          SUB_URL_1: ${{ secrets.SUB_URL_1 }}
-          GIST_TOKEN: ${{ secrets.GIST_TOKEN }}
-          GIST_ID: ${{ secrets.GIST_ID_STANDARD }}
-          CONFIG_PATH: config/baiye-single.yaml
-          GIST_FILE_SINGLE: baiye-single.yaml
           COMMIT_SHORT: ${{ github.sha }}
+          DRY_RUN:      ${{ env.DRY_RUN }}
         run: |
-          export COMMIT_SHORT="${COMMIT_SHORT:0:7}"
-          node .github/scripts/build-single.js
+          node .github/scripts/build-and-publish.js
 
-      - name: Build & Publish (multiple-lite + mini-lite)
-        if: steps.need_multi_lite.outputs.need == 'true'
+      # —— LITE Gist：一次写入 multiple-lite/single-lite/mini-lite ——
+      - name: Publish LITE gist (one PATCH)
+        if: ${{ inputs.force_full || steps.chg.outputs.ml == 'true' || steps.chg.outputs.sl == 'true' }}
         env:
-          SUB_URL_1: ${{ secrets.SUB_URL_1 }}
-          SUB_URL_2: ${{ secrets.SUB_URL_2 }}
           GIST_TOKEN: ${{ secrets.GIST_TOKEN }}
-          GIST_ID: ${{ secrets.GIST_ID_LITE }}
-          CONFIG_PATH: config/baiye-multiple-lite.yaml
+          GIST_ID:    ${{ secrets.GIST_ID_LITE }}
+
+          SUB_URL_1:  ${{ secrets.SUB_URL_1 }}
+          SUB_URL_2:  ${{ secrets.SUB_URL_2 }}
+
+          CONFIG_MULTIPLE: config/baiye-multiple-lite.yaml
+          CONFIG_SINGLE:   config/baiye-single-lite.yaml
+
           GIST_FILE_MULTIPLE: baiye-multiple-lite.yaml
-          GIST_FILE_MINI: baiye-mini-lite.yaml
-          COMMIT_SHORT: ${{ github.sha }}
-        run: |
-          export COMMIT_SHORT="${COMMIT_SHORT:0:7}"
-          node .github/scripts/build-multi.js
+          GIST_FILE_SINGLE:   baiye-single-lite.yaml
+          GIST_FILE_MINI:     baiye-mini-lite.yaml
 
-      - name: Build & Publish (single-lite)
-        if: steps.need_single_lite.outputs.need == 'true'
-        env:
-          SUB_URL_1: ${{ secrets.SUB_URL_1 }}
-          GIST_TOKEN: ${{ secrets.GIST_TOKEN }}
-          GIST_ID: ${{ secrets.GIST_ID_LITE }}
-          CONFIG_PATH: config/baiye-single-lite.yaml
-          GIST_FILE_SINGLE: baiye-single-lite.yaml
           COMMIT_SHORT: ${{ github.sha }}
+          DRY_RUN:      ${{ env.DRY_RUN }}
         run: |
-          export COMMIT_SHORT="${COMMIT_SHORT:0:7}"
-          node .github/scripts/build-single.js
+          node .github/scripts/build-and-publish.js
 
       - name: Upload artifacts (optional)
-        if: |
-          steps.need_multi.outputs.need == 'true' ||
-          steps.need_single.outputs.need == 'true' ||
-          steps.need_multi_lite.outputs.need == 'true' ||
-          steps.need_single_lite.outputs.need == 'true'
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: built-configs
           path: |
-            baiye-multiple.generated.yaml
-            baiye-mini.generated.yaml
-            baiye-single.generated.yaml
-            baiye-multiple-lite.generated.yaml
-            baiye-mini-lite.generated.yaml
-            baiye-single-lite.generated.yaml
+            *.generated.yaml
+          if-no-files-found: ignore
