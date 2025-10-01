@@ -12,17 +12,17 @@ on:
       - 'config/baiye-multiple-lite.yaml'
       - 'config/baiye-single-lite.yaml'
       - '.github/scripts/build-and-publish.js'
-      - '.github/workflows/publish-gist.yml'
+      - '.github/workflows/publish-gists.yml'
   workflow_dispatch:
     inputs:
       dry_run:
-        type: boolean
-        default: false
         description: 'Build only, skip publishing to Gist'
-      force_full:
         type: boolean
         default: false
-        description: 'Ignore path-diff and rebuild all'
+      force_full:
+        description: 'Ignore path-diff and rebuild all variants'
+        type: boolean
+        default: false
 
 concurrency:
   group: build-and-publish
@@ -36,16 +36,16 @@ jobs:
     if: ${{ github.event_name != 'push' || startsWith(github.ref, 'refs/heads/') }}
     runs-on: ubuntu-latest
     env:
-      FORCE_FULL: ${{ inputs.force_full && 'true' || 'false' }}
       DRY_RUN:    ${{ inputs.dry_run && 'true' || 'false' }}
+      FORCE_FULL: ${{ inputs.force_full && 'true' || 'false' }}
     steps:
-      - name: Checkout
+      - name: Checkout (full)
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
           ref: ${{ startsWith(github.ref, 'refs/tags/') && 'main' || github.ref }}
 
-      - name: Detect changed files (safe on tag/initial)
+      - name: Detect changed files
         id: chg
         shell: bash
         run: |
@@ -62,16 +62,16 @@ jobs:
           fi
           grep -E '^(icons/|rules/)' changed.all.txt | sort -u > changed.targets.txt || true
 
-          M_CHANGED=false; S_CHANGED=false; ML_CHANGED=false; SL_CHANGED=false
-          grep -qx "config/baiye-multiple.yaml"       changed.all.txt && M_CHANGED=true
-          grep -qx "config/baiye-single.yaml"         changed.all.txt && S_CHANGED=true
-          grep -qx "config/baiye-multiple-lite.yaml"  changed.all.txt && ML_CHANGED=true
-          grep -qx "config/baiye-single-lite.yaml"    changed.all.txt && SL_CHANGED=true
+          M=false; S=false; ML=false; SL=false
+          grep -qx "config/baiye-multiple.yaml"       changed.all.txt && M=true
+          grep -qx "config/baiye-single.yaml"         changed.all.txt && S=true
+          grep -qx "config/baiye-multiple-lite.yaml"  changed.all.txt && ML=true
+          grep -qx "config/baiye-single-lite.yaml"    changed.all.txt && SL=true
 
-          echo "m=${M_CHANGED}"       >> $GITHUB_OUTPUT
-          echo "s=${S_CHANGED}"       >> $GITHUB_OUTPUT
-          echo "ml=${ML_CHANGED}"     >> $GITHUB_OUTPUT
-          echo "sl=${SL_CHANGED}"     >> $GITHUB_OUTPUT
+          echo "m=${M}"  >> $GITHUB_OUTPUT
+          echo "s=${S}"  >> $GITHUB_OUTPUT
+          echo "ml=${ML}" >> $GITHUB_OUTPUT
+          echo "sl=${SL}" >> $GITHUB_OUTPUT
 
           echo "Changed files:" && cat changed.all.txt || true
           echo "Changed targets (icons/rules):" && cat changed.targets.txt || true
@@ -82,7 +82,7 @@ jobs:
         with:
           node-version: 20
 
-      # —— 标准 Gist：一次写入 multiple/single/mini ——
+      # —— STANDARD Gist：一次 PATCH 写 multiple/single/mini ——
       - name: Publish STANDARD gist (one PATCH)
         if: ${{ inputs.force_full || steps.chg.outputs.m == 'true' || steps.chg.outputs.s == 'true' }}
         env:
@@ -101,10 +101,9 @@ jobs:
 
           COMMIT_SHORT: ${{ github.sha }}
           DRY_RUN:      ${{ env.DRY_RUN }}
-        run: |
-          node .github/scripts/build-and-publish.js
+        run: node .github/scripts/build-and-publish.js
 
-      # —— LITE Gist：一次写入 multiple-lite/single-lite/mini-lite ——
+      # —— LITE Gist：一次 PATCH 写 multiple-lite/single-lite/mini-lite ——
       - name: Publish LITE gist (one PATCH)
         if: ${{ inputs.force_full || steps.chg.outputs.ml == 'true' || steps.chg.outputs.sl == 'true' }}
         env:
@@ -123,10 +122,9 @@ jobs:
 
           COMMIT_SHORT: ${{ github.sha }}
           DRY_RUN:      ${{ env.DRY_RUN }}
-        run: |
-          node .github/scripts/build-and-publish.js
+        run: node .github/scripts/build-and-publish.js
 
-      - name: Upload artifacts (optional)
+      - name: Upload artifacts (outputs)
         if: always()
         uses: actions/upload-artifact@v4
         with:
