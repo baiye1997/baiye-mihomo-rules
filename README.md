@@ -18,7 +18,7 @@
 | `config/baiye-single.yaml` | 单一订阅 | 标准版（RULE-SET） |
 | `config/baiye-multiple-lite.yaml` | 多订阅合一（Lite） | 主要使用 GEO 上游 |
 | `config/baiye-single-lite.yaml` | 单一订阅（Lite） | 主要使用 GEO 上游 |
-
+> 特色：完整好用的`rules/domainset/fake_ip.list`和`rules/domainset/sniff-skip.list`，解决一系列通信问题
 ---
 
 ## 🚀 使用方法
