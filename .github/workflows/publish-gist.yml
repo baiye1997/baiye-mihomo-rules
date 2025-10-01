@@ -99,22 +99,29 @@ jobs:
           STATUS_FILE:  "status-lite.txt"      # 非隐藏
         run: node .github/scripts/build-and-publish.js
 
-      # 兜底：如果前面步骤被条件跳过或异常没写入状态，则补 UNKNOWN
       - name: Ensure status files
         if: always()
-        shell: bash
         run: |
           test -f status-standard.txt || echo UNKNOWN > status-standard.txt
           test -f status-lite.txt     || echo UNKNOWN > status-lite.txt
 
-      # 只上传状态文件（不会泄露任何地址）
-      - name: Upload status
+      - name: Write status to job summary (no artifact)
         if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: publish-status
-          path: |
-            status-standard.txt
-            status-lite.txt
-          if-no-files-found: warn
-          overwrite: false
+        shell: bash
+        run: |
+          std="$(cat status-standard.txt 2>/dev/null || echo UNKNOWN)"
+          lite="$(cat status-lite.txt 2>/dev/null || echo UNKNOWN)"
+
+          echo "## Publish result" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "- STANDARD: **${std}**" >> "$GITHUB_STEP_SUMMARY"
+          echo "- LITE: **${lite}**" >> "$GITHUB_STEP_SUMMARY"
+
+          # 可选：给整个 Job 打个总结果（仅用于阅读，不影响结论）
+          if [ "$std" = "OK" ] || [ "$lite" = "OK" ]; then
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "> Overall: ✅ at least one OK" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "> Overall: ⚠️ no OK" >> "$GITHUB_STEP_SUMMARY"
+          fi
