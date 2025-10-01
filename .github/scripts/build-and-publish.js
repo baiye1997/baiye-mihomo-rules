@@ -1,5 +1,5 @@
 // .github/scripts/build-and-publish.js
-// env（按调用场景传入）：
+// 环境变量（按调用场景传入）：
 //   GIST_TOKEN, GIST_ID
 //   SUB_URL_1, SUB_URL_2
 //   CONFIG_MULTIPLE, CONFIG_SINGLE
@@ -31,9 +31,14 @@ if (!GIST_TOKEN || !GIST_ID) {
   process.exit(2);
 }
 
+const RETRY_STATUS = new Set([409, 500, 502, 503, 522, 524]);
+
 function sha12(s) {
   return crypto.createHash("sha256").update(s).digest("hex").slice(0, 12);
 }
+
+function sleep(ms) { return new Promise((r) => setTimeout(r, ms)); }
+function jitter(ms) { return Math.round(ms * (0.8 + Math.random() * 0.4)); }
 
 function bumpIconsV(s) {
   const re = /(https?:\/\/[^\s"'<>]+\/icons\/[^\s"'<>]+\.(?:png|jpe?g|webp|svg)(?:\?[^\s"'<>]*)?)/gi;
@@ -73,8 +78,8 @@ function httpJSON(method, url, body, headers = {}) {
         let data = "";
         res.on("data", (d) => (data += d));
         res.on("end", () => {
-          const etag = res.headers.etag;
           const status = res.statusCode || 0;
+          const etag = res.headers.etag;
           if (status >= 200 && status < 300) {
             try {
               const json = data ? JSON.parse(data) : {};
@@ -98,10 +103,6 @@ async function getGist() {
   return httpJSON("GET", `https://api.github.com/gists/${GIST_ID}`);
 }
 
-const RETRY_STATUS = new Set([409, 500, 502, 503, 522, 524]);
-function sleep(ms) { return new Promise((r) => setTimeout(r, ms)); }
-function jitter(ms) { return Math.round(ms * (0.8 + Math.random() * 0.4)); }
-
 async function patchGistOnce(files, description) {
   const body = JSON.stringify({ files, description });
   return httpJSON("PATCH", `https://api.github.com/gists/${GIST_ID}`, body);
@@ -115,9 +116,9 @@ async function patchGistWithRetry(files, description, maxRetries = 4) {
     } catch (e) {
       const st = e.status || 0;
       if (RETRY_STATUS.has(st) && i < maxRetries) {
-        const d = Math.round(backoff * (0.8 + Math.random() * 0.4));
+        const d = jitter(backoff);
         console.warn(`⚠️ PATCH failed with ${st}, retry ${i + 1}/${maxRetries} after ${d}ms`);
-        await new Promise(r => setTimeout(r, d));
+        await sleep(d);
         backoff *= 2;
         continue;
       }
@@ -130,7 +131,7 @@ async function patchGistWithRetry(files, description, maxRetries = 4) {
 function buildOutputs() {
   const out = {};
 
-  // multiple / mini（需要 SUB_URL_1 + SUB_URL_2 + CONFIG_MULTIPLE）
+  // multiple / mini
   if (SUB_URL_1 && SUB_URL_2) {
     const rawMulti = readIfExists(CONFIG_MULTIPLE);
     if (!rawMulti) throw new Error(`${CONFIG_MULTIPLE} not found`);
@@ -144,7 +145,7 @@ function buildOutputs() {
     out.mini = multiple.replace(/geodata-loader:\s*standard/g, "geodata-loader: memconservative");
   }
 
-  // single（需要 SUB_URL_1 + CONFIG_SINGLE）
+  // single
   if (SUB_URL_1) {
     const rawSingle = readIfExists(CONFIG_SINGLE);
     if (rawSingle) {
@@ -165,7 +166,7 @@ function diffPlan(currentGistJSON, outputs, names) {
   function unchanged(name, next) {
     const now = filesNow[name];
     if (!now) return false;
-    if (now.truncated) return false; // 无法比对，保守重写
+    if (now.truncated) return false; // 内容被截断无法比对，保守重写
     return now.content === next;
   }
 
@@ -189,6 +190,26 @@ function diffPlan(currentGistJSON, outputs, names) {
   }
 
   return { plan, hashes };
+}
+
+function fixedRawFromApi(owner, gistId, apiRawUrl, fileName) {
+  // 首选规范形式（需要 owner）：
+  if (owner) return `https://gist.githubusercontent.com/${owner}/${gistId}/raw/${fileName}`;
+  // 退而求其次：从 API raw_url 去掉提交 hash
+  // 形如 .../<user>/<id>/raw/<sha>/<file>
+  try {
+    const u = new URL(apiRawUrl);
+    const parts = u.pathname.split("/").filter(Boolean);
+    const iRaw = parts.indexOf("raw");
+    if (iRaw >= 0 && parts.length >= iRaw + 3) {
+      // 移除 raw 后面的 sha 段
+      parts.splice(iRaw + 1, 1);
+      u.pathname = "/" + parts.join("/");
+      return u.toString();
+    }
+  } catch {}
+  // 再不行就返回 apiRawUrl 原样
+  return apiRawUrl || `https://gist.githubusercontent.com/${gistId}/raw/${fileName}`;
 }
 
 (async () => {
@@ -215,7 +236,7 @@ function diffPlan(currentGistJSON, outputs, names) {
 
   console.log(`🧩 Hashes => ${hashStr || "no-change"}`);
 
-  // 将生成物保存到工作区（便于 artifact 或本地排查）
+  // 落盘生成物（便于 artifacts）
   for (const [k, v] of Object.entries(outputs)) {
     const fname =
       (k === "multiple" && wantNames.multiple) ||
@@ -229,27 +250,54 @@ function diffPlan(currentGistJSON, outputs, names) {
 
   if (Object.keys(plan).length === 0) {
     console.log("✅ No effective changes. Skip PATCH.");
+    // 也输出当前固定链接表，方便复制
+    const owner = latest.json?.owner?.login;
+    const id = latest.json?.id || GIST_ID;
+    const table = [];
+    for (const fname of [wantNames.multiple, wantNames.single, wantNames.mini].filter(Boolean)) {
+      const apiRaw = latest.json?.files?.[fname]?.raw_url || "";
+      const url = fixedRawFromApi(owner, id, apiRaw, fname);
+      table.push(`| ${fname} | ${url} |`);
+    }
+    if (table.length) {
+      console.log("::notice title=Gist Links (no changes)::\n" + ["| File | URL |","|------|-----|",...table].join("\n"));
+    }
     process.exit(0);
   }
 
   if (DRY_RUN === "true") {
     console.log("🔎 DRY_RUN=true → build only, skip publishing to Gist.");
+    // 同时也给出推测的固定链接（基于最新 Gist 元数据）
+    const owner = latest.json?.owner?.login;
+    const id = latest.json?.id || GIST_ID;
+    const table = [];
+    for (const fname of Object.keys(plan)) {
+      const apiRaw = latest.json?.files?.[fname]?.raw_url || "";
+      const url = fixedRawFromApi(owner, id, apiRaw, fname);
+      table.push(`| ${fname} | ${url} |`);
+    }
+    if (table.length) {
+      console.log("::notice title=Gist Links (dry-run)::\n" + ["| File | URL |","|------|-----|",...table].join("\n"));
+    }
     process.exit(0);
   }
 
   const desc = `update via CI | ${hashStr || "partial-change"} | ${COMMIT_SHORT}`;
   const patched = await patchGistWithRetry(plan, desc);
 
-  const owner = patched.json?.owner?.login;
-  const id = patched.json?.id || GIST_ID;
+  // 输出固定 raw 地址表（不带 commit hash）
+  const owner = patched.json?.owner?.login || latest.json?.owner?.login;
+  const id = patched.json?.id || latest.json?.id || GIST_ID;
+
+  const table = [];
   for (const fname of Object.keys(plan)) {
-    const fmeta = patched.json?.files?.[fname];
-    if (fmeta?.raw_url) {
-      const raw = `https://gist.githubusercontent.com/${owner}/${id}/raw/${fmeta.raw_url.split("/raw/")[1]}`;
-      console.log(`✅ ${fname} → ${raw}`);
-    } else {
-      console.log(`✅ ${fname} updated.`);
-    }
+    const apiRaw = patched.json?.files?.[fname]?.raw_url || latest.json?.files?.[fname]?.raw_url || "";
+    const url = fixedRawFromApi(owner, id, apiRaw, fname);
+    console.log(`✅ ${fname} → ${url}`);
+    table.push(`| ${fname} | ${url} |`);
+  }
+  if (table.length) {
+    console.log("::notice title=Gist Links::\n" + ["| File | URL |","|------|-----|",...table].join("\n"));
   }
 })().catch((e) => {
   console.error(`❌ Gist update failed: ${e.status || ""} ${e.message || e}`);
