@@ -18,7 +18,7 @@
 | [baiye-multiple.yaml](./config/baiye-single.yaml) | 单一订阅 | 标准版（RULE-SET） |
 | [baiye-multiple.yaml](./config/baiye-multiple-lite.yaml) | 多订阅合一（Lite） | 主要使用 GEO 上游 |
 | [baiye-multiple.yaml](./config/baiye-single-lite.yaml) | 单一订阅（Lite） | 主要使用 GEO 上游 |
-> 特色：完整好用的[fake_ip](./rules/domainset/fake_ip.list)和[sniff-skip](./rules/domainset/sniff-skip.list)，解决一系列通信问题
+> 特色：完整好用的 [fake_ip](./rules/domainset/fake_ip.list) 和[sniff-skip](./rules/domainset/sniff-skip.list) ，解决一系列通信问题
 
 > 建议：关闭客户端的一切覆写功能，本仓库配置文件已经非常好用！
 ---
