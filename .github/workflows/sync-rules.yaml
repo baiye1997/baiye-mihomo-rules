@@ -32,14 +32,16 @@ jobs:
           set -euo pipefail
           if git status --porcelain | grep .; then
             echo "changed=true" >>"$GITHUB_OUTPUT"
+            git diff --name-only > changed.txt
           else
             echo "changed=false" >>"$GITHUB_OUTPUT"
+            : > changed.txt
           fi
 
       - name: Commit & Push (PAT)
         if: steps.diff.outputs.changed == 'true'
         env:
-          GH_PAT: ${{ secrets.ACTIONS_PAT }}   # 你在 Secrets 里保存的 PAT
+          GH_PAT: ${{ secrets.ACTIONS_PAT }}
         shell: bash
         run: |
           set -euo pipefail
@@ -47,8 +49,19 @@ jobs:
           git config user.email "baiye-bot@users.noreply.github.com"
 
           git add -A
-          # ⚠️ 不要写 [ci skip]，否则 push 不会触发其它工作流
           git commit -m "chore(sync): update external rules from upstream"
-
-          # 推送到当前工作流的分支（通常是默认分支）
           git push "https://x-access-token:${GH_PAT}@github.com/${{ github.repository }}.git" HEAD:${{ github.ref_name }}
+
+      - name: Summary (changed rules)
+        if: always()
+        shell: bash
+        run: |
+          echo "## Sync External Rules" >> "$GITHUB_STEP_SUMMARY"
+          if [ "${{ steps.diff.outputs.changed }}" != "true" ]; then
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "- No changes detected." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "### Updated files" >> "$GITHUB_STEP_SUMMARY"
+            sed 's/^/- /' changed.txt >> "$GITHUB_STEP_SUMMARY"
+          fi
