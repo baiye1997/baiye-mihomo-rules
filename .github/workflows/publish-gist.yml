@@ -33,7 +33,6 @@ permissions:
 
 jobs:
   build:
-    if: ${{ github.event_name != 'push' || startsWith(github.ref, 'refs/heads/') }}
     runs-on: ubuntu-latest
     env:
       DRY_RUN:    ${{ inputs.dry_run && 'true' || 'false' }}
@@ -88,47 +87,44 @@ jobs:
         env:
           GIST_TOKEN: ${{ secrets.GIST_TOKEN }}
           GIST_ID:    ${{ secrets.GIST_ID_STANDARD }}
-
           SUB_URL_1:  ${{ secrets.SUB_URL_1 }}
           SUB_URL_2:  ${{ secrets.SUB_URL_2 }}
-
           CONFIG_MULTIPLE: config/baiye-multiple.yaml
           CONFIG_SINGLE:   config/baiye-single.yaml
-
           GIST_FILE_MULTIPLE: baiye-multiple.yaml
           GIST_FILE_SINGLE:   baiye-single.yaml
           GIST_FILE_MINI:     baiye-mini.yaml
-
           COMMIT_SHORT: ${{ github.sha }}
           DRY_RUN:      ${{ env.DRY_RUN }}
+          QUIET:        "true"                             # 静默模式
+          STATUS_FILE:  ".status-standard.txt"            # 仅输出状态
         run: node .github/scripts/build-and-publish.js
 
-      # —— LITE Gist：一次 PATCH 写 multiple-lite/single-lite/mini-lite ——
       - name: Publish LITE gist (one PATCH)
         if: ${{ inputs.force_full || steps.chg.outputs.ml == 'true' || steps.chg.outputs.sl == 'true' }}
         env:
           GIST_TOKEN: ${{ secrets.GIST_TOKEN }}
           GIST_ID:    ${{ secrets.GIST_ID_LITE }}
-
           SUB_URL_1:  ${{ secrets.SUB_URL_1 }}
           SUB_URL_2:  ${{ secrets.SUB_URL_2 }}
-
           CONFIG_MULTIPLE: config/baiye-multiple-lite.yaml
           CONFIG_SINGLE:   config/baiye-single-lite.yaml
-
           GIST_FILE_MULTIPLE: baiye-multiple-lite.yaml
           GIST_FILE_SINGLE:   baiye-single-lite.yaml
           GIST_FILE_MINI:     baiye-mini-lite.yaml
-
           COMMIT_SHORT: ${{ github.sha }}
           DRY_RUN:      ${{ env.DRY_RUN }}
+          QUIET:        "true"
+          STATUS_FILE:  ".status-lite.txt"
         run: node .github/scripts/build-and-publish.js
 
-      - name: Upload artifacts (outputs)
+      # ✅ 可选：只上传「状态」artifact（无敏感信息）
+      - name: Upload status (OK/NOCHANGE/DRYRUN)
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: built-configs
+          name: publish-status
           path: |
-            *.generated.yaml
+            .status-standard.txt
+            .status-lite.txt
           if-no-files-found: ignore
