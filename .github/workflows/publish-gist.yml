@@ -32,7 +32,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-      # 取完整历史，便于 diff
           fetch-depth: 0
 
       - name: Detect changes
@@ -117,7 +116,7 @@ jobs:
           echo "- STANDARD: **${std}**" >> "$GITHUB_STEP_SUMMARY"
           echo "- LITE: **${lite}**" >> "$GITHUB_STEP_SUMMARY"
 
-          # 可选：给整个 Job 打个总结果（仅用于阅读，不影响结论）
+          # 可选：给整个 Job 打个总结果
           if [ "$std" = "OK" ] || [ "$lite" = "OK" ]; then
             echo "" >> "$GITHUB_STEP_SUMMARY"
             echo "> Overall: ✅ at least one OK" >> "$GITHUB_STEP_SUMMARY"
