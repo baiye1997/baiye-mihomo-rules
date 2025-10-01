@@ -15,20 +15,18 @@ const {
   GIST_FILE_SINGLE   = "baiye-single.yaml",
   GIST_FILE_MINI     = "baiye-mini.yaml",
   DRY_RUN = "false",
-  QUIET   = "true",              // 新增：静默模式
-  STATUS_FILE = ""               // 新增：结果写入文件（可选）
+  QUIET   = "true",
+  STATUS_FILE = ""
 } = process.env;
 
 const COMMIT_SHORT = (process.env.COMMIT_SHORT || "dev").slice(0, 7);
+const statusFile = STATUS_FILE ? path.resolve(STATUS_FILE) : "";
 
-function log(...args){ if (QUIET !== "true") console.log(...args); }
-
-if (!GIST_TOKEN || !GIST_ID) {
-  console.error("❌ Missing GIST_TOKEN or GIST_ID.");
-  process.exit(2);
+function writeStatus(text) {
+  if (!statusFile) return;
+  try { fs.writeFileSync(statusFile, String(text).trim() + "\n", "utf8"); }
+  catch {}
 }
-
-const RETRY_STATUS = new Set([409, 500, 502, 503, 522, 524]);
 
 function sha12(s){ return crypto.createHash("sha256").update(s).digest("hex").slice(0,12); }
 function sleep(ms){ return new Promise(r => setTimeout(r, ms)); }
@@ -88,7 +86,7 @@ async function patchGistWithRetry(files, description, maxRetries=4){
     try { return await patchGistOnce(files, description); }
     catch(e){
       const st = e.status||0;
-      if (RETRY_STATUS.has(st) && i<maxRetries){
+      if ([409,500,502,503,522,524].includes(st) && i<maxRetries){
         await sleep(jitter(backoff)); backoff*=2; continue;
       }
       throw e;
@@ -96,7 +94,6 @@ async function patchGistWithRetry(files, description, maxRetries=4){
   }
 }
 
-/** 生成 multiple/single/mini 文本 */
 function buildOutputs(){
   const out = {};
   if (SUB_URL_1 && SUB_URL_2){
@@ -121,7 +118,6 @@ function buildOutputs(){
   return out;
 }
 
-/** 与当前 Gist 对比：未变化则不写入 */
 function diffPlan(currentGistJSON, outputs, names){
   const plan = {};
   const hashes = {};
@@ -150,47 +146,40 @@ function diffPlan(currentGistJSON, outputs, names){
 }
 
 (async ()=>{
-  const wantNames = {
-    multiple: GIST_FILE_MULTIPLE || null,
-    single:   GIST_FILE_SINGLE   || null,
-    mini:     GIST_FILE_MINI     || null,
-  };
+  try {
+    const wantNames = {
+      multiple: GIST_FILE_MULTIPLE || null,
+      single:   GIST_FILE_SINGLE   || null,
+      mini:     GIST_FILE_MINI     || null,
+    };
 
-  const outputs = buildOutputs();
-  if (!outputs.multiple && !outputs.single && !outputs.mini){
-    if (STATUS_FILE) fs.writeFileSync(STATUS_FILE, "NOCHANGE\n");
-    process.exit(0);
-  }
-
-  const latest = await getGist();
-  const { plan, hashes } = diffPlan(latest.json, outputs, wantNames);
-
-  // 落盘（供你本地调试需要时打开；不上传 artifact）
-  for (const [k,v] of Object.entries(outputs)){
-    const fname = (k==="multiple"&&wantNames.multiple) || (k==="single"&&wantNames.single) || (k==="mini"&&wantNames.mini);
-    if (fname){
-      const gen = fname.replace(/\.ya?ml$/, "") + ".generated.yaml";
-      try { fs.writeFileSync(gen, v, "utf8"); } catch {}
+    const outputs = buildOutputs();
+    if (!outputs.multiple && !outputs.single && !outputs.mini){
+      writeStatus("NOCHANGE");
+      process.exit(0);
     }
-  }
 
-  if (Object.keys(plan).length === 0){
-    if (STATUS_FILE) fs.writeFileSync(STATUS_FILE, "NOCHANGE\n");
+    const latest = await getGist();
+    const { plan } = diffPlan(latest.json, outputs, wantNames);
+
+    if (Object.keys(plan).length === 0){
+      writeStatus("NOCHANGE");
+      process.exit(0);
+    }
+
+    if (DRY_RUN === "true"){
+      writeStatus("DRYRUN");
+      process.exit(0);
+    }
+
+    const desc = `update via CI | ${COMMIT_SHORT}`;
+    await patchGistWithRetry(plan, desc);
+
+    writeStatus("OK");
     process.exit(0);
+  } catch(e){
+    writeStatus("ERROR");
+    console.error("❌ Gist update failed:", e.message || e);
+    process.exit(1);
   }
-
-  if (DRY_RUN === "true"){
-    if (STATUS_FILE) fs.writeFileSync(STATUS_FILE, "DRYRUN\n");
-    process.exit(0);
-  }
-
-  const desc = `update via CI | ${Object.values(hashes).filter(Boolean).join(" ")} | ${COMMIT_SHORT}`;
-  await patchGistWithRetry(plan, desc);
-
-  if (STATUS_FILE) fs.writeFileSync(STATUS_FILE, "OK\n");
-  // 全静默：不打印链接、不打印文件名
-  process.exit(0);
-})().catch((e)=>{
-  console.error(`❌ Gist update failed: ${e.status || ""} ${e.message || e}`);
-  process.exit(1);
-});
+})();
