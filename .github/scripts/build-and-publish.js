@@ -24,8 +24,7 @@ const statusFile = STATUS_FILE ? path.resolve(STATUS_FILE) : "";
 
 function writeStatus(text) {
   if (!statusFile) return;
-  try { fs.writeFileSync(statusFile, String(text).trim() + "\n", "utf8"); }
-  catch {}
+  try { fs.writeFileSync(statusFile, String(text).trim() + "\n", "utf8"); } catch {}
 }
 
 function sha12(s){ return crypto.createHash("sha256").update(s).digest("hex").slice(0,12); }
@@ -65,7 +64,9 @@ function httpJSON(method, url, body, headers={}){
           try { resolve({status, json: data?JSON.parse(data):{}, headers: res.headers}); }
           catch { resolve({status, json:{}, headers: res.headers}); }
         } else {
-          reject(Object.assign(new Error(`HTTP ${status}: ${data}`), {status, body:data}));
+          const err = new Error(`HTTP ${status}: ${data}`);
+          err.status = status; err.body = data;
+          reject(err);
         }
       });
     });
@@ -86,7 +87,8 @@ async function patchGistWithRetry(files, description, maxRetries=4){
     try { return await patchGistOnce(files, description); }
     catch(e){
       const st = e.status||0;
-      if ([409,500,502,503,522,524].includes(st) && i<maxRetries){
+      // 只对可重试错误退避；其它直接抛出
+      if ([409,429,500,502,503,504,522,524].includes(st) && i<maxRetries){
         await sleep(jitter(backoff)); backoff*=2; continue;
       }
       throw e;
@@ -120,33 +122,32 @@ function buildOutputs(){
 
 function diffPlan(currentGistJSON, outputs, names){
   const plan = {};
-  const hashes = {};
   const filesNow = (currentGistJSON && currentGistJSON.files) || {};
 
   function unchanged(name, next){
     const now = filesNow[name];
     if (!now) return false;
+    // 若 gist 返回被截断，就当不同，强制覆盖
     if (now.truncated) return false;
     return now.content === next;
   }
 
   if (outputs.multiple && names.multiple){
-    hashes.multiple = sha12(outputs.multiple);
     if (!unchanged(names.multiple, outputs.multiple)) plan[names.multiple] = {content: outputs.multiple};
   }
   if (outputs.single && names.single){
-    hashes.single = sha12(outputs.single);
     if (!unchanged(names.single, outputs.single)) plan[names.single] = {content: outputs.single};
   }
   if (outputs.mini && names.mini){
-    hashes.mini = sha12(outputs.mini);
     if (!unchanged(names.mini, outputs.mini)) plan[names.mini] = {content: outputs.mini};
   }
-  return { plan, hashes };
+  return plan;
 }
 
 (async ()=>{
   try {
+    if (!GIST_TOKEN || !GIST_ID) throw new Error("Missing GIST_TOKEN or GIST_ID");
+
     const wantNames = {
       multiple: GIST_FILE_MULTIPLE || null,
       single:   GIST_FILE_SINGLE   || null,
@@ -160,7 +161,7 @@ function diffPlan(currentGistJSON, outputs, names){
     }
 
     const latest = await getGist();
-    const { plan } = diffPlan(latest.json, outputs, wantNames);
+    const plan = diffPlan(latest.json, outputs, wantNames);
 
     if (Object.keys(plan).length === 0){
       writeStatus("NOCHANGE");
@@ -172,14 +173,16 @@ function diffPlan(currentGistJSON, outputs, names){
       process.exit(0);
     }
 
-    const desc = `update via CI | ${COMMIT_SHORT}`;
+    const desc = QUIET === "true" ? undefined : `update via CI | ${COMMIT_SHORT}`;
     await patchGistWithRetry(plan, desc);
 
     writeStatus("OK");
     process.exit(0);
   } catch(e){
     writeStatus("ERROR");
-    console.error("❌ Gist update failed:", e.message || e);
+    if (QUIET !== "true") {
+      console.error("❌ Gist update failed:", e.message || e);
+    }
     process.exit(1);
   }
 })();
