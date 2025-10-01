@@ -57,8 +57,7 @@ Lite 版将主要规则统一为 GEO 系列，规则效果保持一致，不影�
 ## 🛠 更新与自动化
 
 - 每日定时同步上游规则（北京时间 06:00）  
-- 变更触发：`icons/**`、`rules/**`、`config/*.yaml`  
-- 自动 purge icons & rules 的缓存
+- 自动 purge `icons` & `rules` 缓存
 
 ---
 
