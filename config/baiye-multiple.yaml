@@ -111,7 +111,7 @@ dns:
     
   # fake-ip （ruleset 引用 + 仍可追加零星域名）
   fake-ip-filter:
-    - rule-set:fake_ip
+    - rule-set:fake-ip
     - geosite:cn
     - geosite:connectivity-check
     - geosite:private   #  规则集引用
@@ -127,7 +127,7 @@ sniffer:
     TLS:  {ports: [443, 8443]}
     QUIC: {ports: [443, 8443]}
   skip-domain:
-    - rule-set:sniff_skip   #  规则集引用
+    - rule-set:sniff-skip   #  规则集引用
     # 也可继续追加：
     # - "*.example.com"
 
@@ -232,8 +232,8 @@ dom: &dom {type: http, behavior: domain,    interval: 43200, format: text, proxy
 rule-providers:
   FuckAD:               {<<: *dom, format: yaml, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/yaml/fuckAds.yaml,     path: ./rules/yaml/fuckAds.yaml}
   Game:                 {<<: *cls, format: yaml, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/yaml/Game.yaml,        path: ./rules/yaml/Game.yaml}
-  sniff_skip:           {<<: *dom, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/domainset/sniff-skip.list,           path: ./rules/domainset/sniff-skip.list}
-  fake_ip:              {<<: *dom, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/domainset/fake_ip.list,              path: ./rules/domainset/fake_ip.list}
+  sniff-skip:           {<<: *dom, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/domainset/sniff-skip.list,           path: ./rules/domainset/sniff-skip.list}
+  fake-ip:              {<<: *dom, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/domainset/fake-ip.list,              path: ./rules/domainset/fake_ip.list}
   cdn_domainset:        {<<: *dom, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/domainset/cdn.txt,                   path: ./rules/domainset/cdn.txt}
   cdn_non_ip:           {<<: *cls, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/non_ip/cdn.txt,                      path: ./rules/non_ip/cdn.txt}
   stream_non_ip:        {<<: *cls, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/non_ip/stream.txt,                   path: ./rules/non_ip/stream.txt}
