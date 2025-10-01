@@ -102,28 +102,22 @@ const RETRY_STATUS = new Set([409, 500, 502, 503, 522, 524]);
 function sleep(ms) { return new Promise((r) => setTimeout(r, ms)); }
 function jitter(ms) { return Math.round(ms * (0.8 + Math.random() * 0.4)); }
 
-async function patchGistOnce(files, description, etag) {
+async function patchGistOnce(files, description) {
   const body = JSON.stringify({ files, description });
-  const headers = etag ? { "If-Match": etag } : {};
-  return httpJSON("PATCH", `https://api.github.com/gists/${GIST_ID}`, body, headers);
+  return httpJSON("PATCH", `https://api.github.com/gists/${GIST_ID}`, body);
 }
 
-async function patchGistWithRetry(files, description, baseEtag, maxRetries = 4) {
-  let etag = baseEtag;
+async function patchGistWithRetry(files, description, maxRetries = 4) {
   let backoff = 600;
   for (let i = 0; i <= maxRetries; i++) {
     try {
-      return await patchGistOnce(files, description, etag);
+      return await patchGistOnce(files, description);
     } catch (e) {
       const st = e.status || 0;
       if (RETRY_STATUS.has(st) && i < maxRetries) {
-        const d = jitter(backoff);
+        const d = Math.round(backoff * (0.8 + Math.random() * 0.4));
         console.warn(`⚠️ PATCH failed with ${st}, retry ${i + 1}/${maxRetries} after ${d}ms`);
-        await sleep(d);
-        try {
-          const latest = await getGist(); // 刷新 ETag
-          etag = latest.etag || etag;
-        } catch {}
+        await new Promise(r => setTimeout(r, d));
         backoff *= 2;
         continue;
       }
@@ -244,7 +238,7 @@ function diffPlan(currentGistJSON, outputs, names) {
   }
 
   const desc = `update via CI | ${hashStr || "partial-change"} | ${COMMIT_SHORT}`;
-  const patched = await patchGistWithRetry(plan, desc, latest.etag);
+  const patched = await patchGistWithRetry(plan, desc);
 
   const owner = patched.json?.owner?.login;
   const id = patched.json?.id || GIST_ID;
