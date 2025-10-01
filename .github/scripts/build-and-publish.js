@@ -1,10 +1,10 @@
 // .github/scripts/build-and-publish.js
-// env: GIST_TOKEN, GIST_ID
-//      SUB_URL_1, SUB_URL_2
-//      CONFIG_MULTIPLE, CONFIG_SINGLE
-//      GIST_FILE_MULTIPLE, GIST_FILE_SINGLE, GIST_FILE_MINI
-//      COMMIT_SHORT, DRY_RUN (optional: "true"/"false")
-// 备注：若只需要 single，则也可仅提供 SUB_URL_1 + CONFIG_SINGLE + GIST_FILE_SINGLE，脚本会自动跳过缺失项。
+// env（按调用场景传入）：
+//   GIST_TOKEN, GIST_ID
+//   SUB_URL_1, SUB_URL_2
+//   CONFIG_MULTIPLE, CONFIG_SINGLE
+//   GIST_FILE_MULTIPLE, GIST_FILE_SINGLE, GIST_FILE_MINI
+//   COMMIT_SHORT, DRY_RUN ("true"/"false")
 
 const fs = require("fs");
 const https = require("https");
@@ -83,12 +83,7 @@ function httpJSON(method, url, body, headers = {}) {
               resolve({ status, json: {}, etag, headers: res.headers });
             }
           } else {
-            reject(
-              Object.assign(new Error(`HTTP ${status}: ${data}`), {
-                status,
-                body: data,
-              })
-            );
+            reject(Object.assign(new Error(`HTTP ${status}: ${data}`), { status, body: data }));
           }
         });
       }
@@ -104,12 +99,8 @@ async function getGist() {
 }
 
 const RETRY_STATUS = new Set([409, 500, 502, 503, 522, 524]);
-function sleep(ms) {
-  return new Promise((r) => setTimeout(r, ms));
-}
-function jitter(ms) {
-  return Math.round(ms * (0.8 + Math.random() * 0.4));
-}
+function sleep(ms) { return new Promise((r) => setTimeout(r, ms)); }
+function jitter(ms) { return Math.round(ms * (0.8 + Math.random() * 0.4)); }
 
 async function patchGistOnce(files, description, etag) {
   const body = JSON.stringify({ files, description });
@@ -129,11 +120,10 @@ async function patchGistWithRetry(files, description, baseEtag, maxRetries = 4) 
         const d = jitter(backoff);
         console.warn(`⚠️ PATCH failed with ${st}, retry ${i + 1}/${maxRetries} after ${d}ms`);
         await sleep(d);
-        // 每次重试前刷新最新 ETag 以提升成功率
         try {
-          const latest = await getGist();
+          const latest = await getGist(); // 刷新 ETag
           etag = latest.etag || etag;
-        } catch {} // 忽略 GET 失败，直接继续重试
+        } catch {}
         backoff *= 2;
         continue;
       }
@@ -142,11 +132,11 @@ async function patchGistWithRetry(files, description, baseEtag, maxRetries = 4) 
   }
 }
 
-/** 构建 multiple / single / mini 的文本 */
+/** 生成 multiple / single / mini 文本 */
 function buildOutputs() {
   const out = {};
 
-  // multiple
+  // multiple / mini（需要 SUB_URL_1 + SUB_URL_2 + CONFIG_MULTIPLE）
   if (SUB_URL_1 && SUB_URL_2) {
     const rawMulti = readIfExists(CONFIG_MULTIPLE);
     if (!rawMulti) throw new Error(`${CONFIG_MULTIPLE} not found`);
@@ -157,36 +147,31 @@ function buildOutputs() {
       .replace(/\[显示名称A可修改\]/g, "[Haita]")
       .replace(/\[显示名称B可修改\]/g, "[BoostNet]");
     out.multiple = multiple;
-
-    // mini 基于 multiple 派生
-    const mini = multiple.replace(/geodata-loader:\s*standard/g, "geodata-loader: memconservative");
-    out.mini = mini;
+    out.mini = multiple.replace(/geodata-loader:\s*standard/g, "geodata-loader: memconservative");
   }
 
-  // single
+  // single（需要 SUB_URL_1 + CONFIG_SINGLE）
   if (SUB_URL_1) {
     const rawSingle = readIfExists(CONFIG_SINGLE);
     if (rawSingle) {
       const withIcon = bumpIconsV(rawSingle);
-      const single = withIcon.replace(/替换订阅链接1/g, SUB_URL_1);
-      out.single = single;
+      out.single = withIcon.replace(/替换订阅链接1/g, SUB_URL_1);
     }
   }
 
   return out;
 }
 
-/** 与现有 Gist 对比，若未变化则不更新对应文件 */
+/** 与当前 Gist 对比：未变化则不写入 */
 function diffPlan(currentGistJSON, outputs, names) {
   const plan = {};
   const hashes = {};
-
   const filesNow = (currentGistJSON && currentGistJSON.files) || {};
 
   function unchanged(name, next) {
     const now = filesNow[name];
     if (!now) return false;
-    if (now.truncated) return false; // 无法比对内容，保守认为可能变化
+    if (now.truncated) return false; // 无法比对，保守重写
     return now.content === next;
   }
 
@@ -215,13 +200,13 @@ function diffPlan(currentGistJSON, outputs, names) {
 (async () => {
   const wantNames = {
     multiple: GIST_FILE_MULTIPLE || null,
-    single: GIST_FILE_SINGLE || null,
-    mini: GIST_FILE_MINI || null,
+    single:   GIST_FILE_SINGLE   || null,
+    mini:     GIST_FILE_MINI     || null,
   };
 
   const outputs = buildOutputs();
   if (!outputs.multiple && !outputs.single && !outputs.mini) {
-    console.log("ℹ️ Nothing to build (missing inputs).");
+    console.log("ℹ️ Nothing to build (missing inputs or configs).");
     process.exit(0);
   }
 
@@ -230,13 +215,23 @@ function diffPlan(currentGistJSON, outputs, names) {
 
   const hashStr = [
     hashes.multiple ? `multiple:${hashes.multiple}` : null,
-    hashes.single ? `single:${hashes.single}` : null,
-    hashes.mini ? `mini:${hashes.mini}` : null,
-  ]
-    .filter(Boolean)
-    .join(" ");
+    hashes.single   ? `single:${hashes.single}`     : null,
+    hashes.mini     ? `mini:${hashes.mini}`         : null,
+  ].filter(Boolean).join(" ");
 
   console.log(`🧩 Hashes => ${hashStr || "no-change"}`);
+
+  // 将生成物保存到工作区（便于 artifact 或本地排查）
+  for (const [k, v] of Object.entries(outputs)) {
+    const fname =
+      (k === "multiple" && wantNames.multiple) ||
+      (k === "single"   && wantNames.single)   ||
+      (k === "mini"     && wantNames.mini);
+    if (fname) {
+      const gen = fname.replace(/\.ya?ml$/, "") + ".generated.yaml";
+      fs.writeFileSync(gen, v, "utf8");
+    }
+  }
 
   if (Object.keys(plan).length === 0) {
     console.log("✅ No effective changes. Skip PATCH.");
@@ -244,39 +239,13 @@ function diffPlan(currentGistJSON, outputs, names) {
   }
 
   if (DRY_RUN === "true") {
-    console.log("🔎 DRY_RUN=true → skip publishing to Gist.");
-    // 同时把生成物输出到工作目录便于检查
-    for (const [k, v] of Object.entries(outputs)) {
-      const fname =
-        (k === "multiple" && wantNames.multiple) ||
-        (k === "single" && wantNames.single) ||
-        (k === "mini" && wantNames.mini);
-      if (fname) {
-        const gen = fname.replace(/\.ya?ml$/, "") + ".generated.yaml";
-        fs.writeFileSync(gen, v, "utf8");
-      }
-    }
+    console.log("🔎 DRY_RUN=true → build only, skip publishing to Gist.");
     process.exit(0);
   }
 
-  // 写入工作目录产物（可选，便于 artifacts 输出）
-  for (const [k, v] of Object.entries(outputs)) {
-    const fname =
-      (k === "multiple" && wantNames.multiple) ||
-      (k === "single" && wantNames.single) ||
-      (k === "mini" && wantNames.mini);
-    if (fname) {
-      const gen = fname.replace(/\.ya?ml$/, "") + ".generated.yaml";
-      fs.writeFileSync(gen, v, "utf8");
-    }
-  }
-
-  const desc =
-    `update via CI | ${hashStr || "partial-change"} | ${COMMIT_SHORT}`;
-
+  const desc = `update via CI | ${hashStr || "partial-change"} | ${COMMIT_SHORT}`;
   const patched = await patchGistWithRetry(plan, desc, latest.etag);
 
-  // 输出 raw 链接
   const owner = patched.json?.owner?.login;
   const id = patched.json?.id || GIST_ID;
   for (const fname of Object.keys(plan)) {
