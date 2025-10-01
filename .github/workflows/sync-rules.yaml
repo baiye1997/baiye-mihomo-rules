@@ -10,7 +10,7 @@ concurrency:
   cancel-in-progress: true
 
 permissions:
-  contents: read   # 读取够了；写入用 PAT
+  contents: read   
 
 jobs:
   sync:
@@ -20,7 +20,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          persist-credentials: false   # 关键：不用 GITHUB_TOKEN
+          persist-credentials: false   
 
       - name: Update rule files
         run: bash scripts/update_rules.sh
