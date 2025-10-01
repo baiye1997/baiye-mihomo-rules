@@ -3,7 +3,7 @@ name: Purge CDN
 on:
   push:
     branches: ['**']
-    tags-ignore: ['**']   # 忽略 tag push，避免 Release 触发
+    tags-ignore: ['**']
     paths:
       - "rules/ip/**"
       - "rules/non_ip/**"
@@ -38,7 +38,7 @@ jobs:
         run: |
           set -euo pipefail
 
-          # tag 再保险：直接早退
+          # tag 直接早退
           if [ "${{ github.ref_type }}" = "tag" ] || [[ "${GITHUB_REF:-}" == refs/tags/* ]]; then
             echo "has_ref=false" >> "$GITHUB_OUTPUT"
             echo "Skip on tag ref: ${GITHUB_REF}"
@@ -102,11 +102,51 @@ jobs:
         run: |
           set -euo pipefail
           REPO="${{ github.repository }}"
+          : > purged.ok.txt
+          : > purged.fail.txt
           while read -r p; do
             [ -n "$p" ] || continue
             for REF in latest main; do
               URL="https://purge.jsdelivr.net/gh/${REPO}@${REF}/${p}"
-              echo "Purging $URL"
-              curl -fsS "$URL" >/dev/null || true
+              # 记录 HTTP 状态码；200 视为成功
+              code="$(curl -sS -o /dev/null -w '%{http_code}' "$URL" || echo 000)"
+              if [ "$code" = "200" ]; then
+                echo "$URL" >> purged.ok.txt
+                echo "✅ $URL"
+              else
+                echo "$code $URL" >> purged.fail.txt
+                echo "⚠️  ($code) $URL"
+              fi
             done
           done < referenced.targets.txt
+
+      - name: Summary (what got purged)
+        if: always()
+        shell: bash
+        run: |
+          echo "## Purge result" >> "$GITHUB_STEP_SUMMARY"
+          if [ "${{ steps.detect.outputs.has_ref }}" != "true" ]; then
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "- Skipped: no referenced targets changed." >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+
+          ok=0; fail=0
+          [ -s purged.ok.txt ]   && ok=$(wc -l < purged.ok.txt)
+          [ -s purged.fail.txt ] && fail=$(wc -l < purged.fail.txt)
+
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "- OK: **$ok**"   >> "$GITHUB_STEP_SUMMARY"
+          echo "- Fail: **$fail**" >> "$GITHUB_STEP_SUMMARY"
+
+          if [ "$ok" -gt 0 ]; then
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "### Purged URLs" >> "$GITHUB_STEP_SUMMARY"
+            sed 's/^/- /' purged.ok.txt >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+          if [ "$fail" -gt 0 ]; then
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "### Failed URLs (with status)" >> "$GITHUB_STEP_SUMMARY"
+            sed 's/^/- /' purged.fail.txt >> "$GITHUB_STEP_SUMMARY"
+          fi
