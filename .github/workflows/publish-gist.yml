@@ -1,88 +1,53 @@
-name: Publish Gists
+name: Publish Gist
 
 on:
-  push:
-    branches: ['**']
-    tags-ignore: ['**']
-    paths:
-      - 'icons/**'
-      - 'rules/**'
-      - 'config/baiye-multiple.yaml'
-      - 'config/baiye-single.yaml'
-      - 'config/baiye-multiple-lite.yaml'
-      - 'config/baiye-single-lite.yaml'
-      - '.github/scripts/build-and-publish.js'
-      - '.github/workflows/publish-gists.yml'
   workflow_dispatch:
     inputs:
       dry_run:
-        description: 'Build only, skip publishing to Gist'
+        description: "Dry run (don't actually patch gist)"
         type: boolean
         default: false
       force_full:
-        description: 'Ignore path-diff and rebuild all variants'
+        description: "Force full publish (ignore change detection)"
         type: boolean
         default: false
-
-concurrency:
-  group: build-and-publish
-  cancel-in-progress: true
-
-permissions:
-  contents: read
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    env:
-      DRY_RUN:    ${{ inputs.dry_run && 'true' || 'false' }}
-      FORCE_FULL: ${{ inputs.force_full && 'true' || 'false' }}
     steps:
-      - name: Checkout (full)
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          ref: ${{ startsWith(github.ref, 'refs/tags/') && 'main' || github.ref }}
 
-      - name: Detect changed files
+      - name: Detect changes
         id: chg
         shell: bash
         run: |
           set -euo pipefail
-          AFTER="${{ github.sha }}"
-          BEFORE="${{ github.event.before }}"
-          if [ -z "${BEFORE}" ]; then
-            BEFORE="$(git rev-parse "${AFTER}^" 2>/dev/null || echo '')"
-          fi
+          AFTER="$(git rev-parse HEAD)"
+          BEFORE="$(git rev-parse "${AFTER}^" 2>/dev/null || echo '')"
           if [ -n "${BEFORE}" ]; then
             git diff --name-only "${BEFORE}" "${AFTER}" | sort -u > changed.all.txt
           else
             : > changed.all.txt
           fi
-          grep -E '^(icons/|rules/)' changed.all.txt | sort -u > changed.targets.txt || true
-
           M=false; S=false; ML=false; SL=false
           grep -qx "config/baiye-multiple.yaml"       changed.all.txt && M=true
           grep -qx "config/baiye-single.yaml"         changed.all.txt && S=true
           grep -qx "config/baiye-multiple-lite.yaml"  changed.all.txt && ML=true
           grep -qx "config/baiye-single-lite.yaml"    changed.all.txt && SL=true
-
           echo "m=${M}"  >> $GITHUB_OUTPUT
           echo "s=${S}"  >> $GITHUB_OUTPUT
           echo "ml=${ML}" >> $GITHUB_OUTPUT
           echo "sl=${SL}" >> $GITHUB_OUTPUT
 
-          echo "Changed files:" && cat changed.all.txt || true
-          echo "Changed targets (icons/rules):" && cat changed.targets.txt || true
-
-      - name: Setup Node (if needed)
-        if: ${{ inputs.force_full || steps.chg.outputs.m == 'true' || steps.chg.outputs.s == 'true' || steps.chg.outputs.ml == 'true' || steps.chg.outputs.sl == 'true' }}
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 20
 
-      # —— STANDARD Gist：一次 PATCH 写 multiple/single/mini ——
-      - name: Publish STANDARD gist (one PATCH)
+      # 标准版
+      - name: Publish STANDARD gist
         if: ${{ inputs.force_full || steps.chg.outputs.m == 'true' || steps.chg.outputs.s == 'true' }}
         env:
           GIST_TOKEN: ${{ secrets.GIST_TOKEN }}
@@ -95,12 +60,17 @@ jobs:
           GIST_FILE_SINGLE:   baiye-single.yaml
           GIST_FILE_MINI:     baiye-mini.yaml
           COMMIT_SHORT: ${{ github.sha }}
-          DRY_RUN:      ${{ env.DRY_RUN }}
-          QUIET:        "true"                             # 静默模式
-          STATUS_FILE:  ".status-standard.txt"            # 仅输出状态
+          DRY_RUN:      ${{ inputs.dry_run && 'true' || 'false' }}
+          QUIET:        "true"
+          STATUS_FILE:  ".status-standard.txt"
         run: node .github/scripts/build-and-publish.js
 
-      - name: Publish LITE gist (one PATCH)
+      - name: Ensure status placeholder (standard)
+        if: always()
+        run: test -f .status-standard.txt || echo UNKNOWN > .status-standard.txt
+
+      # Lite 版
+      - name: Publish LITE gist
         if: ${{ inputs.force_full || steps.chg.outputs.ml == 'true' || steps.chg.outputs.sl == 'true' }}
         env:
           GIST_TOKEN: ${{ secrets.GIST_TOKEN }}
@@ -113,13 +83,17 @@ jobs:
           GIST_FILE_SINGLE:   baiye-single-lite.yaml
           GIST_FILE_MINI:     baiye-mini-lite.yaml
           COMMIT_SHORT: ${{ github.sha }}
-          DRY_RUN:      ${{ env.DRY_RUN }}
+          DRY_RUN:      ${{ inputs.dry_run && 'true' || 'false' }}
           QUIET:        "true"
           STATUS_FILE:  ".status-lite.txt"
         run: node .github/scripts/build-and-publish.js
 
-      # ✅ 可选：只上传「状态」artifact（无敏感信息）
-      - name: Upload status (OK/NOCHANGE/DRYRUN)
+      - name: Ensure status placeholder (lite)
+        if: always()
+        run: test -f .status-lite.txt || echo UNKNOWN > .status-lite.txt
+
+      # 上传极小的状态 artifact
+      - name: Upload status
         if: always()
         uses: actions/upload-artifact@v4
         with:
