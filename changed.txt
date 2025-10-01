@@ -1,0 +1,2 @@
+rules/domainset/cdn.txt
+rules/yaml/Game.yaml

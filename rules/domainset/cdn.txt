@@ -1,7 +1,7 @@
 #########################################
 # Sukka's Ruleset - CDN Domains
-# Last Updated: 2025-09-29T18:18:49.966Z
-# Size: 3945
+# Last Updated: 2025-10-01T13:27:33.147Z
+# Size: 3955
 # License: AGPL 3.0
 # Homepage: https://ruleset.skk.moe
 # GitHub: https://github.com/SukkaW/Surge
@@ -939,6 +939,7 @@ irp-cdn.multiscreensite.com
 cache.hackedfreegames.com
 +.girlsgogamescdn.com
 images.financemagnates.com
+ui-cdn.digitalocean-ui.com
 +.customerioforms.com
 imgssl.constantcontact.com
 +.cloudflare-ipfs.com
@@ -1884,6 +1885,7 @@ webstatic.chargebee.com
 js1.chargebee.com
 js.chargebee.com
 cdn.changelog.com
+sequoia.cdn-apple.com
 doppler-config.cbsivideo.com
 www-res.cablelabs.com
 badge.buildkite.com
@@ -3063,6 +3065,7 @@ events-live.apple.com
 apple-relay.apple.com
 time.apple.com
 pba.apple.com
+static.ess.apple.com
 vsmarketplacebadge.apphb.com
 +.ahcdn.com
 wwwimages2.adobe.com
@@ -3360,6 +3363,8 @@ static.svc.litv.tv
 player.svc.litv.tv
 fino.svc.litv.tv
 4gtvimg2.4gtv.tv
+pptstatic.iyf.tv
+static.iyf.tv
 lain.bgm.tv
 embed-v2.testimonial.to
 +.ninjastream.to
@@ -3460,10 +3465,12 @@ s3.acg.mn
 s3.m.0x.mk
 cdn.fasterthanli.me
 +.randomuser.me
++.global-cdn.me
 +.disconnect.me
 api.crashguard.me
 +.rocketcdn.me
 +.javplayer.me
++.dnvodcdn.me
 cdn.daradara.me
 cf.javfree.me
 cdn.picrew.me
@@ -3543,6 +3550,7 @@ web-assets.zendesk.co.jp
 cdn.rex.contents.rakuten.co.jp
 error.rakuten.co.jp
 doujin-assets.dmm.co.jp
+awsimgsrc.dmm.co.jp
 pics.dmm.co.jp
 cdn.dap.dmm.co.jp
 osint.digitalside.it
@@ -3891,6 +3899,7 @@ cdn2.turboviplay.cc
 +.imagehub.cc
 media.tailfin.cc
 +.postimg.cc
+pixoraa.cc
 +.aayinltcs.arduino.cc
 content.arduino.cc
 cdn.arduino.cc
@@ -3938,6 +3947,7 @@ cdn.aimerce.ai
 vetted.ai
 static.netify.ai
 r2.leadsy.ai
+cdn.fellou.ai
 s3.masto.ai
 participants.evolv.ai
 media.evolv.ai
