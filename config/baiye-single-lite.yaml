@@ -104,7 +104,7 @@ dns:
     - rule-set:fake-ip #  规则集引用
     - geosite:cn
     - geosite:connectivity-check
-    - geosite:private   
+    - geosite:private
     # 也可继续追加：
     # - 'example.local'
 
