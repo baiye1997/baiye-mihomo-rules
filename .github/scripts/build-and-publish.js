@@ -1,4 +1,3 @@
-// .github/scripts/build-and-publish.js
 const fs = require("fs");
 const https = require("https");
 const path = require("path");
@@ -6,24 +5,11 @@ const crypto = require("crypto");
 
 const {
   GIST_TOKEN,
-  GIST_ID,
+  GIST_ID_STANDARD,
+  GIST_ID_LITE,
   SUB_URL_1,
   SUB_URL_2,
-
-  // standard
-  CONFIG_MULTIPLE = "config/baiye-multiple.yaml",
-  CONFIG_SINGLE   = "config/baiye-single.yaml",
-  GIST_FILE_MULTIPLE = "baiye-multiple.yaml",
-  GIST_FILE_SINGLE   = "baiye-single.yaml",
-  GIST_FILE_MINI     = "baiye-mini.yaml",
-
-  // 这些 LITE 变量是否传入均可；传了就用于生成更友好的标签
-  GIST_FILE_MULTIPLE_LITE,
-  GIST_FILE_SINGLE_LITE,
-  GIST_FILE_MINI_LITE,
-
   DRY_RUN = "false",
-  QUIET   = "true",
   STATUS_FILE = ""
 } = process.env;
 
@@ -37,14 +23,11 @@ function writeStatus(text) {
   catch {}
 }
 
-// NOTICE/日志辅助
 function maskUrl(raw = "") {
-  // 脱敏：把所有“>=20位十六进制”的片段替换成 ***
   return raw.replace(/[0-9a-f]{20,}/gi, "***");
 }
 function addAnnotation(title, url) {
   const masked = maskUrl(url);
-  // GitHub 注解（会出现在 Annotations）
   console.log(`::notice title=${title}::${masked}`);
   return masked;
 }
@@ -108,15 +91,15 @@ function httpJSON(method, url, body, headers={}){
   });
 }
 
-async function getGist(){ return httpJSON("GET", `https://api.github.com/gists/${GIST_ID}`); }
-async function patchGistOnce(files, description){
+async function getGist(id){ return httpJSON("GET", `https://api.github.com/gists/${id}`); }
+async function patchGistOnce(id, files, description){
   const body = JSON.stringify({ files, description });
-  return httpJSON("PATCH", `https://api.github.com/gists/${GIST_ID}`, body);
+  return httpJSON("PATCH", `https://api.github.com/gists/${id}`, body);
 }
-async function patchGistWithRetry(files, description, maxRetries=4){
+async function patchGistWithRetry(id, files, description, maxRetries=4){
   let backoff = 600;
   for (let i=0;i<=maxRetries;i++){
-    try { return await patchGistOnce(files, description); }
+    try { return await patchGistOnce(id, files, description); }
     catch(e){
       const st = e.status||0;
       if ([409,500,502,503,522,524].includes(st) && i<maxRetries){
@@ -127,89 +110,54 @@ async function patchGistWithRetry(files, description, maxRetries=4){
   }
 }
 
-function buildOutputs(){
-  const out = {};
-  if (SUB_URL_1 && SUB_URL_2){
-    const rawMulti = readIfExists(CONFIG_MULTIPLE);
-    if (!rawMulti) throw new Error(`${CONFIG_MULTIPLE} not found`);
-    const withIcon = bumpIconsV(rawMulti);
-    const multiple = withIcon
-      .replace(/替换订阅链接1/g, SUB_URL_1)
-      .replace(/替换订阅链接2/g, SUB_URL_2)
+function buildOutputs() {
+  const outputs = { standard: {}, lite: {} };
+
+  // multiple.yaml / mini.yaml
+  const rawMulti = readIfExists("config/baiye-multiple.yaml");
+  if (rawMulti) {
+    const withIcon = bumpIconsV(rawMulti)
+      .replace(/替换订阅链接1/g, SUB_URL_1 || "")
+      .replace(/替换订阅链接2/g, SUB_URL_2 || "")
       .replace(/\[显示名称A可修改\]/g, "[Haita]")
       .replace(/\[显示名称B可修改\]/g, "[BoostNet]");
-    out.multiple = multiple;
-    out.mini = multiple.replace(/geodata-loader:\s*standard/g, "geodata-loader: memconservative");
-  }
-  if (SUB_URL_1){
-    const rawSingle = readIfExists(CONFIG_SINGLE);
-    if (rawSingle){
-      const withIcon = bumpIconsV(rawSingle);
-      out.single = withIcon.replace(/替换订阅链接1/g, SUB_URL_1);
-    }
-  }
-  return out;
-}
-
-function diffPlan(currentGistJSON, outputs, names){
-  const plan = {};
-  const hashes = {};
-  const filesNow = (currentGistJSON && currentGistJSON.files) || {};
-
-  function unchanged(name, next){
-    const now = filesNow[name];
-    if (!now) return false;
-    if (now.truncated) return false;
-    return now.content === next;
+    outputs.standard["baiye-multiple.yaml"] = withIcon;
+    outputs.standard["baiye-mini.yaml"] = withIcon.replace(/geodata-loader:\s*standard/g, "geodata-loader: memconservative");
   }
 
-  if (outputs.multiple && names.multiple){
-    hashes.multiple = sha12(outputs.multiple);
-    if (!unchanged(names.multiple, outputs.multiple)) plan[names.multiple] = {content: outputs.multiple};
+  // single.yaml
+  const rawSingle = readIfExists("config/baiye-single.yaml");
+  if (rawSingle) {
+    const withIcon = bumpIconsV(rawSingle).replace(/替换订阅链接1/g, SUB_URL_1 || "");
+    outputs.standard["baiye-single.yaml"] = withIcon;
   }
-  if (outputs.single && names.single){
-    hashes.single = sha12(outputs.single);
-    if (!unchanged(names.single, outputs.single)) plan[names.single] = {content: outputs.single};
-  }
-  if (outputs.mini && names.mini){
-    hashes.mini = sha12(outputs.mini);
-    if (!unchanged(names.mini, outputs.mini)) plan[names.mini] = {content: outputs.mini};
-  }
-  return { plan, hashes };
-}
 
-function buildLabelMap() {
-  const map = {};
-  // standard
-  if (GIST_FILE_MULTIPLE) map[GIST_FILE_MULTIPLE] = " (multiple)";
-  if (GIST_FILE_SINGLE)   map[GIST_FILE_SINGLE]   = " (single)";
-  if (GIST_FILE_MINI)     map[GIST_FILE_MINI]     = " (mini)";
-  // lite（如果当前这次运行传入了对应 env，就会起作用）
-  if (GIST_FILE_MULTIPLE_LITE) map[GIST_FILE_MULTIPLE_LITE] = " (multiple-lite)";
-  if (GIST_FILE_SINGLE_LITE)   map[GIST_FILE_SINGLE_LITE]   = " (single-lite)";
-  if (GIST_FILE_MINI_LITE)     map[GIST_FILE_MINI_LITE]     = " (mini-lite)";
-  return map;
+  // multiple-lite.yaml / mini-lite.yaml
+  const rawMultiLite = readIfExists("config/baiye-multiple-lite.yaml");
+  if (rawMultiLite) {
+    const withIcon = bumpIconsV(rawMultiLite)
+      .replace(/替换订阅链接1/g, SUB_URL_1 || "")
+      .replace(/替换订阅链接2/g, SUB_URL_2 || "")
+      .replace(/\[显示名称A可修改\]/g, "[Haita]")
+      .replace(/\[显示名称B可修改\]/g, "[BoostNet]");
+    outputs.lite["baiye-multiple-lite.yaml"] = withIcon;
+    outputs.lite["baiye-mini-lite.yaml"] = withIcon.replace(/geodata-loader:\s*standard/g, "geodata-loader: memconservative");
+  }
+
+  // single-lite.yaml
+  const rawSingleLite = readIfExists("config/baiye-single-lite.yaml");
+  if (rawSingleLite) {
+    const withIcon = bumpIconsV(rawSingleLite).replace(/替换订阅链接1/g, SUB_URL_1 || "");
+    outputs.lite["baiye-single-lite.yaml"] = withIcon;
+  }
+
+  return outputs;
 }
 
 (async ()=>{
   try {
-    const wantNames = {
-      multiple: GIST_FILE_MULTIPLE || null,
-      single:   GIST_FILE_SINGLE   || null,
-      mini:     GIST_FILE_MINI     || null,
-    };
-    const labelMap = buildLabelMap();
-
     const outputs = buildOutputs();
-    if (!outputs.multiple && !outputs.single && !outputs.mini){
-      writeStatus("NOCHANGE");
-      process.exit(0);
-    }
-
-    const latestBefore = await getGist();
-    const { plan } = diffPlan(latestBefore.json, outputs, wantNames);
-
-    if (Object.keys(plan).length === 0){
+    if (!Object.keys(outputs.standard).length && !Object.keys(outputs.lite).length){
       writeStatus("NOCHANGE");
       process.exit(0);
     }
@@ -220,25 +168,31 @@ function buildLabelMap() {
     }
 
     const desc = `update via CI | ${COMMIT_SHORT}`;
-    await patchGistWithRetry(plan, desc);
-
-    // 重新获取，拿到 raw_url 输出注解/summary（脱敏）
-    const latestAfter = await getGist();
-    const filesAfter = latestAfter.json.files || {};
-    const updatedNames = Object.keys(plan);
-
     const summaryLines = [];
-    for (const fname of updatedNames) {
-      const f = filesAfter[fname];
-      const raw = f && f.raw_url ? f.raw_url : "";
-      const title = `Gist Updated${labelMap[fname] || ""}`;
-      const masked = addAnnotation(title, raw);
-      // Summary 行：**(标签去掉括号)**: URL
-      const tag = (labelMap[fname] || "").replace(/[()]/g, "").trim() || fname;
-      summaryLines.push(`**${tag}**: ${masked}`);
-    }
-    appendSummary(summaryLines);
 
+    // === 更新 standard Gist ===
+    if (GIST_ID_STANDARD && Object.keys(outputs.standard).length){
+      await patchGistWithRetry(GIST_ID_STANDARD, outputs.standard, desc);
+      const after = await getGist(GIST_ID_STANDARD);
+      for (const f of Object.keys(outputs.standard)) {
+        const raw = after.json.files[f]?.raw_url || "";
+        const masked = addAnnotation(`Gist Updated (standard - ${f})`, raw);
+        summaryLines.push(`**standard/${f}**: ${masked}`);
+      }
+    }
+
+    // === 更新 lite Gist ===
+    if (GIST_ID_LITE && Object.keys(outputs.lite).length){
+      await patchGistWithRetry(GIST_ID_LITE, outputs.lite, desc);
+      const after = await getGist(GIST_ID_LITE);
+      for (const f of Object.keys(outputs.lite)) {
+        const raw = after.json.files[f]?.raw_url || "";
+        const masked = addAnnotation(`Gist Updated (lite - ${f})`, raw);
+        summaryLines.push(`**lite/${f}**: ${masked}`);
+      }
+    }
+
+    appendSummary(summaryLines);
     writeStatus("OK");
     process.exit(0);
   } catch(e){
