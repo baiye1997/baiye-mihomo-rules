@@ -3,7 +3,7 @@ name: Purge CDN
 on:
   push:
     branches: ['**']
-    tags-ignore: ['**']   # 忽略 tag push，避免 Release 触发
+    tags-ignore: ['**']     # 忽略 tag push
     paths:
       - "rules/ip/**"
       - "rules/non_ip/**"
@@ -15,12 +15,13 @@ on:
   workflow_dispatch:
     inputs:
       force_purge:
-        description: "Force purge all referenced icons/rules from configs (ignore diff)"
+        description: "Force purge all referenced targets (ignore diff)"
         type: boolean
+        required: false
         default: false
 
 concurrency:
-  group: release-and-purge
+  group: purge-cdn
   cancel-in-progress: true
 
 permissions:
@@ -28,7 +29,7 @@ permissions:
 
 jobs:
   release_purge:
-    # tag push 直接跳过（保险）
+    # 仅在分支 push 触发；确保不被 tag push 触发
     if: ${{ github.event_name != 'push' || startsWith(github.ref, 'refs/heads/') }}
     runs-on: ubuntu-latest
 
@@ -37,15 +38,18 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          # push 两种：分支/标签。若是标签，这里仍 checkout 到 main，避免 diff 异常
+          # tag 情况下仍强制检出 main（虽然上面的 if 已规避）
           ref: ${{ startsWith(github.ref, 'refs/tags/') && 'main' || github.ref }}
 
-      - name: Detect targets to purge
+      # 侦测 icons/rules 在 config 中的“被引用目标”
+      - name: Detect referenced targets (icons/rules) for purge
         id: detect
         shell: bash
+        env:
+          FORCE_PURGE: ${{ github.event_name == 'workflow_dispatch' && inputs.force_purge || 'false' }}
         run: |
           set -euo pipefail
-          STEP_SUMMARY="${GITHUB_STEP_SUMMARY:-}"
+          STEP_SUMMARY="${GITHUB_STEP_SUMMARY:-/dev/null}"
 
           echo "## Purge detect" >> "$STEP_SUMMARY"
           echo "" >> "$STEP_SUMMARY"
@@ -53,19 +57,9 @@ jobs:
           shopt -s nullglob
           CONFIGS=(config/*.yml config/*.yaml)
 
-          # 工具函数：把路径标准化（去掉前缀 ./）、只保留我们关心的目录，并且去重
-          normalize_and_filter() {
-            # 只要 icons/** 或 rules/(ip|non_ip|domainset|yaml)/** 或 config/*.ya?ml
-            grep -Eo '(\./)?(icons/[^"'"'"' ]+|rules/(ip|non_ip|domainset|yaml)/[^"'"'"' ]+|config/[^/"]+\.ya?ml)' \
-            | sed -E 's#^\./##' \
-            | grep -E '^(icons/|rules/(ip|non_ip|domainset|yaml)/|config/[^/]+\.ya?ml)$' \
-            | sort -u
-
-          }
-
           : > referenced.targets.txt
 
-          if [[ "${{ inputs.force_purge }}" == "true" ]]; then
+          if [[ "${FORCE_PURGE}" == "true" ]]; then
             echo "**Mode:** Force purge (ignore diff)" >> "$STEP_SUMMARY"
             echo "" >> "$STEP_SUMMARY"
 
@@ -75,46 +69,55 @@ jobs:
               exit 0
             fi
 
-            # 从所有 config 中抽取被引用的 icons/rules 路径
-            # 常见引用形态：直接写相对路径（icons/... 或 ./icons/...、rules/...）
-            grep -RhoE '(\./)?(icons/[^"'"'"' ]+|rules/(ip|non_ip|domainset|yaml)/[^"'"'"' ]+)' "${CONFIGS[@]}" \
-              | normalize_and_filter \
-              | grep -E '^(icons/|rules/(ip|non_ip|domainset|yaml)/)' \
-              > referenced.targets.txt || true
+            # 1) 枚举仓库内所有候选文件
+            : > all.candidates.txt
+            if [ -d icons ]; then
+              find icons -type f -print | sort -u >> all.candidates.txt
+            fi
+            for d in rules/ip rules/non_ip rules/domainset rules/yaml; do
+              [ -d "$d" ] && find "$d" -type f -print
+            done | sort -u >> all.candidates.txt || true
+
+            # 2) 逐个判断是否在任一 config 被引用（兼容 ./ 前缀）
+            while read -r P; do
+              [ -n "$P" ] || continue
+              RP="${P#./}"
+              if grep -RqlF -- "$RP" "${CONFIGS[@]}" || grep -RqlF -- "./$RP" "${CONFIGS[@]}"; then
+                echo "$RP" >> referenced.targets.txt
+              fi
+            done < all.candidates.txt
+            rm -f all.candidates.txt
 
           else
             echo "**Mode:** Diff-based purge" >> "$STEP_SUMMARY"
             echo "" >> "$STEP_SUMMARY"
 
-            BEFORE="${{ github.event.before }}"
-            if [ -z "${BEFORE}" ]; then
-              BEFORE="$(git rev-parse HEAD^ 2>/dev/null || echo '')"
+            AFTER="$(git rev-parse HEAD)"
+            BEFORE="$(git rev-parse "${AFTER}^" 2>/dev/null || echo '')"
+
+            : > changed.all.txt
+            if [ -n "$BEFORE" ]; then
+              git diff --name-only "$BEFORE" "$AFTER" | sort -u > changed.all.txt
             fi
 
-            if [ -n "${BEFORE}" ]; then
-              git diff --name-only "${BEFORE}" "${{ github.sha }}" | sort -u > changed.all.txt
-            else
-              : > changed.all.txt
-            fi
-
+            : > changed.targets.txt
             if [ -s changed.all.txt ]; then
-              echo "**All changed files (diff ${BEFORE:0:7}..${{ github.sha }}):**" >> "$STEP_SUMMARY"
-              sed 's/^/- /' changed.all.txt >> "$STEP_SUMMARY"
-            else
-              echo "_No changed files in diff._" >> "$STEP_SUMMARY"
+              # 只保留关心范围（目录前缀精确过滤，无需复杂正则）
+              awk '
+                /^icons\// {print; next}
+                /^rules\/ip\// {print; next}
+                /^rules\/non_ip\// {print; next}
+                /^rules\/domainset\// {print; next}
+                /^rules\/yaml\// {print; next}
+              ' changed.all.txt | sort -u > changed.targets.txt || true
             fi
-            echo "" >> "$STEP_SUMMARY"
-
-            # 只保留关心范围
-            grep -E '^(icons/|rules/(ip|non_ip|domainset|yaml)/|config/[^/]+\.ya?ml)$' changed.all.txt \
-              | sort -u > changed.targets.txt || true
 
             if [ -s changed.targets.txt ]; then
-              echo "**Candidate targets:**" >> "$STEP_SUMMARY"
+              echo "**Candidate targets (diff ${BEFORE:0:7}..${AFTER:0:7}):**" >> "$STEP_SUMMARY"
               sed 's/^/- /' changed.targets.txt >> "$STEP_SUMMARY"
               echo "" >> "$STEP_SUMMARY"
             else
-              echo "_No candidate targets under icons/rules/config._" >> "$STEP_SUMMARY"
+              echo "_No candidate targets under icons/rules._" >> "$STEP_SUMMARY"
               echo "" >> "$STEP_SUMMARY"
             fi
 
@@ -122,26 +125,17 @@ jobs:
             if [ ${#CONFIGS[@]} -gt 0 ] && [ -s changed.targets.txt ]; then
               while read -r P; do
                 [ -n "$P" ] || continue
-                if grep -RqlF -- "$P"           "${CONFIGS[@]}" \
-                || grep -RqlF -- "./$P"         "${CONFIGS[@]}"; then
+                if grep -RqlF -- "$P" "${CONFIGS[@]}" || grep -RqlF -- "./$P" "${CONFIGS[@]}"; then
                   echo "$P" >> referenced.targets.txt
                 fi
               done < changed.targets.txt
             fi
           fi
 
-          # 去重
+          # 去重 + 仅保留实际存在的文件（避免 purge 404）
           if [ -s referenced.targets.txt ]; then
             sort -u -o referenced.targets.txt referenced.targets.txt
-          fi
-
-          # 仅保留实际存在的文件（避免无意义 purge）
-          if [ -s referenced.targets.txt ]; then
-            awk '{
-              if ($0 ~ /\/$/) next;  # 排除目录
-              if (system("[ -e \""$0"\" ]") == 0) print $0
-            }' referenced.targets.txt > referenced.targets.existing.txt || true
-            mv referenced.targets.existing.txt referenced.targets.txt
+            awk '{ if ($0 !~ /\/$/ && system("[ -e \""$0"\" ]")==0) print $0 }' referenced.targets.txt > tmp && mv tmp referenced.targets.txt
           fi
 
           if [ -s referenced.targets.txt ]; then
@@ -160,21 +154,23 @@ jobs:
           set -euo pipefail
           : > purged.txt
           REPO="${{ github.repository }}"
+          # 可选限速，避免被风控：sleep 0.2
           while read -r p; do
             [ -n "$p" ] || continue
-            URL="https://purge.jsdelivr.net/gh/${REPO}@main/${p}"
-            echo "Purging $URL"
-            if curl -fsS "$URL" >/dev/null; then
-              echo "$URL" >> purged.txt
+            url="https://purge.jsdelivr.net/gh/${REPO}@main/${p}"
+            echo "Purging $url"
+            if curl -fsS "$url" >/dev/null; then
+              echo "$url" >> purged.txt
             fi
+            # sleep 0.2
           done < referenced.targets.txt
 
-      - name: Summary
-        if: always()
+      - name: Summarize purge result
         shell: bash
         run: |
           set -euo pipefail
-          STEP_SUMMARY="${GITHUB_STEP_SUMMARY:-}"
+          STEP_SUMMARY="${GITHUB_STEP_SUMMARY:-/dev/null}"
+          echo "## Purge result" >> "$STEP_SUMMARY"
           if [ -s purged.txt ]; then
             echo "" >> "$STEP_SUMMARY"
             echo "**Purged URLs (@main):**" >> "$STEP_SUMMARY"
