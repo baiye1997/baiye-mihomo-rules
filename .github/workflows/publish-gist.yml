@@ -1,135 +1,78 @@
 name: Publish Gist
 
 on:
-  workflow_dispatch:
-    inputs:
-      dry_run:
-        description: "Dry run (don't actually patch gist)"
-        type: boolean
-        default: false
-      force_full:
-        description: "Force full publish (ignore change detection)"
-        type: boolean
-        default: false
+  # Purge CDN 成功后自动执行
+  workflow_run:
+    workflows: ["Purge CDN"]
+    types: [completed]
 
-# 只负责发布，不上传 artifact；结果写到 Summary + Annotations
+  # 也支持手动触发
+  workflow_dispatch: {}
+
+concurrency:
+  group: publish-gist
+  cancel-in-progress: true
+
 permissions:
   contents: read
 
 jobs:
-  build:
+  publish:
+    # 仅当 Purge CDN 结论为 success，或人为手动触发时执行
+    if: ${{ github.event_name == 'workflow_dispatch' || (github.event.workflow_run.conclusion == 'success') }}
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout main
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          ref: main
 
-      - name: Detect changes
-        id: chg
-        shell: bash
-        run: |
-          set -euo pipefail
-          AFTER="$(git rev-parse HEAD)"
-          BEFORE="$(git rev-parse "${AFTER}^" 2>/dev/null || echo '')"
-          if [ -n "${BEFORE}" ]; then
-            git diff --name-only "${BEFORE}" "${AFTER}" | sort -u > changed.all.txt
-          else
-            : > changed.all.txt
-          fi
-          M=false; S=false; ML=false; SL=false
-          grep -qx "config/baiye-multiple.yaml"       changed.all.txt && M=true || true
-          grep -qx "config/baiye-single.yaml"         changed.all.txt && S=true || true
-          grep -qx "config/baiye-multiple-lite.yaml"  changed.all.txt && ML=true || true
-          grep -qx "config/baiye-single-lite.yaml"    changed.all.txt && SL=true || true
-          echo "m=${M}"  >> $GITHUB_OUTPUT
-          echo "s=${S}"  >> $GITHUB_OUTPUT
-          echo "ml=${ML}" >> $GITHUB_OUTPUT
-          echo "sl=${SL}" >> $GITHUB_OUTPUT
-
-      - uses: actions/setup-node@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: 20
 
-      # -------- STANDARD --------
-      - name: Publish STANDARD gist
-        if: ${{ inputs.force_full || steps.chg.outputs.m == 'true' || steps.chg.outputs.s == 'true' }}
+      # 运行你那份配套脚本 —— 会一次性更新两个 Gist（standard + lite）
+      - name: Build & Publish to Gists (standard + lite)
         env:
-          GIST_TOKEN: ${{ secrets.GIST_TOKEN }}
-          GIST_ID:    ${{ secrets.GIST_ID_STANDARD }}
-          SUB_URL_1:  ${{ secrets.SUB_URL_1 }}
-          SUB_URL_2:  ${{ secrets.SUB_URL_2 }}
+          # ── 必需：用于更新 Gist 的 token 与两个 Gist 的 ID ──────────────────────────────
+          GIST_TOKEN:        ${{ secrets.GIST_TOKEN }}
+          GIST_ID_STANDARD:  ${{ secrets.GIST_ID_STANDARD }}   # 放 standard 三件套
+          GIST_ID_LITE:      ${{ secrets.GIST_ID_LITE }}       # 放 lite 三件套
 
-          CONFIG_MULTIPLE: config/baiye-multiple.yaml
-          CONFIG_SINGLE:   config/baiye-single.yaml
+          # ── 订阅链接（脚本会把模板里的“替换订阅链接1/2”替换为这两个） ──────────────────
+          SUB_URL_1:         ${{ secrets.SUB_URL_1 }}
+          SUB_URL_2:         ${{ secrets.SUB_URL_2 }}
 
-          GIST_FILE_MULTIPLE: baiye-multiple.yaml
-          GIST_FILE_SINGLE:   baiye-single.yaml
-          GIST_FILE_MINI:     baiye-mini.yaml
+          # ── 用于给 icons 链接追加 ?v= 短哈希，强制刷新缓存（脚本内部会使用） ─────────────
+          COMMIT_SHORT:      ${{ github.sha }}
 
-          # 传入 lite 名字仅用于注解标签友好（当次不会用到这些文件）
+          # ── 模板路径（保持与你仓库一致；脚本会基于 multiple 派生 mini） ────────────────
+          CONFIG_MULTIPLE_STD:   config/baiye-multiple.yaml
+          CONFIG_SINGLE_STD:     config/baiye-single.yaml
+          CONFIG_MULTIPLE_LITE:  config/baiye-multiple-lite.yaml
+          CONFIG_SINGLE_LITE:    config/baiye-single-lite.yaml
+
+          # ── 目标文件名（写入到两个 Gist 中的文件名） ────────────────────────────────────
+          GIST_FILE_MULTIPLE_STD:  baiye-multiple.yaml
+          GIST_FILE_SINGLE_STD:    baiye-single.yaml
+          GIST_FILE_MINI_STD:      baiye-mini.yaml
+
           GIST_FILE_MULTIPLE_LITE: baiye-multiple-lite.yaml
           GIST_FILE_SINGLE_LITE:   baiye-single-lite.yaml
           GIST_FILE_MINI_LITE:     baiye-mini-lite.yaml
 
-          COMMIT_SHORT: ${{ github.sha }}
-          DRY_RUN:      ${{ inputs.dry_run && 'true' || 'false' }}
-          QUIET:        "true"
-          STATUS_FILE:  "status-standard.txt"
-        run: node .github/scripts/build-and-publish.js
-
-      # -------- LITE --------
-      - name: Publish LITE gist
-        if: ${{ inputs.force_full || steps.chg.outputs.ml == 'true' || steps.chg.outputs.sl == 'true' }}
-        env:
-          GIST_TOKEN: ${{ secrets.GIST_TOKEN }}
-          GIST_ID:    ${{ secrets.GIST_ID_LITE }}
-          SUB_URL_1:  ${{ secrets.SUB_URL_1 }}
-          SUB_URL_2:  ${{ secrets.SUB_URL_2 }}
-
-          CONFIG_MULTIPLE: config/baiye-multiple-lite.yaml
-          CONFIG_SINGLE:   config/baiye-single-lite.yaml
-
-          GIST_FILE_MULTIPLE: baiye-multiple-lite.yaml
-          GIST_FILE_SINGLE:   baiye-single-lite.yaml
-          GIST_FILE_MINI:     baiye-mini-lite.yaml
-
-          # 传入 standard 名字仅用于注解标签友好
-          GIST_FILE_MULTIPLE_LITE: baiye-multiple-lite.yaml
-          GIST_FILE_SINGLE_LITE:   baiye-single-lite.yaml
-          GIST_FILE_MINI_LITE:     baiye-mini-lite.yaml
-
-          COMMIT_SHORT: ${{ github.sha }}
-          DRY_RUN:      ${{ inputs.dry_run && 'true' || 'false' }}
-          QUIET:        "true"
-          STATUS_FILE:  "status-lite.txt"
-        run: node .github/scripts/build-and-publish.js
-
-      # 占位，避免 Summary 出现 UNKNOWN（如果上面没跑）
-      - name: Ensure status placeholders
-        if: always()
-        shell: bash
-        run: |
-          test -f status-standard.txt || echo UNKNOWN > status-standard.txt
-          test -f status-lite.txt     || echo UNKNOWN > status-lite.txt
-
-      # 摘要（简单的 OK/NOCHANGE/ERROR 汇总；具体文件&链接已由脚本写入 Annotations + Summary）
-      - name: Summary (status)
-        if: always()
-        shell: bash
+          # ── 可选：控制脚本行为（保留默认即可） ──────────────────────────────────────────
+          DRY_RUN:    "false"          # 设为 "true" 可试跑但不提交
+          QUIET:      "true"           # 精简日志
+          STATUS_FILE: status-publish.txt
         run: |
           set -euo pipefail
-          std="$(cat status-standard.txt 2>/dev/null || echo UNKNOWN)"
-          lite="$(cat status-lite.txt 2>/dev/null || echo UNKNOWN)"
-          {
-            echo "## Publish result"
-            echo
-            echo "- STANDARD: **${std}**"
-            echo "- LITE: **${lite}**"
-            echo
-            if [ "$std" = "OK" ] || [ "$lite" = "OK" ]; then
-              echo "> Overall: ✅ at least one OK"
-            else
-              echo "> Overall: ⚠️ no OK"
-            fi
-            echo
-          } >> "$GITHUB_STEP_SUMMARY"
+          node .github/scripts/build-and-publish-gists.js
+
+      - name: Show status file (optional)
+        if: always()
+        run: |
+          test -f status-publish.txt && echo "Status: $(cat status-publish.txt)" || echo "No status file"
