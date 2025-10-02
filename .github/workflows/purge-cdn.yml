@@ -56,10 +56,11 @@ jobs:
           # 工具函数：把路径标准化（去掉前缀 ./）、只保留我们关心的目录，并且去重
           normalize_and_filter() {
             # 只要 icons/** 或 rules/(ip|non_ip|domainset|yaml)/** 或 config/*.ya?ml
-            grep -Eo '(?:\./)?(?:icons/[^"'"'"' ]+|rules/(?:ip|non_ip|domainset|yaml)/[^"'"'"' ]+|config/[^/"]+\.ya?ml)' \
+            grep -Eo '(\./)?(icons/[^"'"'"' ]+|rules/(ip|non_ip|domainset|yaml)/[^"'"'"' ]+|config/[^/"]+\.ya?ml)' \
             | sed -E 's#^\./##' \
             | grep -E '^(icons/|rules/(ip|non_ip|domainset|yaml)/|config/[^/]+\.ya?ml)$' \
             | sort -u
+
           }
 
           : > referenced.targets.txt
@@ -76,7 +77,7 @@ jobs:
 
             # 从所有 config 中抽取被引用的 icons/rules 路径
             # 常见引用形态：直接写相对路径（icons/... 或 ./icons/...、rules/...）
-            grep -RhoE '(?:\./)?(?:icons/[^"'"'"' ]+|rules/(?:ip|non_ip|domainset|yaml)/[^"'"'"' ]+)' "${CONFIGS[@]}" \
+            grep -RhoE '(\./)?(icons/[^"'"'"' ]+|rules/(ip|non_ip|domainset|yaml)/[^"'"'"' ]+)' "${CONFIGS[@]}" \
               | normalize_and_filter \
               | grep -E '^(icons/|rules/(ip|non_ip|domainset|yaml)/)' \
               > referenced.targets.txt || true
