@@ -9,11 +9,19 @@ const {
   GIST_ID,
   SUB_URL_1,
   SUB_URL_2,
+
+  // standard
   CONFIG_MULTIPLE = "config/baiye-multiple.yaml",
   CONFIG_SINGLE   = "config/baiye-single.yaml",
   GIST_FILE_MULTIPLE = "baiye-multiple.yaml",
   GIST_FILE_SINGLE   = "baiye-single.yaml",
   GIST_FILE_MINI     = "baiye-mini.yaml",
+
+  // 这些 LITE 变量是否传入均可；传了就用于生成更友好的标签
+  GIST_FILE_MULTIPLE_LITE,
+  GIST_FILE_SINGLE_LITE,
+  GIST_FILE_MINI_LITE,
+
   DRY_RUN = "false",
   QUIET   = "true",
   STATUS_FILE = ""
@@ -21,10 +29,36 @@ const {
 
 const COMMIT_SHORT = (process.env.COMMIT_SHORT || "dev").slice(0, 7);
 const statusFile = STATUS_FILE ? path.resolve(STATUS_FILE) : "";
+const stepSummaryPath = process.env.GITHUB_STEP_SUMMARY;
 
 function writeStatus(text) {
   if (!statusFile) return;
-  try { fs.writeFileSync(statusFile, String(text).trim() + "\n", "utf8"); } catch {}
+  try { fs.writeFileSync(statusFile, String(text).trim() + "\n", "utf8"); }
+  catch {}
+}
+
+// NOTICE/日志辅助
+function maskUrl(raw = "") {
+  // 脱敏：把所有“>=20位十六进制”的片段替换成 ***
+  return raw.replace(/[0-9a-f]{20,}/gi, "***");
+}
+function addAnnotation(title, url) {
+  const masked = maskUrl(url);
+  // GitHub 注解（会出现在 Annotations）
+  console.log(`::notice title=${title}::${masked}`);
+  return masked;
+}
+function appendSummary(lines = []) {
+  if (!stepSummaryPath || !lines.length) return;
+  try {
+    const out = [
+      "## Gist updated files",
+      "",
+      ...lines.map(s => `- ${s}`),
+      ""
+    ].join("\n");
+    fs.appendFileSync(stepSummaryPath, out, "utf8");
+  } catch {}
 }
 
 function sha12(s){ return crypto.createHash("sha256").update(s).digest("hex").slice(0,12); }
@@ -64,9 +98,7 @@ function httpJSON(method, url, body, headers={}){
           try { resolve({status, json: data?JSON.parse(data):{}, headers: res.headers}); }
           catch { resolve({status, json:{}, headers: res.headers}); }
         } else {
-          const err = new Error(`HTTP ${status}: ${data}`);
-          err.status = status; err.body = data;
-          reject(err);
+          reject(Object.assign(new Error(`HTTP ${status}: ${data}`), {status, body:data}));
         }
       });
     });
@@ -87,8 +119,7 @@ async function patchGistWithRetry(files, description, maxRetries=4){
     try { return await patchGistOnce(files, description); }
     catch(e){
       const st = e.status||0;
-      // 只对可重试错误退避；其它直接抛出
-      if ([409,429,500,502,503,504,522,524].includes(st) && i<maxRetries){
+      if ([409,500,502,503,522,524].includes(st) && i<maxRetries){
         await sleep(jitter(backoff)); backoff*=2; continue;
       }
       throw e;
@@ -122,37 +153,52 @@ function buildOutputs(){
 
 function diffPlan(currentGistJSON, outputs, names){
   const plan = {};
+  const hashes = {};
   const filesNow = (currentGistJSON && currentGistJSON.files) || {};
 
   function unchanged(name, next){
     const now = filesNow[name];
     if (!now) return false;
-    // 若 gist 返回被截断，就当不同，强制覆盖
     if (now.truncated) return false;
     return now.content === next;
   }
 
   if (outputs.multiple && names.multiple){
+    hashes.multiple = sha12(outputs.multiple);
     if (!unchanged(names.multiple, outputs.multiple)) plan[names.multiple] = {content: outputs.multiple};
   }
   if (outputs.single && names.single){
+    hashes.single = sha12(outputs.single);
     if (!unchanged(names.single, outputs.single)) plan[names.single] = {content: outputs.single};
   }
   if (outputs.mini && names.mini){
+    hashes.mini = sha12(outputs.mini);
     if (!unchanged(names.mini, outputs.mini)) plan[names.mini] = {content: outputs.mini};
   }
-  return plan;
+  return { plan, hashes };
+}
+
+function buildLabelMap() {
+  const map = {};
+  // standard
+  if (GIST_FILE_MULTIPLE) map[GIST_FILE_MULTIPLE] = " (multiple)";
+  if (GIST_FILE_SINGLE)   map[GIST_FILE_SINGLE]   = " (single)";
+  if (GIST_FILE_MINI)     map[GIST_FILE_MINI]     = " (mini)";
+  // lite（如果当前这次运行传入了对应 env，就会起作用）
+  if (GIST_FILE_MULTIPLE_LITE) map[GIST_FILE_MULTIPLE_LITE] = " (multiple-lite)";
+  if (GIST_FILE_SINGLE_LITE)   map[GIST_FILE_SINGLE_LITE]   = " (single-lite)";
+  if (GIST_FILE_MINI_LITE)     map[GIST_FILE_MINI_LITE]     = " (mini-lite)";
+  return map;
 }
 
 (async ()=>{
   try {
-    if (!GIST_TOKEN || !GIST_ID) throw new Error("Missing GIST_TOKEN or GIST_ID");
-
     const wantNames = {
       multiple: GIST_FILE_MULTIPLE || null,
       single:   GIST_FILE_SINGLE   || null,
       mini:     GIST_FILE_MINI     || null,
     };
+    const labelMap = buildLabelMap();
 
     const outputs = buildOutputs();
     if (!outputs.multiple && !outputs.single && !outputs.mini){
@@ -160,8 +206,8 @@ function diffPlan(currentGistJSON, outputs, names){
       process.exit(0);
     }
 
-    const latest = await getGist();
-    const plan = diffPlan(latest.json, outputs, wantNames);
+    const latestBefore = await getGist();
+    const { plan } = diffPlan(latestBefore.json, outputs, wantNames);
 
     if (Object.keys(plan).length === 0){
       writeStatus("NOCHANGE");
@@ -173,16 +219,31 @@ function diffPlan(currentGistJSON, outputs, names){
       process.exit(0);
     }
 
-    const desc = QUIET === "true" ? undefined : `update via CI | ${COMMIT_SHORT}`;
+    const desc = `update via CI | ${COMMIT_SHORT}`;
     await patchGistWithRetry(plan, desc);
+
+    // 重新获取，拿到 raw_url 输出注解/summary（脱敏）
+    const latestAfter = await getGist();
+    const filesAfter = latestAfter.json.files || {};
+    const updatedNames = Object.keys(plan);
+
+    const summaryLines = [];
+    for (const fname of updatedNames) {
+      const f = filesAfter[fname];
+      const raw = f && f.raw_url ? f.raw_url : "";
+      const title = `Gist Updated${labelMap[fname] || ""}`;
+      const masked = addAnnotation(title, raw);
+      // Summary 行：**(标签去掉括号)**: URL
+      const tag = (labelMap[fname] || "").replace(/[()]/g, "").trim() || fname;
+      summaryLines.push(`**${tag}**: ${masked}`);
+    }
+    appendSummary(summaryLines);
 
     writeStatus("OK");
     process.exit(0);
   } catch(e){
     writeStatus("ERROR");
-    if (QUIET !== "true") {
-      console.error("❌ Gist update failed:", e.message || e);
-    }
+    console.error("❌ Gist update failed:", e.message || e);
     process.exit(1);
   }
 })();
