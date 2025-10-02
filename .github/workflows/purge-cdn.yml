@@ -15,7 +15,7 @@ on:
   workflow_dispatch: {}
 
 concurrency:
-  group: release-and-purge
+  group: purge-cdn
   cancel-in-progress: true
 
 permissions:
@@ -23,8 +23,10 @@ permissions:
 
 jobs:
   release_purge:
+    # 仅分支 push（忽略 tag push）
     if: ${{ github.event_name != 'push' || startsWith(github.ref, 'refs/heads/') }}
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout (with history)
         uses: actions/checkout@v4
@@ -37,116 +39,71 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-
-          # tag 直接早退
-          if [ "${{ github.ref_type }}" = "tag" ] || [[ "${GITHUB_REF:-}" == refs/tags/* ]]; then
-            echo "has_ref=false" >> "$GITHUB_OUTPUT"
-            echo "Skip on tag ref: ${GITHUB_REF}"
-            exit 0
-          fi
-
           BEFORE="${{ github.event.before }}"
-          if [ -z "${BEFORE}" ]; then
-            BEFORE="$(git rev-parse HEAD^ 2>/dev/null || echo '')"
-          fi
+          [ -z "$BEFORE" ] && BEFORE="$(git rev-parse HEAD^ 2>/dev/null || echo '')"
 
-          if [ -n "${BEFORE}" ]; then
-            git diff --name-only "${BEFORE}" "${{ github.sha }}" | sort -u > changed.all.txt
+          if [ -n "$BEFORE" ]; then
+            git diff --name-only "$BEFORE" "${{ github.sha }}" | sort -u > changed.all.txt
           else
             : > changed.all.txt
           fi
 
-          if [ ! -s changed.all.txt ]; then
-            echo "has_ref=false" >> "$GITHUB_OUTPUT"
-            echo "No file changes; skip."
-            exit 0
-          fi
-
           grep -E '^(icons/|rules/(ip|non_ip|domainset|yaml)/)' changed.all.txt | sort -u > changed.targets.txt || true
 
-          if [ ! -s changed.targets.txt ]; then
-            echo "has_ref=false" >> "$GITHUB_OUTPUT"
-            echo "No icons/rules changed."
-            exit 0
-          fi
-
+          # 将真正被 config 引用到的目标筛出（避免无意义 purge）
+          : > referenced.targets.txt
           shopt -s nullglob
           CONFIGS=(config/*.yml config/*.yaml)
-          : > referenced.targets.txt
-          if [ ${#CONFIGS[@]} -eq 0 ]; then
-            echo "has_ref=false" >> "$GITHUB_OUTPUT"
-            echo "No config YAML files exist; skip."
-            exit 0
+          if [ ${#CONFIGS[@]} -gt 0 ] && [ -s changed.targets.txt ]; then
+            while read -r P; do
+              [ -n "$P" ] || continue
+              if grep -RqlF -- "$P" "${CONFIGS[@]}"; then
+                echo "$P" >> referenced.targets.txt
+              fi
+            done < changed.targets.txt
           fi
 
-          while read -r P; do
-            [ -n "$P" ] || continue
-            if grep -RqlF -- "$P" "${CONFIGS[@]}"; then
-              echo "$P" >> referenced.targets.txt
-            fi
-          done < changed.targets.txt
-
-          if [ ! -s referenced.targets.txt ]; then
+          if [ -s referenced.targets.txt ]; then
+            echo "has_ref=true" >> "$GITHUB_OUTPUT"
+          else
             echo "has_ref=false" >> "$GITHUB_OUTPUT"
-            echo "Changed icons/rules are NOT referenced in config; skip."
-            exit 0
           fi
-
-          echo "has_ref=true" >> "$GITHUB_OUTPUT"
-          echo "Referenced targets:"
-          cat referenced.targets.txt
 
       - name: Purge jsDelivr for referenced targets (@latest + @main)
         if: steps.detect.outputs.has_ref == 'true'
+        id: purge
         shell: bash
         run: |
           set -euo pipefail
           REPO="${{ github.repository }}"
-          : > purged.ok.txt
-          : > purged.fail.txt
+          : > purged.txt
           while read -r p; do
             [ -n "$p" ] || continue
             for REF in latest main; do
               URL="https://purge.jsdelivr.net/gh/${REPO}@${REF}/${p}"
-              # 记录 HTTP 状态码；200 视为成功
-              code="$(curl -sS -o /dev/null -w '%{http_code}' "$URL" || echo 000)"
-              if [ "$code" = "200" ]; then
-                echo "$URL" >> purged.ok.txt
-                echo "✅ $URL"
-              else
-                echo "$code $URL" >> purged.fail.txt
-                echo "⚠️  ($code) $URL"
+              echo "Purging $URL"
+              if curl -fsS "$URL" >/dev/null; then
+                echo "$URL" >> purged.txt
               fi
             done
           done < referenced.targets.txt
 
-      - name: Summary (what got purged)
+      - name: Summary
         if: always()
         shell: bash
         run: |
           echo "## Purge result" >> "$GITHUB_STEP_SUMMARY"
           if [ "${{ steps.detect.outputs.has_ref }}" != "true" ]; then
             echo "" >> "$GITHUB_STEP_SUMMARY"
-            echo "- Skipped: no referenced targets changed." >> "$GITHUB_STEP_SUMMARY"
+            echo "Nothing to purge." >> "$GITHUB_STEP_SUMMARY"
             exit 0
           fi
 
-          ok=0; fail=0
-          [ -s purged.ok.txt ]   && ok=$(wc -l < purged.ok.txt)
-          [ -s purged.fail.txt ] && fail=$(wc -l < purged.fail.txt)
-
-          echo "" >> "$GITHUB_STEP_SUMMARY"
-          echo "- OK: **$ok**"   >> "$GITHUB_STEP_SUMMARY"
-          echo "- Fail: **$fail**" >> "$GITHUB_STEP_SUMMARY"
-
-          if [ "$ok" -gt 0 ]; then
+          if [ -s purged.txt ]; then
             echo "" >> "$GITHUB_STEP_SUMMARY"
-            echo "### Purged URLs" >> "$GITHUB_STEP_SUMMARY"
-            sed 's/^/- /' purged.ok.txt >> "$GITHUB_STEP_SUMMARY"
-          fi
-
-          if [ "$fail" -gt 0 ]; then
+            echo "**Purged URLs:**" >> "$GITHUB_STEP_SUMMARY"
+            sed 's/^/- /' purged.txt >> "$GITHUB_STEP_SUMMARY"
+          else
             echo "" >> "$GITHUB_STEP_SUMMARY"
-            echo "### Failed URLs (with status)" >> "$GITHUB_STEP_SUMMARY"
-            sed 's/^/- /' purged.fail.txt >> "$GITHUB_STEP_SUMMARY"
+            echo "No URL purged (curl failed or empty set)." >> "$GITHUB_STEP_SUMMARY"
           fi
