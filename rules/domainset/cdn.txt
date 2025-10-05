@@ -1,7 +1,7 @@
 #########################################
 # Sukka's Ruleset - CDN Domains
-# Last Updated: 2025-10-04T18:06:56.371Z
-# Size: 3960
+# Last Updated: 2025-10-05T18:15:08.011Z
+# Size: 3966
 # License: AGPL 3.0
 # Homepage: https://ruleset.skk.moe
 # GitHub: https://github.com/SukkaW/Surge
@@ -1894,6 +1894,7 @@ media.breitbart.com
 static.bravoporn.com
 +.bnbstatic.com
 images.blockscan.com
+assets.bitwarden.com
 +.bitgetimg.com
 upos-sz-mirrorcosbstar1.bilivideo.com
 upos-sz-mirroralibstar1.bilivideo.com
@@ -1997,6 +1998,7 @@ apps-static.route4me.com
 +.roseimgs.com
 cdnassets.roboflow.com
 static.roboflow.com
+source.roboflow.com
 cdn.roboflow.com
 app.roboflow.com
 api.roboflow.com
@@ -2903,6 +2905,9 @@ player.vimeo.com
 static.vanta.com
 +.uvcdn.com
 +.unpkg.com
+idportal-cdn-prd.unity.com
+cdn.login.unity.com
+cdn.cloud.unity.com
 +.twimg.com
 media1.tenor.com
 media.tenor.com
@@ -3738,6 +3743,7 @@ cdn.pendo.io
 +.nxcli.io
 media.mstdn.io
 +.strapi.logto.io
+cdn-blocks.karte.io
 cdn-edge.karte.io
 statics.goorm.io
 sdk.gleap.io
