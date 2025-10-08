@@ -1,7 +1,7 @@
 #########################################
 # Sukka's Ruleset - CDN Domains
-# Last Updated: 2025-10-05T18:15:08.011Z
-# Size: 3966
+# Last Updated: 2025-10-08T14:20:36.760Z
+# Size: 3975
 # License: AGPL 3.0
 # Homepage: https://ruleset.skk.moe
 # GitHub: https://github.com/SukkaW/Surge
@@ -40,6 +40,7 @@ cdn.bsky.social
 objects.g0v.social
 +.picsum.photos
 files.mastodon.online
++.am-cdn.online
 cdn.glitch.global
 code.iconify.design
 api.iconify.design
@@ -103,11 +104,13 @@ res2.weblium.site
 nextra.site
 p.inari.site
 imgfile.shop
++.am-cdn.pics
 +.codeberg.page
 +.instant.page
 +.kinsta.page
 assets-next.matters.news
 assets.matters.news
+web-api-cdn.ground.news
 static.bad.news
 content.api.news
 pics.hentai.name
@@ -737,6 +740,7 @@ vz-c0fe498e-5ab.b-cdn.net
 vz-2222604c-50b.b-cdn.net
 hentaiworldtv.b-cdn.net
 divhunt-site.b-cdn.net
+groundnews.b-cdn.net
 mintlify.b-cdn.net
 linuxiac.b-cdn.net
 jsdelivr.b-cdn.net
@@ -791,6 +795,8 @@ latency-test.lab.skk.moe
 img.skk.moe
 +.cdn.skk.moe
 objects.hit.moe
+assets-cdn.anh.moe
+cdn.amh.moe
 +.cloudflare.ltd
 static.coinall.ltd
 image.acg.lol
@@ -2805,6 +2811,7 @@ time.google.com
 static.corp.google.com
 +.crashlytics2.l.google.com
 s3.go2778.com
+static.gmgard.com
 content.product.glitch.com
 cdn.glitch.com
 +.glbimg.com
@@ -3492,6 +3499,8 @@ cdn.rauno.me
 cdn.judge.me
 static-cache.fboom.me
 static.fboom.me
+media-cms.ayoba.me
+dynamic-cdn.cms.ayoba.me
 emoji-css.afeld.me
 pic.7mmtv.me
 cdn.123av.me
