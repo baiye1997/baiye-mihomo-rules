@@ -149,7 +149,7 @@ geox-url:
 
 # ============================ 锚点 ============================
 # —— 基础模板 —— #
-tmpl: &tmpl {url: *url, interval: 300, lazy: true, timeout: 2000, disable-udp: false, max-failed-times: 3, hidden: true, include-all: true}
+tmpl: &tmpl {url: *url, interval: 300, lazy: true, timeout: 3500, disable-udp: false, max-failed-times: 3, hidden: true, include-all: true}
 sel:  &sel  {type: select, url: *url, disable-udp: false, hidden: false, include-all: true}
 test: &test {type: url-test, <<: *tmpl, tolerance: 50}
 fall: &fall {type: fallback, <<: *tmpl}
@@ -222,7 +222,7 @@ dom: &dom {type: http, behavior: domain,    interval: 43200, format: text, proxy
 rule-providers:
   FuckAD:               {<<: *dom, format: yaml, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/yaml/fuckAds.yaml,     path: ./rules/yaml/fuckAds.yaml}
   sniff-skip:           {<<: *dom, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/domainset/sniff-skip.list,           path: ./rules/domainset/sniff-skip.list}
-  fake-ip:              {<<: *dom, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/domainset/fake-ip.list,              path: ./rules/domainset/fake_ip.list}
+  fake-ip:              {<<: *dom, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/domainset/fake-ip.list,              path: ./rules/domainset/fake-ip.list}
   stream_non_ip:        {<<: *cls, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/non_ip/stream.txt,                   path: ./rules/non_ip/stream.txt}
   stream_ip:            {<<: *cls, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/ip/stream.txt,                       path: ./rules/ip/stream.txt}
 
