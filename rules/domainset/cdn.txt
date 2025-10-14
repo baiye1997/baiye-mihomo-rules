@@ -1,7 +1,7 @@
 #########################################
 # Sukka's Ruleset - CDN Domains
-# Last Updated: 2025-10-10T18:09:32.296Z
-# Size: 3976
+# Last Updated: 2025-10-14T12:28:25.787Z
+# Size: 3978
 # License: AGPL 3.0
 # Homepage: https://ruleset.skk.moe
 # GitHub: https://github.com/SukkaW/Surge
@@ -1792,6 +1792,7 @@ store-images.microsoft.com
 +.smartscreen.microsoft.com
 cmtycdn.powerpages.microsoft.com
 wcpstatic.microsoft.com
+oneocsp.microsoft.com
 cdn.create.microsoft.com
 images.ecomm.microsoft.com
 ajax.microsoft.com
@@ -2174,6 +2175,7 @@ cdn.credible.com
 assets.controld.com
 img.connatix.com
 cds.connatix.com
+ocsp.comodoca.com
 crt.comodoca.com
 downloads.coindesk.com
 s1.coincarp.com
