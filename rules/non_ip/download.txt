@@ -1,6 +1,6 @@
 #########################################
 # Sukka's Ruleset - Large Files Hosting IPs
-# Last Updated: 2025-10-10T18:09:31.634Z
+# Last Updated: 2025-10-17T13:08:04.457Z
 # Size: 8
 # License: AGPL 3.0
 # Homepage: https://ruleset.skk.moe
@@ -9,12 +9,12 @@
 # This file contains ruleset for software updating & large file hosting.
 #########################################
 DOMAIN,7h1s_rul35et_i5_mad3_by_5ukk4w-ruleset.skk.moe
-DOMAIN-WILDCARD,cdn-*.comaps.tech
-DOMAIN-WILDCARD,ftp.
-DOMAIN-WILDCARD,ftp.
-DOMAIN-WILDCARD,*.s3.*.backblazeb2.com
 DOMAIN-WILDCARD,download*.mediafire.com
-DOMAIN-WILDCARD,cdn-*.organicmaps.app
+DOMAIN-WILDCARD,ftp.??.debian.org
+DOMAIN-WILDCARD,ftp.??.freebsd.org
+DOMAIN-WILDCARD,*.s3.*.backblazeb2.com
 DOMAIN-WILDCARD,cdn-*.comaps.app
+DOMAIN-WILDCARD,cdn-*.comaps.tech
+DOMAIN-WILDCARD,cdn-*.organicmaps.app
 ################## EOF ##################
 
