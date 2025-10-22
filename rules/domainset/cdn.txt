@@ -1,7 +1,7 @@
 #########################################
 # Sukka's Ruleset - CDN Domains
-# Last Updated: 2025-10-21T13:51:58.835Z
-# Size: 3990
+# Last Updated: 2025-10-22T17:09:30.245Z
+# Size: 3993
 # License: AGPL 3.0
 # Homepage: https://ruleset.skk.moe
 # GitHub: https://github.com/SukkaW/Surge
@@ -1364,6 +1364,7 @@ media.graphassets.com
 static.gettyimages.com
 media.gettyimages.com
 +.cdn.getfeedback.com
++.gauthstatic.com
 stories.freepiklabs.com
 static.foxbusiness.com
 use.fortawesome.com
@@ -2799,6 +2800,7 @@ i.iheart.com
 +.cdn.ifixit.com
 img.icons8.com
 bst.icons8.com
+statici.icloud.com
 +.hugoal.com
 static.hotjar.com
 +.hommec.com
@@ -3596,6 +3598,7 @@ assets.garr.it
 lib.arvancloud.ir
 +.cdn.applicationinsights.io
 typescript-eslint.io
+cdn.insightmediagroup.io
 +.polyfill-fastly.io
 images.microcms-assets.io
 assets-next.mattersprotocol.io

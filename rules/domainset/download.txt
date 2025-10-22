@@ -1,7 +1,7 @@
 #########################################
 # Sukka's Ruleset - Large Files Hosting Domains
-# Last Updated: 2025-10-15T09:49:45.063Z
-# Size: 1188
+# Last Updated: 2025-10-22T17:09:30.245Z
+# Size: 1189
 # License: AGPL 3.0
 # Homepage: https://ruleset.skk.moe
 # GitHub: https://github.com/SukkaW/Surge
@@ -1031,6 +1031,7 @@ registry.terraform.io
 update.cyberduck.io
 release.runcloud.io
 repo.nextdns.io
+pkgs.netbird.io
 +.jitpack.io
 download.cypress.io
 cdn.cypress.io
