@@ -1,7 +1,7 @@
 #########################################
 # Sukka's Ruleset - CDN Domains
-# Last Updated: 2025-11-03T15:03:48.003Z
-# Size: 3995
+# Last Updated: 2025-11-04T15:07:43.766Z
+# Size: 3999
 # License: AGPL 3.0
 # Homepage: https://ruleset.skk.moe
 # GitHub: https://github.com/SukkaW/Surge
@@ -2308,6 +2308,7 @@ img2.tnaflix.com
 cdnl.tnaflix.com
 artworks.thetvdb.com
 cdn.termius.com
+nel.teo-rum.com
 wpmedia.tealium.com
 cdn.svgator.com
 +.stripst.com
@@ -2413,6 +2414,7 @@ i.magecdn.com
 +.lzzyimg.com
 +.lulucdn.com
 img.ltyears.com
+img.logokit.com
 aurora-customization-usw2.lithium.com
 +.kym-cdn.com
 static-forms.klaviyo.com
@@ -2548,6 +2550,7 @@ w.chatlio.com
 +.cf-ipfs.com
 +.cdntrex.com
 +.cdnpure.com
+static.cdnlogo.com
 +.cdn2020.com
 +.cdn1122.com
 +.cdn-one.com
@@ -3674,6 +3677,7 @@ cdn.metadata.io
 cdn.jetboost.io
 widget.intercom.io
 +.ik.imagekit.io
+icon.icepanel.io
 +.ipfs.denarius.io
 +.rum.cronitor.io
 cdn.commento.io

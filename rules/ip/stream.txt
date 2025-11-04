@@ -1,6 +1,6 @@
 #########################################
 # Sukka's Ruleset - Stream Services IPs: All
-# Last Updated: 2025-08-17T09:19:41.724Z
+# Last Updated: 2025-11-04T15:07:42.889Z
 # Size: 20
 # License: AGPL 3.0
 # Homepage: https://ruleset.skk.moe
@@ -37,6 +37,7 @@
 # - KKBOX
 # - KKTV
 # - Line TV
+# - MangaFox
 # - My5
 # - myTV Super
 # - Netflix

@@ -1,7 +1,7 @@
 #########################################
 # Sukka's Ruleset - Large Files Hosting Domains
-# Last Updated: 2025-10-24T07:06:24.479Z
-# Size: 1190
+# Last Updated: 2025-11-04T15:07:43.766Z
+# Size: 1192
 # License: AGPL 3.0
 # Homepage: https://ruleset.skk.moe
 # GitHub: https://github.com/SukkaW/Surge
@@ -74,6 +74,8 @@ ftp.harukasan.org
 cdn.cocoapods.org
 mirror.apache-kr.org
 +.tmpfiles.org
+rubygems.org
+index.rubygems.org
 static.redox-os.org
 download.opensuse.org
 cdn.opensuse.org
