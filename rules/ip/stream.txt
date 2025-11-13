@@ -1,6 +1,6 @@
 #########################################
 # Sukka's Ruleset - Stream Services IPs: All
-# Last Updated: 2025-11-04T15:07:42.889Z
+# Last Updated: 2025-11-13T20:33:00.155Z
 # Size: 20
 # License: AGPL 3.0
 # Homepage: https://ruleset.skk.moe
@@ -51,6 +51,7 @@
 # - Peacock
 # - Pandora
 # - Pornhub
+# - Pluto TV
 # - SoundCloud
 # - SHOWTIME
 # - Spotify
@@ -59,6 +60,7 @@
 # - TikTok
 # - TVB Anywhere
 # - Twitch
+# - Tubi TV
 # - ViuTV
 # - Vudu
 # - WeTV

@@ -1,7 +1,7 @@
 #########################################
 # Sukka's Ruleset - CDN Domains
-# Last Updated: 2025-11-12T20:27:11.165Z
-# Size: 4034
+# Last Updated: 2025-11-13T20:34:01.724Z
+# Size: 4041
 # License: AGPL 3.0
 # Homepage: https://ruleset.skk.moe
 # GitHub: https://github.com/SukkaW/Surge
@@ -47,6 +47,7 @@ code.iconify.design
 api.iconify.design
 +.ant.design
 fonts1.unidays.world
+tubi.video
 img.api.video
 namedotcom-cdn.name.tools
 pics.javhd.today
@@ -1835,6 +1836,7 @@ cdn.lineicons.com
 scdn.line-apps.com
 cdn.lgrckt-in.com
 +.kinja-img.com
+images.justwatch.com
 cdn.joypixels.com
 cdn.joinhoney.com
 +.jisuimage.com
@@ -2672,6 +2674,7 @@ cdn-cms.tunein.com
 static.tumblr.com
 +.assets.tumblr.com
 +.media.tumblr.com
+canvas-lb.tubitv.com
 cdn2.ttloli.com
 cdn.ttloli.com
 cdn.tracxn.com
@@ -3156,6 +3159,8 @@ assets.play.xbox.com
 livemap-tiles1.waze.com
 web-assets.waze.com
 cdnstatic.w1mp.com
+images2.vudu.com
+images.vudu.com
 cdn.vnoc.com
 tn.vjav.com
 vice-web-statics-cdn.vice.com
@@ -3413,6 +3418,7 @@ clips-media-assets2.twitch.tv
 assets.twitch.tv
 embed.twitch.tv
 +.storry.tv
+static-homepage-en.pluto.tv
 images.pluto.tv
 assets-cdn.jable.tv
 assetscdn.jable.tv
@@ -3425,6 +3431,7 @@ imgcn2.bgmbk.tv
 imgcn.bgmbk.tv
 cdn.18jav.tv
 static.yfsp.tv
+mcdn.tubi.tv
 s-cdnstatic.svc.litv.tv
 p-cdnstatic.svc.litv.tv
 jsmodule.svc.litv.tv
