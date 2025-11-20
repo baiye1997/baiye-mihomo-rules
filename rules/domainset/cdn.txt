@@ -1,7 +1,7 @@
 #########################################
 # Sukka's Ruleset - CDN Domains
-# Last Updated: 2025-11-19T15:21:33.614Z
-# Size: 4083
+# Last Updated: 2025-11-20T13:41:08.241Z
+# Size: 4086
 # License: AGPL 3.0
 # Homepage: https://ruleset.skk.moe
 # GitHub: https://github.com/SukkaW/Surge
@@ -455,6 +455,7 @@ cdn.sapphire.microsoftapp.net
 static.edge.microsoftapp.net
 +.f.hubspotemail.net
 +.directupload.net
++.dc-telemetry.net
 +.coral.coralproject.net
 +.blackbaudcdn.net
 +.storage.yandexcloud.net
@@ -1104,6 +1105,7 @@ s3.duellinksmeta.com
 +.dropboxstatic.com
 +.discourse-cdn.com
 chat.digitalgenius.com
++.digikeyassets.com
 images8.design-editor.com
 images7.design-editor.com
 images.design-editor.com
@@ -1819,6 +1821,7 @@ cdn.onesignal.com
 +.res.office365.com
 +.oculuscdn.com
 +.oaistatic.com
+cdn.nodeimage.com
 cms-assets.nodecraft.com
 +.nhentaimg.com
 media.newyorker.com
