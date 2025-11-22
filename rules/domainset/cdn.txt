@@ -1,7 +1,7 @@
 #########################################
 # Sukka's Ruleset - CDN Domains
-# Last Updated: 2025-11-20T13:41:08.241Z
-# Size: 4086
+# Last Updated: 2025-11-22T06:16:12.021Z
+# Size: 4089
 # License: AGPL 3.0
 # Homepage: https://ruleset.skk.moe
 # GitHub: https://github.com/SukkaW/Surge
@@ -1160,6 +1160,7 @@ media.steampowered.com
 +.staticflickr.com
 cdn.staticdelivr.com
 +.ipfs.soul-network.com
+api-cdn.shutterstock.com
 image.shutterstock.com
 static.serverhunter.com
 +.scribdassets.com
@@ -1250,6 +1251,7 @@ img.atlasobscura.com
 cdn77-t.ashemaletube.com
 cdn77.ashemaletube.com
 +.ipfs.arching-kaos.com
+server.arcgisonline.com
 +.appsflyersdk.com
 photos5.appleinsider.com
 widgets.zohosalesiq.com
@@ -1427,6 +1429,7 @@ e.calibermind.com
 +.bstarstatic.com
 cdn77.boyfriendtv.com
 cc.boyfriendtv.com
++.storage.boilerplate.com
 +.bleepstatic.com
 blade-public-static.blade-group.com
 checkout-sdk.bigcommerce.com
