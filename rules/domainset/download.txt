@@ -1,7 +1,7 @@
 #########################################
 # Sukka's Ruleset - Large Files Hosting Domains
-# Last Updated: 2025-11-10T16:41:39.334Z
-# Size: 1859
+# Last Updated: 2025-11-29T07:55:04.412Z
+# Size: 1861
 # License: AGPL 3.0
 # Homepage: https://ruleset.skk.moe
 # GitHub: https://github.com/SukkaW/Surge
@@ -14,6 +14,7 @@ ossmirror.mycloud.services
 +.nitro.download
 +.kali.download
 mirror.kumi.systems
+mirror.level66.network
 mirror.hostiko.network
 mirror.nishi.network
 mirrors.esto.network
@@ -244,6 +245,7 @@ gpl.savoirfairelinux.net
 ctan.mc1.root.project-creative.net
 debian-archive.trafficmanager.net
 +.mirrors.lucidnetworks.net
+fdroid.tetaneutral.net
 ctan.tetaneutral.net
 cpan.tetaneutral.net
 apt.tetaneutral.net

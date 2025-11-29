@@ -1,7 +1,7 @@
 #########################################
 # Sukka's Ruleset - CDN Domains
-# Last Updated: 2025-11-26T05:16:08.970Z
-# Size: 4102
+# Last Updated: 2025-11-29T08:15:20.314Z
+# Size: 4106
 # License: AGPL 3.0
 # Homepage: https://ruleset.skk.moe
 # GitHub: https://github.com/SukkaW/Surge
@@ -447,6 +447,8 @@ oct8neproxy.azurewebsites.net
 d4.alternativeto.net
 +.vusercontent.net
 +.vscode-unpkg.net
++.tiles.virtualearth.net
+ecn.dev.virtualearth.net
 static.vesselfinder.net
 map.vesselfinder.net
 cdn.tokyo-motion.net
@@ -3266,6 +3268,7 @@ zephr-templates.cnbc.com
 production-cmp.isgprivacy.cbsi.com
 at.cbsi.com
 th.bing.com
+r.bing.com
 i.bang.com
 +.ax1x.com
 img.atom.com
@@ -3959,6 +3962,7 @@ cdn.european-alternatives.eu
 +.1passwordusercontent.eu
 +.zohostatic.eu
 cravatar.eu
+upload.movim.eu
 img.agrd.eu
 st.agrd.eu
 versionbadg.es
