@@ -1,7 +1,7 @@
 #########################################
 # Sukka's Ruleset - Large Files Hosting Domains
-# Last Updated: 2025-12-02T17:56:37.397Z
-# Size: 1867
+# Last Updated: 2025-12-08T14:09:40.309Z
+# Size: 1866
 # License: AGPL 3.0
 # Homepage: https://ruleset.skk.moe
 # GitHub: https://github.com/SukkaW/Surge
@@ -90,7 +90,7 @@ mirror.keystealth.org
 update.greasyfork.org
 releases.grapheneos.org
 dennou-k.gfd-dennou.org
-gnu.freemirror.org
++.freemirror.org
 repo.extreme-ix.org
 repos.del.extreme-ix.org
 artifacts.electronjs.org
@@ -1547,7 +1547,6 @@ mirror.del.albony.in
 mirror.bom.albony.in
 gopkg.in
 go.yaml.in
-ctan.imsc.res.in
 ubuntu-mirror.snu.edu.in
 mirror.ietlucknow.ac.in
 mirror.nitc.ac.in
