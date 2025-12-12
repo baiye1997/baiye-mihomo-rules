@@ -1,7 +1,7 @@
 #########################################
 # Sukka's Ruleset - CDN Domains
-# Last Updated: 2025-12-11T14:24:57.060Z
-# Size: 4122
+# Last Updated: 2025-12-12T16:53:48.217Z
+# Size: 4126
 # License: AGPL 3.0
 # Homepage: https://ruleset.skk.moe
 # GitHub: https://github.com/SukkaW/Surge
@@ -349,7 +349,6 @@ cdn.mathjax.org
 pcz.javidol.org
 +.haproxy.org
 +.graphql.org
-+.f-droid.org
 web-static.archive.org
 image.ap-mail.org
 +.99avcdn.org
@@ -409,6 +408,7 @@ ps.w.org
 s.w.org
 ooo.0o0.ooo
 +.usercontent.one
+wiki.metacubex.one
 storageapi.fleek.one
 static.xns.one
 +.ipfs.jbb.one
@@ -817,6 +817,8 @@ img.skk.moe
 +.cdn.skk.moe
 objects.hit.moe
 assets-cdn.anh.moe
+static.ahu.moe
+file.ahu.moe
 +.cloudflare.ltd
 static.coinall.ltd
 image.acg.lol
@@ -1161,6 +1163,7 @@ static.threatlocker.com
 cdn.sunofbeaches.com
 +.strpssts-ana.com
 +.stripeassets.com
+assets.streamlinehq.com
 media.steampowered.com
 +.staticflickr.com
 cdn.staticdelivr.com
@@ -3544,6 +3547,7 @@ storage.tally.so
 assets-v2.super.so
 sites.super.so
 assets.cello.so
+cdn.mida.so
 images.spr.so
 +.cdn-zlib.sk
 +.registry.gitplac.si
