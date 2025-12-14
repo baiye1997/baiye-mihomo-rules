@@ -1,7 +1,7 @@
 #########################################
 # Sukka's Ruleset - Large Files Hosting Domains
-# Last Updated: 2025-12-12T16:53:48.217Z
-# Size: 1871
+# Last Updated: 2025-12-14T14:54:33.571Z
+# Size: 1873
 # License: AGPL 3.0
 # Homepage: https://ruleset.skk.moe
 # GitHub: https://github.com/SukkaW/Surge
@@ -1118,6 +1118,7 @@ launcher.mojang.com
 iterm2.com
 ubuntu.ipacct.com
 debian.ipacct.com
+dl.imobie.com
 mirror.ubuntu.ikoula.com
 mirror.debian.ikoula.com
 +.mirrors.hoobly.com
@@ -1225,6 +1226,7 @@ repos.interior.edu.uy
 espejito.fder.edu.uy
 ubuntu.repo.cure.edu.uy
 debian.repo.cure.edu.uy
+cdn.electronic.us
 mirror.timkevin.us
 cdn.zoom.us
 mirrors.xtom.us
