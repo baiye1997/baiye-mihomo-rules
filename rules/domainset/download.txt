@@ -1,7 +1,7 @@
 #########################################
 # Sukka's Ruleset - Large Files Hosting Domains
-# Last Updated: 2025-12-14T14:54:33.571Z
-# Size: 1873
+# Last Updated: 2025-12-15T02:21:27.393Z
+# Size: 1874
 # License: AGPL 3.0
 # Homepage: https://ruleset.skk.moe
 # GitHub: https://github.com/SukkaW/Surge
@@ -597,6 +597,7 @@ mirrors.usinternet.com
 +.mirror.thegigabit.com
 mirror.pit.teraswitch.com
 mirror.team-cymru.com
+downloads.slack-edge.com
 mirror.plusserver.com
 +.pixeldrain.com
 mirror.pilotfiber.com
