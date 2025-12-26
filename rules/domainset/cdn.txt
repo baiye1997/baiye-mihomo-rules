@@ -1,7 +1,7 @@
 #########################################
 # Sukka's Ruleset - CDN Domains
-# Last Updated: 2025-12-25T13:38:25.836Z
-# Size: 4165
+# Last Updated: 2025-12-26T01:37:38.155Z
+# Size: 4166
 # License: AGPL 3.0
 # Homepage: https://ruleset.skk.moe
 # GitHub: https://github.com/SukkaW/Surge
@@ -964,6 +964,7 @@ c.speedtestcustom.com
 images.softwaresuggest.com
 searchserverapi.com
 +.runkit-packages.com
++.replicateassets.com
 +.project1content.com
 static.planetminecraft.com
 +.pipedriveassets.com
@@ -2395,7 +2396,7 @@ img2.tnaflix.com
 cdnl.tnaflix.com
 artworks.thetvdb.com
 cdn.termius.com
-nel.teo-rum.com
++.teo-rum.com
 upload.teftera.com
 wpmedia.tealium.com
 cdn.svgator.com
