@@ -1,7 +1,7 @@
 #########################################
 # Sukka's Ruleset - CDN Domains
-# Last Updated: 2025-12-27T11:54:20.860Z
-# Size: 4169
+# Last Updated: 2025-12-30T12:53:01.717Z
+# Size: 4170
 # License: AGPL 3.0
 # Homepage: https://ruleset.skk.moe
 # GitHub: https://github.com/SukkaW/Surge
@@ -2197,6 +2197,7 @@ modulous.huffpost.com
 fastporndelivery.hqporner.com
 cdn.hinative.com
 +.hgagecdn.com
+cdn.hero-sms.com
 newassets.hcaptcha.com
 imgs3.hcaptcha.com
 cdn.hashnode.com
