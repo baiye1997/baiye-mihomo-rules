@@ -1,7 +1,7 @@
 #########################################
 # Sukka's Ruleset - Large Files Hosting Domains
-# Last Updated: 2025-12-30T12:53:01.717Z
-# Size: 1892
+# Last Updated: 2026-01-02T07:16:59.726Z
+# Size: 1888
 # License: AGPL 3.0
 # Homepage: https://ruleset.skk.moe
 # GitHub: https://github.com/SukkaW/Surge
@@ -460,7 +460,6 @@ speedtest-net-servers.cdn.skk.moe
 chnroutes2.cdn.skk.moe
 filters.cdn.skk.moe
 mirror.gsl.icu
-ftp.cc.uoc.grs
 linux-mirrors.fnal.gov
 maven.is-quite.gay
 ctan.math.washington.edu
@@ -1072,7 +1071,6 @@ dist.blizzard.com
 desktop.wifiman.com
 mirror.virtury.com
 autoupdate.termius.com
-mirrors.eze.sysarmy.com
 enterprise.proxmox.com
 ubuntu.parsvds.com
 mirrors.nxthost.com
@@ -1850,8 +1848,7 @@ mirror.unix-solutions.be
 ctan.space-pro.be
 ftp.belnet.be
 lib.ugent.be
-apache.cu.be
-kde.cu.be
++.mirrors.cu.be
 mirror.visiontech.com.bd
 mirror.amberit.com.bd
 ubuntu-mirror.bhtelecom.ba
@@ -1886,7 +1883,6 @@ debian.mur.at
 ubuntu.uni-klu.ac.at
 ftp.tu-graz.ac.at
 mirrors.sarak.as
-mirrors.dc.clear.net.ar
 debian.unnoba.edu.ar
 ubuntu.unc.edu.ar
 cpan.mmgdesigns.com.ar
