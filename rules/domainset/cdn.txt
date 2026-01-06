@@ -1,7 +1,7 @@
 #########################################
 # Sukka's Ruleset - CDN Domains
-# Last Updated: 2026-01-03T13:58:35.537Z
-# Size: 4190
+# Last Updated: 2026-01-06T06:38:25.722Z
+# Size: 4192
 # License: AGPL 3.0
 # Homepage: https://ruleset.skk.moe
 # GitHub: https://github.com/SukkaW/Surge
@@ -9,7 +9,6 @@
 # This file contains object storage and static assets CDN domains.
 #########################################
 7h1s_rul35et_i5_mad3_by_5ukk4w-ruleset.skk.moe
-website-media
 +.static.microsoft
 cdn.arcade.software
 media.infosec.exchange
@@ -3322,6 +3321,7 @@ assets.goat.com
 image.goat.com
 +.fsdn.com
 images.dmca.com
+website-media.deel.com
 sf-coze-web-cdn.coze.com
 zephr-templates.cnbc.com
 production-cmp.isgprivacy.cbsi.com
@@ -3410,6 +3410,7 @@ assets.ecomm.ui.com
 cdn.ecomm.ui.com
 net-fe-static-assets.network-controller.svc.ui.com
 uos-support-files.svc.ui.com
+content-cdn.svc.ui.com
 account-cdn.svc.ui.com
 images.svc.ui.com
 fonts.svc.ui.com
@@ -3836,6 +3837,7 @@ media.hachyderm.io
 static.getbutton.io
 +.crossbell.io
 +.corsproxy.io
+static.corespeed.io
 r2cdn.corespeed.io
 assets.mcp.corespeed.io
 sandpack-cdn-staging.blazingly.io
