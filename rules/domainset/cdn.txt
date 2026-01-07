@@ -1,7 +1,7 @@
 #########################################
 # Sukka's Ruleset - CDN Domains
-# Last Updated: 2026-01-06T06:38:25.722Z
-# Size: 4192
+# Last Updated: 2026-01-07T17:17:54.197Z
+# Size: 4197
 # License: AGPL 3.0
 # Homepage: https://ruleset.skk.moe
 # GitHub: https://github.com/SukkaW/Surge
@@ -273,6 +273,7 @@ cdn-media-2.freecodecamp.org
 cdn-media-1.freecodecamp.org
 cdn-media-0.freecodecamp.org
 cdn.freecodecamp.org
+media.fidoalliance.org
 embed.culturalspot.org
 +.cdn-telegram.org
 files.writefreely.org
@@ -854,6 +855,7 @@ logos.composio.dev
 +.ipfs.orbitor.dev
 +.apac.orbitor.dev
 +.eu.orbitor.dev
+biomejs.dev
 +.angular.dev
 +.vercel.dev
 stats.setapp.macpaw.dev
@@ -1846,6 +1848,7 @@ content.powerapps.com
 cdnstatic.porno-cum.com
 static.polldaddy.com
 assets.polarbyte.com
+image.pitchbook.com
 widgets.pinterest.com
 +.assets.pinterest.com
 storage-b.picacomic.com
@@ -2098,6 +2101,7 @@ public.saasexch.com
 +.rrcdnbf3.com
 apps-static.route4me.com
 +.roseimgs.com
+media-cdn.rollcall.com
 cdnassets.roboflow.com
 static.roboflow.com
 source.roboflow.com
@@ -3628,6 +3632,7 @@ static.mysph.sph.com.sg
 cdp.sph.com.sg
 +.ipfs.best-practice.se
 widget.datablocks.se
+media-cdn.factba.se
 +.webp.se
 curl.se
 avatars.dzeninfra.ru
