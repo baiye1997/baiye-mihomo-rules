@@ -1,7 +1,7 @@
 #########################################
 # Sukka's Ruleset - CDN Domains
-# Last Updated: 2026-01-09T09:56:50.452Z
-# Size: 4212
+# Last Updated: 2026-01-10T06:43:44.240Z
+# Size: 4214
 # License: AGPL 3.0
 # Homepage: https://ruleset.skk.moe
 # GitHub: https://github.com/SukkaW/Surge
@@ -77,6 +77,7 @@ files.smashing.media
 images.github.media
 jssdk.opin.media
 +.icon.horse
+global-assets.fitch.group
 node.green
 assets.buttondown.email
 +.ipfs-gateway.cloud
@@ -1744,6 +1745,7 @@ static.buydomains.com
 media.bundlehunt.com
 cdn.britannica.com
 player.interactivity.brightcove.com
+assets.map.brightcove.com
 app.brightback.com
 static.prd.borderfree.com
 +.boomio-cdn.com
