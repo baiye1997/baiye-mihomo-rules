@@ -1,7 +1,7 @@
 #########################################
 # Sukka's Ruleset - Large Files Hosting Domains
-# Last Updated: 2026-01-09T09:56:50.452Z
-# Size: 1889
+# Last Updated: 2026-01-14T15:33:40.025Z
+# Size: 1890
 # License: AGPL 3.0
 # Homepage: https://ruleset.skk.moe
 # GitHub: https://github.com/SukkaW/Surge
@@ -530,6 +530,7 @@ packages-cf.termux.dev
 packages.termux.dev
 ubuntu.gjolly.dev
 releases.warp.dev
++.pkg.dev
 +.r2.dev
 onepluscommunityserver.com
 mirrors.standaloneinstaller.com

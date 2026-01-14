@@ -1,7 +1,7 @@
 #########################################
 # Sukka's Ruleset - CDN Domains
-# Last Updated: 2026-01-11T15:53:05.404Z
-# Size: 4226
+# Last Updated: 2026-01-14T15:33:40.025Z
+# Size: 4227
 # License: AGPL 3.0
 # Homepage: https://ruleset.skk.moe
 # GitHub: https://github.com/SukkaW/Surge
@@ -884,6 +884,7 @@ zod.dev
 cdn.tuk.dev
 static.reo.dev
 pkg.csb.dev
+r2cdn.c7d.dev
 static.bit.dev
 cdn.bfe.dev
 cdn.builderprofile.aws.dev
