@@ -74,7 +74,7 @@ jobs:
 
         run: |
           set -euo pipefail
-          node .github/scripts/build-and-publish.v3.js
+          node .github/scripts/build-and-publish.js
 
       - name: Show status file
         if: always()
