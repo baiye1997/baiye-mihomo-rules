@@ -6,23 +6,29 @@ prov: &prov {type: http, interval: 86400, health-check: {enable: true, url: *url
 
 # ======================= 建议仅修改此部分内容======================
 # ========================= 订阅 Providers =======================
-# "替换订阅链接1"里填入你的机场订阅链接
-# [显示名称可修改]即客户端中可显示的节点前缀，可根据喜好自行更改，如：[🐂🍺] -香港节点1 #需保留括号
-
+# [替换订阅链接]里填入你的机场订阅链接
+# [显示名称]可修改即客户端中可显示的节点前缀，可根据喜好自行更改，如：[🐂🍺] -香港节点1 #需保留括号[]
 proxy-providers:
-# 机场订阅1
-  Node-1:
+  Sub-1:
     <<: *prov
     url: "替换订阅链接1"
-    path: './proxy_provider/providers-1.yaml'
-    override: {additional-prefix: "[显示名称A可修改] "}
+    path: "./proxy_provider/providers-1.yaml"
+    override:
+      additional-prefix: "[显示名称1]"
     filter: *blk
-# 机场订阅2
-  Node-2:
+  Sub-2:
     <<: *prov
     url: "替换订阅链接2"
-    path: './proxy_provider/providers-2.yaml'
-    override: {additional-prefix: "[显示名称B可修改] "}
+    path: "./proxy_provider/providers-2.yaml"
+    override:
+      additional-prefix: "[显示名称2]"
+    filter: *blk
+  Sub-3:
+    <<: *prov
+    url: "替换订阅链接3"
+    path: "./proxy_provider/providers-3.yaml"
+    override:
+      additional-prefix: "[显示名称3]"
     filter: *blk
 
 # ======================  ⬆️⬆️⬆️⬆️⬆️  ========================
