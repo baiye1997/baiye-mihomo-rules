@@ -1,12 +1,10 @@
 name: Publish Gists
 
 on:
-  # Purge CDN 成功后自动执行
   workflow_run:
     workflows: ["Purge CDN"]
     types: [completed]
 
-  # 也支持手动触发
   workflow_dispatch: {}
 
 concurrency:
@@ -18,7 +16,6 @@ permissions:
 
 jobs:
   publish:
-    # 仅当 Purge CDN 结论为 success，或人为手动触发时执行
     if: ${{ github.event_name == 'workflow_dispatch' || (github.event.workflow_run.conclusion == 'success') }}
     runs-on: ubuntu-latest
 
@@ -34,22 +31,35 @@ jobs:
         with:
           node-version: 20
 
-      - name: Build & Publish to Gists (standard + lite)
+      - name: Build & Publish to Gists
         env:
+          # === Tokens / Gists
           GIST_TOKEN:        ${{ secrets.GIST_TOKEN }}
           GIST_ID_STANDARD:  ${{ secrets.GIST_ID_STANDARD }}
           GIST_ID_LITE:      ${{ secrets.GIST_ID_LITE }}
 
-          SUB_URL_1:         ${{ secrets.SUB_URL_1 }}
-          SUB_URL_2:         ${{ secrets.SUB_URL_2 }}
+          # === 多订阅（重点）===
+          # 每行一个订阅
+          SUB_URLS: |
+            ${{ secrets.SUB_URL_1 }}
+            ${{ secrets.SUB_URL_2 }}
+            ${{ secrets.SUB_URL_3 }}
 
-          COMMIT_SHORT:      ${{ github.sha }}
+          # 可选：显示名（不写就自动生成）
+          SUB_NAMES: |
+            [YouTu]
+            [BoostNet]
+            [HaiTa]
 
+          COMMIT_SHORT: ${{ github.sha }}
+
+          # === 源文件 ===
           CONFIG_MULTIPLE_STD:   config/baiye-multiple.yaml
           CONFIG_SINGLE_STD:     config/baiye-single.yaml
           CONFIG_MULTIPLE_LITE:  config/baiye-multiple-lite.yaml
           CONFIG_SINGLE_LITE:    config/baiye-single-lite.yaml
 
+          # === 目标文件名 ===
           GIST_FILE_MULTIPLE_STD:  baiye-multiple.yaml
           GIST_FILE_SINGLE_STD:    baiye-single.yaml
           GIST_FILE_MINI_STD:      baiye-mini.yaml
@@ -58,15 +68,13 @@ jobs:
           GIST_FILE_SINGLE_LITE:   baiye-single-lite.yaml
           GIST_FILE_MINI_LITE:     baiye-mini-lite.yaml
 
-          DISPLAY_NAME_A:     "[Haita]"
-          DISPLAY_NAME_B:     "[BoostNet]"
-
-          DRY_RUN:    "false"          # 设为 "true" 可试跑但不提交
-          QUIET:      "true"           # 精简日志
+          DRY_RUN: "false"
+          QUIET:   "true"
           STATUS_FILE: status-publish.txt
+
         run: |
           set -euo pipefail
-          node .github/scripts/build-and-publish.js
+          node .github/scripts/build-and-publish.v3.js
 
       - name: Show status file
         if: always()
