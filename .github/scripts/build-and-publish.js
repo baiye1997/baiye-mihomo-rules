@@ -69,15 +69,12 @@ function maskUrl(raw = "") {
   return raw.replace(/([?&]token=)[^&]+/gi, "$1***");
 }
 
-/* ===================== 修复：JSON转义 ===================== */
+/* ===================== 修复：正确的JSON转义 ===================== */
 function escapeForJson(content) {
   if (typeof content !== 'string') return content;
-  return content
-    .replace(/\\/g, '\\\\')  // 反斜杠转义
-    .replace(/"/g, '\\"')    // 双引号转义
-    .replace(/\n/g, '\\n')   // 换行转义
-    .replace(/\r/g, '\\r')   // 回车转义
-    .replace(/\t/g, '\\t');  // 制表符转义
+  // 首先进行标准的JSON转义
+  return JSON.stringify(content).slice(1, -1);
+  // 上面的代码会：把 " 转义为 \"，\ 转义为 \\，保持换行符为实际的换行
 }
 
 /* ===================== Subscriptions ===================== */
@@ -90,10 +87,18 @@ function applySubscriptions(template) {
 
   subUrls.forEach((url, i) => {
     const name = subNames[i] || `[Sub${i + 1}]`;
-    out = out
-      .replace(new RegExp(`替换订阅链接${i + 1}`, "g"), url)
-      .replace(new RegExp(`\\[显示名称${i + 1}\\]`, "g"), name)
-      .replace(new RegExp(`\\[\\*\\*\\*\\]`, "g"), url); // 也处理 [***] 格式
+    // 替换多个可能的占位符格式
+    const placeholders = [
+      `替换订阅链接${i + 1}`,
+      `[***]`,
+      `***`
+    ];
+    
+    placeholders.forEach(placeholder => {
+      out = out.replace(new RegExp(placeholder.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), "g"), url);
+    });
+    
+    out = out.replace(new RegExp(`\\[显示名称${i + 1}\\]`, "g"), name);
   });
 
   return out;
@@ -106,7 +111,7 @@ function deriveMini(s) {
 /* ===================== HTTP ===================== */
 function httpJSON(method, url, body) {
   return new Promise((resolve, reject) => {
-    const options = {
+    const req = https.request(url, {
       method,
       headers: {
         Authorization: `token ${GIST_TOKEN}`,
@@ -115,21 +120,19 @@ function httpJSON(method, url, body) {
         "Content-Type": "application/json",
       },
       timeout: 20000,
-    };
-    
-    const req = https.request(url, options, res => {
+    }, res => {
       let data = "";
       res.on("data", d => data += d);
       res.on("end", () => {
         if (res.statusCode >= 200 && res.statusCode < 300) {
           try { resolve(JSON.parse(data || "{}")); } catch { resolve({}); }
         } else {
-          reject(new Error(`HTTP ${res.statusCode}: ${data.slice(0, 500)}`));
+          reject(new Error(`HTTP ${res.statusCode}: ${data.slice(0, 200)}`));
         }
       });
     });
     req.on("error", reject);
-    req.write(JSON.stringify(body));
+    if (body) req.write(JSON.stringify(body));
     req.end();
   });
 }
@@ -139,122 +142,124 @@ function httpJSON(method, url, body) {
   try {
     if (!GIST_TOKEN) throw new Error("Missing GIST_TOKEN");
 
+    log("开始处理配置文件...");
+    
     const outputs = { standard: {}, lite: {} };
 
-    // 处理标准版配置文件
+    // 读取和处理配置文件
     const multiStd = readIfExists(CONFIG_MULTIPLE_STD);
     if (multiStd) {
+      log(`读取多订阅标准版配置文件: ${CONFIG_MULTIPLE_STD}`);
       const s = applySubscriptions(multiStd);
-      // 修复：使用对象格式，并转义内容
       outputs.standard[GIST_FILE_MULTIPLE_STD] = {
-        content: escapeForJson(s)
+        content: s  // 注意：这里使用原始字符串，不需要转义！
       };
       outputs.standard[GIST_FILE_MINI_STD] = {
-        content: escapeForJson(deriveMini(s))
+        content: deriveMini(s)
       };
+    } else {
+      log(`未找到多订阅标准版配置文件: ${CONFIG_MULTIPLE_STD}`);
     }
 
     const singleStd = readIfExists(CONFIG_SINGLE_STD);
     if (singleStd) {
+      log(`读取单订阅标准版配置文件: ${CONFIG_SINGLE_STD}`);
       outputs.standard[GIST_FILE_SINGLE_STD] = {
-        content: escapeForJson(applySubscriptions(singleStd))
+        content: applySubscriptions(singleStd)
       };
+    } else {
+      log(`未找到单订阅标准版配置文件: ${CONFIG_SINGLE_STD}`);
     }
 
-    // 处理精简版配置文件
     const multiLite = readIfExists(CONFIG_MULTIPLE_LITE);
     if (multiLite) {
+      log(`读取多订阅精简版配置文件: ${CONFIG_MULTIPLE_LITE}`);
       const s = applySubscriptions(multiLite);
       outputs.lite[GIST_FILE_MULTIPLE_LITE] = {
-        content: escapeForJson(s)
+        content: s
       };
       outputs.lite[GIST_FILE_MINI_LITE] = {
-        content: escapeForJson(deriveMini(s))
+        content: deriveMini(s)
       };
+    } else {
+      log(`未找到多订阅精简版配置文件: ${CONFIG_MULTIPLE_LITE}`);
     }
 
     const singleLite = readIfExists(CONFIG_SINGLE_LITE);
     if (singleLite) {
+      log(`读取单订阅精简版配置文件: ${CONFIG_SINGLE_LITE}`);
       outputs.lite[GIST_FILE_SINGLE_LITE] = {
-        content: escapeForJson(applySubscriptions(singleLite))
+        content: applySubscriptions(singleLite)
       };
+    } else {
+      log(`未找到单订阅精简版配置文件: ${CONFIG_SINGLE_LITE}`);
     }
 
-    // 调试输出
-    log(`准备更新文件数 - 标准版: ${Object.keys(outputs.standard).length}, 精简版: ${Object.keys(outputs.lite).length}`);
-    
+    log(`处理完成，标准版文件数: ${Object.keys(outputs.standard).length}, 精简版文件数: ${Object.keys(outputs.lite).length}`);
+
     if (DRY_RUN === "true") {
       writeStatus("DRYRUN");
-      log("Dry run, skip publish");
-      // 输出预览
-      Object.keys(outputs.standard).forEach(filename => {
-        log(`标准版 ${filename}: ${outputs.standard[filename].content.length} 字符`);
-      });
-      Object.keys(outputs.lite).forEach(filename => {
-        log(`精简版 ${filename}: ${outputs.lite[filename].content.length} 字符`);
+      log("=== DRY RUN 模式 ===");
+      // 输出示例内容
+      Object.entries(outputs.standard).forEach(([filename, fileObj]) => {
+        log(`标准版 ${filename} 内容前100字符:`);
+        console.log(fileObj.content.substring(0, 100));
+        log("---");
       });
       return;
     }
 
     // === PATCH Standard Gist ===
     if (GIST_ID_STANDARD && Object.keys(outputs.standard).length) {
-      log(`正在更新标准版 Gist: ${GIST_ID_STANDARD}`);
+      log(`更新标准版 Gist: ${GIST_ID_STANDARD}`);
       try {
-        const resp = await httpJSON("PATCH", 
-          `https://api.github.com/gists/${GIST_ID_STANDARD}`, 
-          {
-            files: outputs.standard,
-            description: `update via CI | ${COMMIT_SHORT}`,
-          }
-        );
-        log("标准版 Gist 更新成功");
+        const resp = await httpJSON("PATCH", `https://api.github.com/gists/${GIST_ID_STANDARD}`, {
+          files: outputs.standard,
+          description: `update via CI | ${COMMIT_SHORT}`,
+        });
+        log("✅ 标准版 Gist 更新成功");
         Object.keys(outputs.standard).forEach(f => {
-          log(`  ${f}: ${maskUrl(resp.files?.[f]?.raw_url || 'unknown')}`);
+          log(`  ${f}: ${maskUrl(resp.files[f]?.raw_url)}`);
         });
       } catch (e) {
-        console.error("标准版 Gist 更新失败:", e.message);
+        console.error("❌ 标准版 Gist 更新失败:", e.message);
         throw e;
       }
-    } else {
-      log("跳过标准版 Gist 更新: 无配置或缺少 GIST_ID_STANDARD");
     }
 
     // === PATCH Lite Gist ===
     if (GIST_ID_LITE && Object.keys(outputs.lite).length) {
-      log(`正在更新精简版 Gist: ${GIST_ID_LITE}`);
+      log(`更新精简版 Gist: ${GIST_ID_LITE}`);
       try {
-        const resp = await httpJSON("PATCH", 
-          `https://api.github.com/gists/${GIST_ID_LITE}`, 
-          {
-            files: outputs.lite,
-            description: `update via CI | ${COMMIT_SHORT}`,
-          }
-        );
-        log("精简版 Gist 更新成功");
+        const resp = await httpJSON("PATCH", `https://api.github.com/gists/${GIST_ID_LITE}`, {
+          files: outputs.lite,
+          description: `update via CI | ${COMMIT_SHORT}`,
+        });
+        log("✅ 精简版 Gist 更新成功");
         Object.keys(outputs.lite).forEach(f => {
-          log(`  ${f}: ${maskUrl(resp.files?.[f]?.raw_url || 'unknown')}`);
+          log(`  ${f}: ${maskUrl(resp.files[f]?.raw_url)}`);
         });
       } catch (e) {
-        console.error("精简版 Gist 更新失败:", e.message);
+        console.error("❌ 精简版 Gist 更新失败:", e.message);
         throw e;
       }
-    } else {
-      log("跳过精简版 Gist 更新: 无配置或缺少 GIST_ID_LITE");
     }
 
     writeStatus("OK");
-    log("✅ 所有 Gist 更新完成");
+    log("🎉 所有 Gist 更新完成");
   } catch (e) {
     writeStatus("ERROR");
     console.error("❌ Gist 更新失败:", e.message);
-    // 输出更多调试信息
-    if (e.message.includes("422")) {
-      console.error("\n常见 422 错误原因:");
-      console.error("1. GIST_TOKEN 权限不足");
-      console.error("2. Gist ID 不正确");
-      console.error("3. JSON 格式不正确（已修复）");
-      console.error("4. 文件内容包含无效字符");
+    
+    // 如果可能是YAML格式问题，给出提示
+    if (e.message.includes("422") && e.message.includes("Invalid request")) {
+      console.error("\n💡 可能的解决方案:");
+      console.error("1. 检查配置文件是否为有效的YAML格式");
+      console.error("2. 确保配置文件中没有未闭合的引号或括号");
+      console.error("3. 尝试手动更新Gist确认权限");
+      console.error("4. 使用 DRY_RUN=true 检查处理后的内容");
     }
+    
     process.exit(1);
   }
 })();
