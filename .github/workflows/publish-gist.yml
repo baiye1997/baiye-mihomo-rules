@@ -26,7 +26,8 @@ jobs:
     # 逻辑：如果是 PR，或者 workflow_dispatch，或者 workflow_run 成功时运行
     if: ${{ github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch' || (github.event.workflow_run.conclusion == 'success') }}
     runs-on: ubuntu-latest
-
+    timeout-minutes: 5
+    
     steps:
       - name: Checkout main
         uses: actions/checkout@v4
