@@ -135,7 +135,7 @@ tun:
 
 # ========================== Geodata ==========================
 geodata-mode: true
-geodata-loader: standard
+geodata-loader: memconservative
 geo-auto-update: true
 geo-update-interval: 24
 geox-url:
