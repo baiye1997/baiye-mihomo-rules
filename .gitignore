@@ -5,3 +5,16 @@ baiye-mini.generated.yaml
 baiye-multiple-lite.generated.yaml
 baiye-single-lite.generated.yaml
 baiye-mini-lite.generated.yaml
+# Node.js 依赖 (如果你以后引入 package.json)
+node_modules/
+
+# 脚本生成的临时状态文件
+status-publish.txt
+purged.txt
+
+# 规则下载时的临时文件 (虽然脚本放在 /tmp 但以防万一)
+*.tmp
+
+# 系统缩略图
+.DS_Store
+Thumbs.db
