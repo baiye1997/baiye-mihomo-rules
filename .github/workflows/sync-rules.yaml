@@ -16,10 +16,10 @@ jobs:
   sync:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout (no GITHUB_TOKEN creds)
+      - name: Checkout
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 1 # 优化：只拉取最新代码
           persist-credentials: false
 
       - name: Update rule files
@@ -30,7 +30,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          if git status --porcelain | tee /dev/stderr | grep .; then
+          if git status --porcelain | grep .; then
             echo "changed=true" >>"$GITHUB_OUTPUT"
           else
             echo "changed=false" >>"$GITHUB_OUTPUT"
@@ -45,9 +45,13 @@ jobs:
           set -euo pipefail
           git config user.name  "baiye-bot"
           git config user.email "baiye-bot@users.noreply.github.com"
+          
           git add -A
           git commit -m "chore(sync): update external rules from upstream"
-          git push "https://x-access-token:${GH_PAT}@github.com/${{ github.repository }}.git" HEAD:${{ github.ref_name }}
+          
+          # 优化：更安全的 Push 方式
+          git config --global url."https://x-access-token:${GH_PAT}@github.com/".insteadOf "https://github.com/"
+          git push origin HEAD:${{ github.ref_name }}
 
       - name: Summary
         if: always()
@@ -57,7 +61,8 @@ jobs:
           if [ "${{ steps.diff.outputs.changed }}" = "true" ]; then
             echo "" >> "$GITHUB_STEP_SUMMARY"
             echo "**Changed files:**" >> "$GITHUB_STEP_SUMMARY"
-            git diff --name-only HEAD~1 HEAD | sed 's/^/- /' >> "$GITHUB_STEP_SUMMARY" || true
+            # 因为 fetch-depth=1，且刚 commit 了一次，所以 HEAD~1 是有效的
+            git diff --name-only HEAD~1 HEAD | sed 's/^/- /' >> "$GITHUB_STEP_SUMMARY" || echo "Check commits for details"
           else
             echo "" >> "$GITHUB_STEP_SUMMARY"
             echo "No changes." >> "$GITHUB_STEP_SUMMARY"
