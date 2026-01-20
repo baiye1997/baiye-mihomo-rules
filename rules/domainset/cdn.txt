@@ -1,7 +1,7 @@
 #########################################
 # Sukka's Ruleset - CDN Domains
-# Last Updated: 2026-01-19T12:19:04.126Z
-# Size: 4228
+# Last Updated: 2026-01-20T09:57:26.119Z
+# Size: 4232
 # License: AGPL 3.0
 # Homepage: https://ruleset.skk.moe
 # GitHub: https://github.com/SukkaW/Surge
@@ -311,6 +311,7 @@ cdn.gamemonkey.org
 cdn.autoketing.org
 +.ampproject.org
 creativajs.altervista.org
+intake-logging.wikimedia.org
 upload.wikimedia.org
 cdn.travis-ci.org
 light.spicegems.org
@@ -944,6 +945,7 @@ tour-content-cdn.kellymadisonmedia.com
 conversiongorilla.com
 +.claudeusercontent.com
 +.chargebeestaticv2.com
+nel.bgptools-agent-cf.com
 b5x-sentry.1passwordservices.com
 telemetry.1passwordservices.com
 cdn.virtuoussoftware.com
@@ -956,6 +958,7 @@ static2.sharepointonline.com
 cdn.seonintelligence.com
 assets4.mist-train-girls.com
 hubspotonwebflow.com
++.hsbrowserreports.com
 +.googleadservices.com
 +.dolphin-anty-cdn.com
 +.cloudflarestream.com
@@ -2852,6 +2855,7 @@ sp.replit.com
 static.redhat.com
 cloud.redhat.com
 cdn.redhat.com
+w3-reporting.reddit.com
 embed.reddit.com
 +.rdtcdn.com
 +.rbxcdn.com
