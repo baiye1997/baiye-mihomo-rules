@@ -1,56 +1,36 @@
 # =====================================
-# sniff-skip.txt
-# 作用：跳过流量嗅探，避免推送/长连误判
-# 场景：办公 / 推送 / 会议 / IM / 游戏
+# sniff-skip.list (Optimized)
+# 作用：跳过流量嗅探，避免长连误判
 # =====================================
 
-# ------ Apple 推送 / 通知 ------
+# ------ Apple & Microsoft 推送 ------
 *.push.apple.com
 courier.push.apple.com
 api.push.apple.com
-*.icloud.com
-*.icloud-content.com
-
-# ------ Microsoft 推送 (WNS) ------
 *.push.microsoft.com
 wns.windows.com
-*.wns.windows.com
 *.notify.windows.com
 
-# ------ Google FCM / Android 推送 ------
+# ------ Google & 厂商推送 ------
 *.push.google.com
 mtalk.google.com
 fcm.googleapis.com
-
-# ------ Android 厂商推送 ------
-push.hicloud.com        # 华为
-push.oppomobile.com     # OPPO/一加/realme
-
-# ------ 小米 / IoT 推送 ------
+push.hicloud.com
+push.oppomobile.com
 push.xiaomi.com
-api.io.mi.com
-miot-spec.org
-*.mi.com
-*.xiaomi.com
 
 # ------ 协作 / 会议（RTC 长连） ------
 *.zoom.us
 *.teams.microsoft.com
 *.skype.com
-*.webex.com
-*.cisco.com
 *.slack.com
-*.notion.so
-*.figma.com
+*.webex.com
 
-# ------ 即时通讯（长连） ------
-*.telegram.org
-*.whatsapp.com
-*.whatsapp.net
-*.signal.org
-*.line.me
-*.discord.com
-*.wechat.com
+# ------ 邮件服务 (IMAP/SMTP) ------
+imap.*
+smtp.*
+pop.*
 
-# ------ 游戏下载 / 内容分发 ------
+# ------ 游戏下载 / QUIC 流量 ------
 *.steamcontent.com
+*.googlevideo.com # 优化 YouTube QUIC 体验
