@@ -1,7 +1,6 @@
 # =====================================
-# fake-ip-filter.txt
-# 作用：绕过 fake-ip，用真实 DNS
-# 场景：CN 境内 + 国外办公 + 游戏 + IoT
+# fake-ip-filter.list (Optimized)
+# 作用：绕过 fake-ip，使用真实解析
 # =====================================
 
 # ------ 内网 / 本地域名 ------
@@ -10,12 +9,16 @@
 *.localdomain
 *.home.arpa
 *.localhost
+localhost.ptlogin2.qq.com # 解决腾讯系登录问题
 
 # ------ 时间同步 / NTP ------
 pool.ntp.org
 *.ntp.org.cn
 ntp.aliyun.com
 ntp1.aliyun.com
+time*.apple.com
+time*.google.com
+time.windows.com
 
 # ------ STUN / NAT 打洞（会议、语音） ------
 stun.*
@@ -27,103 +30,44 @@ api.io.mi.com
 dig.io.mi.com
 push.xiaomi.com
 miot-spec.org
+*.miui.com
 
-# ------ Microsoft（Outlook / Teams / Office 365） ------
+# ------ Microsoft (Outlook / Teams) ------
 *.outlook.com
 outlook.office365.com
-outlook.office.com
-outlook.live.com
-smtp.office365.com
-imap.outlook.com
-smtp-mail.outlook.com
-login.microsoftonline.com
-autodiscover.outlook.com
 *.office.com
-*.office365.com
-*.live.com
 *.microsoft.com
 *.microsoftonline.com
 *.teams.microsoft.com
+login.microsoftonline.com
 
-# ------ Google（Gmail / Meet / Drive / Workspace） ------
+# ------ Google (Gmail / Drive) ------
 mail.google.com
 meet.google.com
 drive.google.com
 *.google.com
 *.gstatic.com
 
-# ------ Apple（iCloud / Push / Facetime） ------
+# ------ Apple (iCloud / Push) ------
 *.icloud.com
 *.icloud-content.com
 *.apple.com
 *.push.apple.com
 courier.push.apple.com
-api.push.apple.com
 
-# ------ 协作 & 项目管理 ------
+# ------ 协作 & 即时通讯 ------
 *.zoom.us
 *.slack.com
-*.webex.com
-*.cisco.com
-*.gotomeeting.com
 *.notion.so
 *.figma.com
 *.github.com
-*.githubusercontent.com
-*.gitlab.com
-*.atlassian.com
-*.jira.com
-*.bitbucket.org
-
-# ------ 即时通讯 / 社交 ------
 *.telegram.org
 *.whatsapp.com
-*.whatsapp.net
-*.signal.org
-*.line.me
-*.skype.com
-*.discord.com
 *.wechat.com
+*.discord.com
 
-# ------ 远程工作 / 外包平台 ------
-*.upwork.com
-*.upworkglobal.com
-*.freelancer.com
-*.fiverr.com
-*.toptal.com
-
-# ------ CDN / 静态资源 ------
-*.akamaihd.net
-*.akamai.net
-*.cloudfront.net
-*.fastly.net
-*.cdn-telegram.org
+# ------ 游戏平台内容分发 ------
 *.steamcontent.com
-*.cdn-apple.com
-
-# ------ 游戏平台 / 联机服务 ------
-# Steam
-store.steampowered.com
-api.steampowered.com
-*.steamcommunity.com
-*.steamcontent.com
-# Battle.net
-*.battle.net
-*.blizzard.com
-# Epic
-*.epicgames.com
-*.unrealengine.com
-# Riot（LOL/VAL）
-*.riotgames.com
-*.riotcdn.net
-# EA / Origin
-*.ea.com
-*.origin.com
-# Ubisoft
-*.ubisoft.com
-*.uplay.com
-# PlayStation / Xbox
-*.playstation.net
+*.battlenet.com.cn
 *.playstation.com
 *.xboxlive.com
-*.xboxservices.com
