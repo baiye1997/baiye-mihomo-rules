@@ -1,7 +1,7 @@
 #########################################
 # Sukka's Ruleset - CDN Domains
-# Last Updated: 2026-01-22T16:03:26.029Z
-# Size: 4240
+# Last Updated: 2026-01-23T16:44:58.181Z
+# Size: 4243
 # License: AGPL 3.0
 # Homepage: https://ruleset.skk.moe
 # GitHub: https://github.com/SukkaW/Surge
@@ -481,6 +481,7 @@ sourcemaps.squarespace.net
 static-resource.np.community.playstation.net
 akamai-origin.myanimelist.net
 cdn.myanimelist.net
+sdk-static.loyaltylion.net
 sdk.loyaltylion.net
 +.f.hubspotfree.net
 +.hsappstatic.net
@@ -2021,7 +2022,7 @@ assets.bitwarden.com
 upos-sz-mirrorcosbstar1.bilivideo.com
 upos-sz-mirroralibstar1.bilivideo.com
 secure.beer7live.com
-assets.bbystatic.com
++.bbystatic.com
 cdn.babylonjs.com
 +.awsstatic.com
 atl-global.atlassian.com
@@ -2241,6 +2242,7 @@ snippet.growsumo.com
 +.widget.cluster.groovehq.com
 +.gravatar.com
 cdn.gofundme.com
+static.goaffpro.com
 static.gigabyte.com
 cdn.ghostery.com
 cdn.getkoala.com
@@ -2810,8 +2812,7 @@ cdn2.ttloli.com
 cdn.ttloli.com
 cdn.tracxn.com
 +.tpucdn.com
-static.toiimg.com
-assets.toiimg.com
++.toiimg.com
 +.tmsimg.com
 +.tkcdns.com
 +.tiqcdn.com
@@ -3374,6 +3375,7 @@ i.bang.com
 img.atom.com
 g-static.ap4r.com
 +.a1tb.com
+content.9gtb.com
 bundle.9gtb.com
 accounts-cdn.9gag.com
 bundle.5gtb.com
@@ -3876,6 +3878,7 @@ js-cdn.blockchair.io
 +.wixstudio.io
 cdn.transcend.io
 static.tokenview.io
+storage.synctrack.io
 cdn.simplesat.io
 assets.keysquare.io
 media.hachyderm.io
