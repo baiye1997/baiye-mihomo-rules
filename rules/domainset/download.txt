@@ -1,7 +1,7 @@
 #########################################
 # Sukka's Ruleset - Large Files Hosting Domains
-# Last Updated: 2026-01-17T06:55:54.725Z
-# Size: 1880
+# Last Updated: 2026-01-24T13:07:42.212Z
+# Size: 1881
 # License: AGPL 3.0
 # Homepage: https://ruleset.skk.moe
 # GitHub: https://github.com/SukkaW/Surge
@@ -78,6 +78,7 @@ fedorapeople.org
 mirror.ubuntu.serverforge.org
 mirror.mci-1.serverforge.org
 +.getcomposer.org
+cdn.evolution-x.org
 mirror.cyberchains.org
 cpan.cpantesters.org
 dl-cdn.alpinelinux.org
