@@ -1,7 +1,7 @@
 #########################################
 # Sukka's Ruleset - CDN Domains
-# Last Updated: 2026-01-24T13:07:42.212Z
-# Size: 4246
+# Last Updated: 2026-01-25T14:21:36.330Z
+# Size: 4254
 # License: AGPL 3.0
 # Homepage: https://ruleset.skk.moe
 # GitHub: https://github.com/SukkaW/Surge
@@ -213,6 +213,7 @@ cdn.redwap.xyz
 +.chcdn.xyz
 cdn-longterm.mee6.xyz
 vod.jfly.xyz
+sdk-cdn.fun.xyz
 img.hentaihaven.xxx
 +.imhentai.xxx
 i.xozilla.xxx
@@ -1247,6 +1248,7 @@ rest.happierleads.com
 cdn.googlesource.com
 +.githubassets.com
 m3u8.girigirilove.com
++.getaroom-cdn.com
 +.framerstatic.com
 static.filestackapi.com
 staticm.fastcomments.com
@@ -1558,6 +1560,7 @@ img.sparknotes.com
 w.soundcloud.com
 static.solarwinds.com
 rum-agent.na-01.cloud.solarwinds.com
+cdn.snaptravel.com
 webappassets.smartsheet.com
 +.slack-imgs.com
 +.slack-edge.com
@@ -1865,6 +1868,7 @@ img.represent.com
 +.siteintercept.qualtrics.com
 jfe-cdn.qualtrics.com
 js.qualified.com
+plugins.pubtailer.com
 vpncdn.protonweb.com
 pmecdn.protonweb.com
 content.powerapps.com
@@ -2035,6 +2039,7 @@ api.media.atlassian.com
 +.aspnetcdn.com
 +.appmifile.com
 +.anyhentai.com
+www-cdn.anthropic.com
 s-cdn.anthropic.com
 a-cdn.anthropic.com
 +.ipfs.anonymize.com
@@ -3120,7 +3125,9 @@ cdn.cloud.unity.com
 media1.tenor.com
 media.tenor.com
 c.tadst.com
++.tacdn.com
 +.t8cdn.com
+cdn.super.com
 assets.stash.com
 cdn.stash.com
 +.srcdn.com
@@ -3913,6 +3920,7 @@ icon.icepanel.io
 cdn.hackaday.io
 +.ipfs.filebase.io
 +.ipfs.denarius.io
+assets.customer.io
 +.rum.cronitor.io
 +.cloudimg.io
 static.assetlab.io

@@ -1,7 +1,7 @@
 #########################################
 # Sukka's Ruleset - Large Files Hosting Domains
-# Last Updated: 2026-01-24T13:07:42.212Z
-# Size: 1881
+# Last Updated: 2026-01-25T17:10:07.242Z
+# Size: 1883
 # License: AGPL 3.0
 # Homepage: https://ruleset.skk.moe
 # GitHub: https://github.com/SukkaW/Surge
@@ -767,6 +767,7 @@ downloadr2.apkmirror.com
 +.s3-website.us-gov-west-1.amazonaws.com
 +.s3-accesspoint-fips.dualstack.us-gov-west-1.amazonaws.com
 +.s3-accesspoint.dualstack.us-gov-west-1.amazonaws.com
++.s3-website.dualstack.us-gov-west-1.amazonaws.com
 +.s3-fips.dualstack.us-gov-west-1.amazonaws.com
 +.s3.dualstack.us-gov-west-1.amazonaws.com
 +.s3-fips.us-gov-west-1.amazonaws.com
@@ -777,6 +778,7 @@ downloadr2.apkmirror.com
 +.s3-website.us-gov-east-1.amazonaws.com
 +.s3-accesspoint-fips.dualstack.us-gov-east-1.amazonaws.com
 +.s3-accesspoint.dualstack.us-gov-east-1.amazonaws.com
++.s3-website.dualstack.us-gov-east-1.amazonaws.com
 +.s3-fips.dualstack.us-gov-east-1.amazonaws.com
 +.s3.dualstack.us-gov-east-1.amazonaws.com
 +.s3-fips.us-gov-east-1.amazonaws.com
