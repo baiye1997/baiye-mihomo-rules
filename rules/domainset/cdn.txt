@@ -1,7 +1,7 @@
 #########################################
 # Sukka's Ruleset - CDN Domains
-# Last Updated: 2026-01-26T17:01:40.038Z
-# Size: 4256
+# Last Updated: 2026-01-27T16:09:02.012Z
+# Size: 4262
 # License: AGPL 3.0
 # Homepage: https://ruleset.skk.moe
 # GitHub: https://github.com/SukkaW/Surge
@@ -2328,6 +2328,9 @@ assets-app.circleci.com
 app.chatwoot.com
 +.chasecdn.com
 js.chargify.com
+img-new.cgtrader.com
+assets.cgtrader.com
+media.cgtrader.com
 +.cdnfonts.com
 cdn-stamplib.casetify.com
 cdn-image02.casetify.com
@@ -2741,9 +2744,12 @@ media.beehiiv.com
 +.bdzybf7.com
 assets.basehub.com
 hiveplayer-static.bamgrid.com
+static-images.aptoide.com
 cdn-mobile.aptoide.com
 ws2-cache.aptoide.com
+cdn-en.aptoide.com
 cdn6.aptoide.com
+cdn.aptoide.com
 images.en.aptoide.com
 img.apponic.com
 cdn.apponic.com
