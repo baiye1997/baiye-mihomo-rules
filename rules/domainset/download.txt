@@ -1,7 +1,7 @@
 #########################################
 # Sukka's Ruleset - Large Files Hosting Domains
-# Last Updated: 2026-01-25T17:10:07.242Z
-# Size: 1883
+# Last Updated: 2026-01-29T13:28:36.778Z
+# Size: 1885
 # License: AGPL 3.0
 # Homepage: https://ruleset.skk.moe
 # GitHub: https://github.com/SukkaW/Surge
@@ -1522,6 +1522,7 @@ registry.terraform.io
 ubuntu.letscloud.io
 +.mirror.letscloud.io
 mirror.datamossa.io
+version.cyberduck.io
 update.cyberduck.io
 release.runcloud.io
 mirror.katapult.io
@@ -1764,6 +1765,7 @@ builds.paranoidandroid.co
 mirrors.pardisco.co
 mirrors.atlas.net.co
 mirror.unimagdalena.edu.co
+cas-bridge.xethub.hf.co
 elmirror.cl
 ubuntu-mirror.puq.apoapsis.cl
 debian-mirror.puq.apoapsis.cl
