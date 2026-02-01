@@ -1,7 +1,7 @@
 #########################################
 # Sukka's Ruleset - Large Files Hosting Domains
-# Last Updated: 2026-01-29T13:28:36.778Z
-# Size: 1885
+# Last Updated: 2026-02-01T07:30:10.235Z
+# Size: 1888
 # License: AGPL 3.0
 # Homepage: https://ruleset.skk.moe
 # GitHub: https://github.com/SukkaW/Surge
@@ -129,6 +129,8 @@ tukaani.org
 s3.teckids.org
 +.iso.reactos.org
 downloads.openwrt.org
+s2.animeko.openani.org
+s1.animeko.openani.org
 download.mozilla.org
 versioncheck-bg.addons.mozilla.org
 versioncheck.addons.mozilla.org
@@ -209,6 +211,7 @@ repo.maven.apache.org
 static.adtidy.org
 mirror.siwoo.org
 registry.npmjs.org
+d2.myani.org
 d.myani.org
 repo1.maven.org
 repository.jboss.org

@@ -1,7 +1,7 @@
 #########################################
 # Sukka's Ruleset - CDN Domains
-# Last Updated: 2026-01-30T20:44:46.186Z
-# Size: 4281
+# Last Updated: 2026-02-01T07:30:10.235Z
+# Size: 4282
 # License: AGPL 3.0
 # Homepage: https://ruleset.skk.moe
 # GitHub: https://github.com/SukkaW/Surge
@@ -307,6 +307,7 @@ assets.mayoclinic.org
 seccdn.libravatar.org
 cdn.libravatar.org
 cdn.gamemonkey.org
+sub.creamycake.org
 +.codeforces.org
 +.bytebucket.org
 cdn.autoketing.org
