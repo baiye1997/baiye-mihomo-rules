@@ -1,7 +1,7 @@
 #########################################
 # Sukka's Ruleset - CDN Domains
-# Last Updated: 2026-02-01T07:30:10.235Z
-# Size: 4282
+# Last Updated: 2026-02-04T09:55:53.789Z
+# Size: 4287
 # License: AGPL 3.0
 # Homepage: https://ruleset.skk.moe
 # GitHub: https://github.com/SukkaW/Surge
@@ -1293,6 +1293,7 @@ static.chrome-stats.com
 +.capcutstatic.com
 cdnjs.buymeacoffee.com
 cdn.buymeacoffee.com
+mms.businesswire.com
 bundlephobia.com
 cdn.botframework.com
 +.bootstrapcdn.com
@@ -1595,6 +1596,7 @@ qmod.quotemedia.com
 app.quotemedia.com
 cdn.promotekit.com
 apps.profitihub.com
+mma.prnewswire.com
 media.printables.com
 +.placewaifu.com
 cdn.pickystory.com
@@ -1896,6 +1898,7 @@ s3.picacomic.com
 cdn.permutive.com
 cdn.privacy.paramount.com
 static.parallels.com
+cdn.pagerduty.com
 assets.openshift.com
 media-cms.onesignal.com
 cdn.onesignal.com
@@ -3404,6 +3407,7 @@ production-cmp.isgprivacy.cbsi.com
 at.cbsi.com
 th.bing.com
 r.bing.com
+schema-cf.bc0a.com
 i.bang.com
 +.ax1x.com
 img.atom.com
@@ -3489,6 +3493,7 @@ net-fe-static-assets.network-controller.svc.ui.com
 uos-support-files.svc.ui.com
 content-cdn.svc.ui.com
 account-cdn.svc.ui.com
+cdn.academy.svc.ui.com
 images.svc.ui.com
 fonts.svc.ui.com
 files.svc.ui.com
