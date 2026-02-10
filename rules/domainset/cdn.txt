@@ -1,7 +1,7 @@
 #########################################
 # Sukka's Ruleset - CDN Domains
-# Last Updated: 2026-02-06T07:55:48.121Z
-# Size: 4341
+# Last Updated: 2026-02-10T18:50:32.291Z
+# Size: 4347
 # License: AGPL 3.0
 # Homepage: https://ruleset.skk.moe
 # GitHub: https://github.com/SukkaW/Surge
@@ -1204,6 +1204,9 @@ images.arigatotravel.com
 +.images.arcpublishing.com
 +.adobeccstatic.com
 jac.yahoosandbox.com
+i3.xiaoyakankan.com
+i2.xiaoyakankan.com
+i1.xiaoyakankan.com
 cms-assets.xboxservices.com
 assets.xboxservices.com
 +.wpcomstaging.com
@@ -2237,6 +2240,7 @@ cdn-public-apis.moonlock.com
 pp-static.monotype.com
 +.sny.monosnap.com
 momentjs.com
+play.modujx11.com
 launcher-files.modrinth.com
 cdn-raw.modrinth.com
 cdn.modrinth.com
@@ -4224,6 +4228,7 @@ static.convertio.co
 +.ipfs.sloppyta.co
 assets.jolipage.co
 cdn.jolipage.co
+cdn.inviter.co
 +.doodcdn.co
 img.decrypt.co
 cdn.decrypt.co
@@ -4324,6 +4329,7 @@ sdk.customfit.ai
 static.returngo.ai
 file.xiaohai.ai
 prod-cdn.webtune.ai
+cms.mistral.ai
 widget.docsbot.ai
 cdn.aimerce.ai
 vetted.ai
