@@ -1,7 +1,7 @@
 #########################################
 # Sukka's Ruleset - Large Files Hosting Domains
-# Last Updated: 2026-02-23T05:58:25.052Z
-# Size: 1889
+# Last Updated: 2026-02-24T11:01:35.898Z
+# Size: 1890
 # License: AGPL 3.0
 # Homepage: https://ruleset.skk.moe
 # GitHub: https://github.com/SukkaW/Surge
@@ -428,6 +428,7 @@ mirror1.totbb.net
 mirrors.sonic.net
 mirror.pregi.net
 mirrors.netix.net
+mx-app-blob-prod.maxon.net
 mirror.limda.net
 mirror.init7.net
 down.filen.net

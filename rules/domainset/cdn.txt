@@ -1,7 +1,7 @@
 #########################################
 # Sukka's Ruleset - CDN Domains
-# Last Updated: 2026-02-23T05:58:25.051Z
-# Size: 4354
+# Last Updated: 2026-02-24T11:01:35.897Z
+# Size: 4355
 # License: AGPL 3.0
 # Homepage: https://ruleset.skk.moe
 # GitHub: https://github.com/SukkaW/Surge
@@ -770,6 +770,7 @@ cdn.reimu.net
 img.pawoo.net
 +.nsimg.net
 static.monei.net
+assets.maxon.net
 static-cdn.jtvnw.net
 jsdelivr.ioiox.net
 static-act.imoim.net
