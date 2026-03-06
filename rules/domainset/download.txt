@@ -1,7 +1,7 @@
 #########################################
 # Sukka's Ruleset - Large Files Hosting Domains
-# Last Updated: 2026-03-04T14:04:20.049Z
-# Size: 1895
+# Last Updated: 2026-03-06T12:17:17.957Z
+# Size: 1894
 # License: AGPL 3.0
 # Homepage: https://ruleset.skk.moe
 # GitHub: https://github.com/SukkaW/Surge
@@ -266,7 +266,6 @@ fdroid.tetaneutral.net
 ctan.tetaneutral.net
 cpan.tetaneutral.net
 apt.tetaneutral.net
-+.steamserver.net
 downloads.sourceforge.net
 +.dl.sourceforge.net
 +.dl.playstation.net

@@ -1,7 +1,7 @@
 #########################################
 # Sukka's Ruleset - CDN Domains
-# Last Updated: 2026-03-04T08:58:25.670Z
-# Size: 4387
+# Last Updated: 2026-03-06T12:17:17.957Z
+# Size: 4392
 # License: AGPL 3.0
 # Homepage: https://ruleset.skk.moe
 # GitHub: https://github.com/SukkaW/Surge
@@ -1849,6 +1849,8 @@ cache.armorgames.com
 agi.armorgames.com
 +.anpustream.com
 +.anpoimages.com
+widget.allkeyshop.com
+cdn.allkeyshop.com
 +.algolianet.com
 static.adguardvpn.com
 +.adguardcdn.com
@@ -2780,6 +2782,8 @@ cdn.embedly.com
 +.ebayimg.com
 comm.res.easebar.com
 static.drtuber.com
+static.driffle.com
+assets.driffle.com
 static.doujins.com
 cdn.docsbot.com
 global.divhunt.com
@@ -3396,7 +3400,6 @@ static-clst.avgle.com
 cdn2.auth0.com
 cdn.auth0.com
 events-delivery.apple.com
-lcdn-locator.apple.com
 news-assets.apple.com
 events-live.apple.com
 time.apple.com
@@ -4048,6 +4051,8 @@ cdn2.stamped.io
 cdn1.stamped.io
 +.shields.io
 images.scalero.io
+widget.reviews.io
+assets.reviews.io
 js.prosopo.io
 images.prismic.io
 +.cdn.prismic.io
