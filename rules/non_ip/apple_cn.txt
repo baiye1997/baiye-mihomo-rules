@@ -1,6 +1,6 @@
 #########################################
 # Sukka's Ruleset - Apple China Special Domains
-# Last Updated: 2025-11-26T05:16:08.056Z
+# Last Updated: 2026-03-10T14:56:40.478Z
 # Size: 10
 # License: AGPL 3.0
 # Homepage: https://ruleset.skk.moe
@@ -19,4 +19,3 @@ DOMAIN,api.smoot.apple.cn
 DOMAIN-SUFFIX,icloud.com.cn
 DOMAIN-SUFFIX,apple.com.cn
 ################## EOF ##################
-

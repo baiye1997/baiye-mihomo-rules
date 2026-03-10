@@ -1,6 +1,6 @@
 #########################################
 # Sukka's Ruleset - Apple Domains
-# Last Updated: 2025-09-05T11:49:28.985Z
+# Last Updated: 2026-03-10T14:56:40.479Z
 # Size: 26
 # License: AGPL 3.0
 # Homepage: https://ruleset.skk.moe
@@ -35,4 +35,3 @@ PROCESS-NAME,findmydevice-user-agent
 PROCESS-NAME,CoreLocationAgent
 PROCESS-NAME,WeatherWidget
 ################## EOF ##################
-
