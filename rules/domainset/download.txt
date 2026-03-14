@@ -1,7 +1,7 @@
 #########################################
 # Sukka's Ruleset - Large Files Hosting Domains
-# Last Updated: 2026-03-13T17:26:37.960Z
-# Size: 1895
+# Last Updated: 2026-03-14T17:17:46.059Z
+# Size: 1896
 # License: AGPL 3.0
 # Homepage: https://ruleset.skk.moe
 # GitHub: https://github.com/SukkaW/Surge
@@ -1528,6 +1528,7 @@ download.ameliorated.io
 docker.cloudsmith.io
 dl.cloudsmith.io
 registry.terraform.io
+downloads.portainer.io
 ubuntu.letscloud.io
 +.mirror.letscloud.io
 mirror.datamossa.io
