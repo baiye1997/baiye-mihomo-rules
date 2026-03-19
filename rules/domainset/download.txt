@@ -1,7 +1,7 @@
 #########################################
 # Sukka's Ruleset - Large Files Hosting Domains
-# Last Updated: 2026-03-18T17:51:53.893Z
-# Size: 1899
+# Last Updated: 2026-03-19T17:46:38.939Z
+# Size: 1901
 # License: AGPL 3.0
 # Homepage: https://ruleset.skk.moe
 # GitHub: https://github.com/SukkaW/Surge
@@ -21,6 +21,7 @@ mirrors.esto.network
 ubuntu.netforce.hosting
 debian.netforce.hosting
 mirror.eliv.digital
+cr.yandex
 mirror.jeonnam.school
 mirrors.gethosted.online
 mirror.kkg.berlin
@@ -669,6 +670,7 @@ cdn.winget.microsoft.com
 +.update.microsoft.com
 +.download.prss.microsoft.com
 msdl.microsoft.com
+mcr.microsoft.com
 +.delivery.mp.microsoft.com
 mirrors.liquidweb.com
 packages.linuxmint.com

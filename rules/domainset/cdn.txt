@@ -1,7 +1,7 @@
 #########################################
 # Sukka's Ruleset - CDN Domains
-# Last Updated: 2026-03-18T17:51:53.893Z
-# Size: 4408
+# Last Updated: 2026-03-19T17:46:38.939Z
+# Size: 4411
 # License: AGPL 3.0
 # Homepage: https://ruleset.skk.moe
 # GitHub: https://github.com/SukkaW/Surge
@@ -947,6 +947,7 @@ runkit-packages-static-executables.com
 cdn-a.sonyentertainmentnetwork.com
 +.agechecker-northern-apps.com
 useruploads.visualwebsiteoptimizer.com
+dev.visualwebsiteoptimizer.com
 runkit-packages-static.com
 cdn.quickemailverification.com
 +.hackerone-user-content.com
@@ -2278,7 +2279,9 @@ static.mypikpak.com
 cdnl.moviefap.com
 img.moviefap.com
 cdn-public-apis.moonlock.com
+antiqua-ux-cdn.monotype.com
 pp-static.monotype.com
+static.monotype.com
 +.sny.monosnap.com
 momentjs.com
 play.modujx11.com
