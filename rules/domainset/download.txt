@@ -1,7 +1,7 @@
 #########################################
 # Sukka's Ruleset - Large Files Hosting Domains
-# Last Updated: 2026-03-19T17:46:38.939Z
-# Size: 1901
+# Last Updated: 2026-03-20T17:28:19.894Z
+# Size: 1902
 # License: AGPL 3.0
 # Homepage: https://ruleset.skk.moe
 # GitHub: https://github.com/SukkaW/Surge
@@ -692,6 +692,7 @@ mirror.citrahost.com
 mirror.biznetgio.com
 product-downloads.atlassian.com
 gnu.askapache.com
+boot.arcboxcdn.com
 downloadr2.apkmirror.com
 +.s3-website-ap-southeast-2.amazonaws.com
 +.s3-website-ap-southeast-1.amazonaws.com
