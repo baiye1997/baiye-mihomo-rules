@@ -1,7 +1,7 @@
 #########################################
 # Sukka's Ruleset - Telegram IP CIDR
-# Last Updated: 2026-03-20T17:28:20.087Z
-# Size: 17
+# Last Updated: 2026-03-24T17:47:31.227Z
+# Size: 16
 # License: AGPL 3.0
 # Homepage: https://ruleset.skk.moe
 # GitHub: https://github.com/SukkaW/Surge
@@ -22,7 +22,6 @@ IP-CIDR,95.161.64.0/20,no-resolve
 IP-CIDR,139.59.210.98/32,no-resolve
 IP-CIDR,149.154.160.0/20,no-resolve
 IP-CIDR,185.76.151.0/24,no-resolve
-IP-CIDR,196.55.216.167/32,no-resolve
 IP-CIDR6,2001:b28:f23d::/48,no-resolve
 IP-CIDR6,2001:b28:f23f::/48,no-resolve
 IP-CIDR6,2001:67c:4e8::/48,no-resolve
