@@ -1,7 +1,7 @@
 #########################################
 # Sukka's Ruleset - CDN Domains
-# Last Updated: 2026-03-25T17:49:01.071Z
-# Size: 4417
+# Last Updated: 2026-03-26T17:51:32.275Z
+# Size: 4418
 # License: AGPL 3.0
 # Homepage: https://ruleset.skk.moe
 # GitHub: https://github.com/SukkaW/Surge
@@ -2081,6 +2081,7 @@ static.assets-stash.eet-china.com
 marber-cdn.economist.com
 cmp-cdn.p.aws.economist.com
 +.dummyjson.com
++.dubassets.com
 +.doppiocdn.com
 cdn.doofinder.com
 assets.dnsfilter.com
