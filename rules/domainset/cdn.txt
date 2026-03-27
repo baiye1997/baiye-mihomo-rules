@@ -1,7 +1,7 @@
 #########################################
 # Sukka's Ruleset - CDN Domains
-# Last Updated: 2026-03-26T17:51:32.275Z
-# Size: 4418
+# Last Updated: 2026-03-27T17:41:04.770Z
+# Size: 4419
 # License: AGPL 3.0
 # Homepage: https://ruleset.skk.moe
 # GitHub: https://github.com/SukkaW/Surge
@@ -3592,6 +3592,7 @@ cdn.ecomm.ui.com
 net-fe-static-assets.network-controller.svc.ui.com
 uos-support-files.svc.ui.com
 content-cdn.svc.ui.com
+cdn.casestudies.svc.ui.com
 account-cdn.svc.ui.com
 cdn.academy.svc.ui.com
 images.svc.ui.com
