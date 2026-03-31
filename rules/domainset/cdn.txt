@@ -1,7 +1,7 @@
 #########################################
 # Sukka's Ruleset - CDN Domains
-# Last Updated: 2026-03-30T17:43:33.291Z
-# Size: 4424
+# Last Updated: 2026-03-31T15:36:18.442Z
+# Size: 4429
 # License: AGPL 3.0
 # Homepage: https://ruleset.skk.moe
 # GitHub: https://github.com/SukkaW/Surge
@@ -2053,6 +2053,7 @@ media.glassdoor.com
 +.gitmirror.com
 +.assets.getpocket.com
 i.geekflare.com
++.garmincdn.com
 mosaic-blender.fxtwitter.com
 mosaic.fxtwitter.com
 webp.frostming.com
@@ -3142,6 +3143,10 @@ tuf-repo.github.com
 raw.github.com
 +.pkg.github.com
 assets.genius.com
+static.garmin.com
+fonts.garmin.com
+res.garmin.com
+share-assets.fe.garmin.com
 +.fw-cdn.com
 +.fsvod1.com
 assets.foxdcg.com
@@ -4433,4 +4438,3 @@ limitless.cmax.ai
 bot.ivy.ai
 rules.ac
 ################## EOF ##################
-
