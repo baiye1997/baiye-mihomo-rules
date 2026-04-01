@@ -1,7 +1,7 @@
 #########################################
 # Sukka's Ruleset - CDN Domains
-# Last Updated: 2026-03-31T15:36:18.442Z
-# Size: 4429
+# Last Updated: 2026-04-01T04:19:41.481Z
+# Size: 4431
 # License: AGPL 3.0
 # Homepage: https://ruleset.skk.moe
 # GitHub: https://github.com/SukkaW/Surge
@@ -1899,6 +1899,7 @@ hawk.tomsguide.com
 +.tnastatic.com
 +.tinifycdn.com
 +.tiktokcdn.com
+assets.tigerdata.com
 thumbsnap.com
 +.thisiscdn.com
 static.test-beta.com
@@ -2411,6 +2412,7 @@ api.dicebear.com
 cdn.datacamp.com
 script.custobar.com
 cdn.credible.com
+cdn.cr-proxy.com
 assets.controld.com
 img.connatix.com
 cds.connatix.com
