@@ -62,12 +62,10 @@ dns:
   fake-ip-range: 198.18.0.1/16
   use-hosts: true
 
-  # 国际（加密防污染）
+  # 国际（加密防污染，DoH + H3 优化）
   nameserver:
-    - "tls://1.1.1.1"
-    - "tls://8.8.8.8"
-    - "tls://[2606:4700:4700::1111]"
-    - "tls://[2001:4860:4860::8888]"
+    - "https://1.1.1.1/dns-query"
+    - "https://8.8.8.8/dns-query"
 
   # 国内（就近稳定）
   default-nameserver:
@@ -77,7 +75,7 @@ dns:
     - "[2400:3200::1]"
     - "[2402:4e00::]"
 
-  # 按地域分流解析
+  # 按地域分流解析（仅需覆盖国内，国际域名默认走 nameserver）
   nameserver-policy:
     'geosite:cn':
       - "223.5.5.5"
@@ -85,11 +83,6 @@ dns:
       - "180.184.1.1"
       - "[2400:3200::1]"
       - "[2402:4e00::]"
-    'geosite:geolocation-!cn':
-      - "tls://1.1.1.1"
-      - "tls://8.8.8.8"
-      - "tls://[2606:4700:4700::1111]"
-      - "tls://[2001:4860:4860::8888]"
 
   # 节点域名解析
   proxy-server-nameserver:
@@ -210,7 +203,7 @@ proxy-groups:
   - {name: "🇬🇧 - 自动回退", <<: *fall, filter: *uk}
   - {name: "🇫🇷 - 自动回退", <<: *fall, filter: *fr}
   - {name: "🇩🇪 - 自动回退", <<: *fall, filter: *de}
-  - {name: "🇹🇼 - 自动回退", <<: *fall, filter: *tw}}
+  - {name: "🇹🇼 - 自动回退", <<: *fall, filter: *tw}
 
 
 # =========================== 规则集 ===========================
@@ -255,6 +248,7 @@ rules:
   - RULE-SET,apple_cdn,🌐 全球直连
   - RULE-SET,apple_cn_non_ip,🌐 全球直连
   - RULE-SET,apple_services,🍎 苹果服务
+  - GEOSITE,onedrive,☁️ Onedrive
   - RULE-SET,microsoft_cdn_non_ip,🌐 全球直连
   - RULE-SET,microsoft_non_ip,Ⓜ️ 微软服务
   - RULE-SET,download_domainset,🚀 节点选择
