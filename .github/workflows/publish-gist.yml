@@ -50,12 +50,10 @@ jobs:
           SUB_URLS: |
             ${{ secrets.SUB_URL_1 }}
             ${{ secrets.SUB_URL_2 }}
-            ${{ secrets.SUB_URL_3 }}
           
           SUB_NAMES: |
             [YouTu]
             [BoostNet]
-            [HaiTa]
 
           COMMIT_SHORT: ${{ github.sha }}
 
