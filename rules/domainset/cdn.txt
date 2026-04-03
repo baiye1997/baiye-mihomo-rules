@@ -1,7 +1,7 @@
 #########################################
 # Sukka's Ruleset - CDN Domains
-# Last Updated: 2026-04-02T12:46:50.308Z
-# Size: 4434
+# Last Updated: 2026-04-03T14:07:49.377Z
+# Size: 4435
 # License: AGPL 3.0
 # Homepage: https://ruleset.skk.moe
 # GitHub: https://github.com/SukkaW/Surge
@@ -3372,6 +3372,7 @@ s3-alpha-sig.figma.com
 marketing.figma.com
 s3-alpha.figma.com
 static.figma.com
+errors.figma.com
 sprig.figma.com
 static.fc2id.com
 static.fc2cn.com
