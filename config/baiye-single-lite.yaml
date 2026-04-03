@@ -91,16 +91,6 @@ dns:
     - "https://doh.pub/dns-query"
     - "system"
 
-  # 国际域名 fallback 兜底，防止污染
-  fallback:
-    - "https://1.1.1.1/dns-query"
-    - "https://8.8.8.8/dns-query"
-  fallback-filter:
-    geoip: true
-    geoip-code: CN
-    ipcidr:
-      - 240.0.0.0/4
-
   fake-ip-filter:
     - rule-set:fake-ip
     - geosite:cn
