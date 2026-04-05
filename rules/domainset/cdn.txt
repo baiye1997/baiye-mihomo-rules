@@ -1,7 +1,7 @@
 #########################################
 # Sukka's Ruleset - CDN Domains
-# Last Updated: 2026-04-03T14:07:49.377Z
-# Size: 4435
+# Last Updated: 2026-04-05T16:34:38.257Z
+# Size: 4437
 # License: AGPL 3.0
 # Homepage: https://ruleset.skk.moe
 # GitHub: https://github.com/SukkaW/Surge
@@ -782,6 +782,7 @@ img.reimu.net
 cdn.reimu.net
 +.pximg.net
 +.pixfs.net
+origin.picgo.net
 img.pawoo.net
 +.nsimg.net
 static.monei.net
@@ -1267,6 +1268,7 @@ ak.sail-horizon.com
 cdn.privacy-mgmt.com
 +.pressablecdn.com
 ui.powerreviews.com
+cdna.pcpartpicker.com
 js.partnerstack.com
 sbl.onfastspring.com
 cdn.onfastspring.com
