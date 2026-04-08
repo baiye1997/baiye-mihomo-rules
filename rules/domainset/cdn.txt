@@ -1,7 +1,7 @@
 #########################################
 # Sukka's Ruleset - CDN Domains
-# Last Updated: 2026-04-06T13:21:04.772Z
-# Size: 4437
+# Last Updated: 2026-04-08T12:05:28.536Z
+# Size: 4441
 # License: AGPL 3.0
 # Homepage: https://ruleset.skk.moe
 # GitHub: https://github.com/SukkaW/Surge
@@ -632,6 +632,7 @@ img.javstore.net
 +.hsstatic.net
 img.highporn.net
 cdn.highporn.net
+embed.getwally.net
 files.gempages.net
 +.forgecdn.net
 connect.facebook.net
@@ -2707,6 +2708,7 @@ img3.javmost.com
 img2.javmost.com
 cdn.javmiku.com
 img2.javdove.com
+static.isitetv.com
 assets.ipstack.com
 i.insider.com
 static.iris.informa.com
@@ -3635,6 +3637,7 @@ tilemaps.icgc.cat
 oss.moe.cat
 +.tile.openstreetmap.bzh
 ns-cdn.neustar.biz
+media.currys.biz
 pics.mf8.biz
 static.sdkassets.chime.aws
 +.ipfs.kaleido.art
@@ -4129,6 +4132,7 @@ tiles.terria.io
 scripts.tabler.io
 static.status.io
 image.status.io
+cdn.socket.io
 media.smooch.io
 cdn.smooch.io
 +.webfe.shopee.io
