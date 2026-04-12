@@ -1,7 +1,7 @@
 #########################################
 # Sukka's Ruleset - CDN Domains
-# Last Updated: 2026-04-08T12:05:28.536Z
-# Size: 4441
+# Last Updated: 2026-04-12T09:54:16.085Z
+# Size: 4443
 # License: AGPL 3.0
 # Homepage: https://ruleset.skk.moe
 # GitHub: https://github.com/SukkaW/Surge
@@ -1111,6 +1111,7 @@ media.nbcconnecticut.com
 image.email.microsoftemail.com
 +.mediadecathlon.com
 assets.media-platform.com
+media.marshmallow-qa.com
 na-library.klarnaservices.com
 static.killedbygoogle.com
 +.kc-usercontent.com
@@ -3722,6 +3723,7 @@ cf.shopee.tw
 socialpic.video.friday.tw
 vbmspic.video.friday.tw
 megapx-assets.dcard.tw
+assets.clibo.tw
 +.pimg.tw
 news-data.pts.org.tw
 img-fnc.ebc.net.tw
