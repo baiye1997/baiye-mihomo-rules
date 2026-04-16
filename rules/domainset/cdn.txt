@@ -1,7 +1,7 @@
 #########################################
 # Sukka's Ruleset - CDN Domains
-# Last Updated: 2026-04-15T19:26:22.868Z
-# Size: 4452
+# Last Updated: 2026-04-16T17:49:31.665Z
+# Size: 4449
 # License: AGPL 3.0
 # Homepage: https://ruleset.skk.moe
 # GitHub: https://github.com/SukkaW/Surge
@@ -106,9 +106,9 @@ img.itch.zone
 static.frame.work
 tn.txxx.tube
 js.txxx.tube
-media.d.tube
+play.d.tube
+nas2.d.tube
 docs.mrchromebox.tech
-media.remax-prod.eng.remax.tech
 static.pepy.tech
 packages.jetbrains.team
 pkg-cdn.jetbrains.team
@@ -217,7 +217,6 @@ cdn.redwap.xyz
 +.picjs.xyz
 +.chcdn.xyz
 cdn-longterm.mee6.xyz
-vod.jfly.xyz
 sdk-cdn.fun.xyz
 img.hentaihaven.xxx
 +.imhentai.xxx
@@ -374,7 +373,6 @@ fonts.codeberg.org
 static.aizanmei.org
 +.ziglang.org
 tools-static.wmflabs.org
-tiles.wmflabs.org
 +.proxy.ustclug.org
 cdn.userway.org
 +.typedoc.org
@@ -414,6 +412,7 @@ gdb.rferl.org
 cdn.pagic.org
 +.lencr.org
 jotai.org
+file.izanm.org
 +.cdn.icann.org
 godoc.org
 tileserver.gnome.org
@@ -520,6 +519,7 @@ telemetry2.devolutions.net
 cdnfonts.devolutions.net
 cdnweb.devolutions.net
 cdn.devolutions.net
+static.contentpass.net
 cdn.arstechnica.net
 +.vscode-cdn.net
 +.ungrounded.net
@@ -599,7 +599,6 @@ pic-bstarstatic.akamaized.net
 img-s-msn-com.akamaized.net
 mwf-service.akamaized.net
 viu-static.akamaized.net
-mycommerce.akamaized.net
 melonbooks.akamaized.net
 amp.akamaized.net
 mixin-images.zeromesh.net
@@ -687,7 +686,6 @@ interactive-examples.mdn.mozilla.net
 +.minotar.net
 +.jscloud.net
 pg2dhpc3p5ec22g3.jkforum.net
-file.izanmei.net
 cdn-img3.iporntv.net
 cdn-img2.iporntv.net
 cdn.iporntv.net
@@ -701,7 +699,6 @@ cdn2.ettoday.net
 cdn1.ettoday.net
 +.daumcdn.net
 badges.crowdin.net
-edge1.certona.net
 cf-images.ap-northeast-1.prod.boltdns.net
 cf-images.us-east-1.prod.boltdns.net
 mir-s3-cdn-cf.behance.net
@@ -738,7 +735,6 @@ data.osmand.net
 attachments.office.net
 +.nel.measure.office.net
 support.content.office.net
-cdn.graph.office.net
 cdn.forms.office.net
 cdn.designerapp.osi.office.net
 +.myanalytics.cdn.office.net
@@ -757,8 +753,6 @@ tourpic-vector.maps.komoot.net
 fiddle.jshell.net
 ik.imgkit.net
 +.imgair.net
-images.idgesg.net
-alt.idgesg.net
 +.hbfile.net
 practicaldev-herokuapp-com.freetls.fastly.net
 lastfm.freetls.fastly.net
@@ -878,11 +872,11 @@ latency-test.lab.skk.moe
 img.skk.moe
 +.cdn.skk.moe
 objects.hit.moe
-assets-cdn.anh.moe
 static.ahu.moe
 file.ahu.moe
 +.cloudflare.ltd
 static.coinall.ltd
++.zpicdn.lol
 image.acg.lol
 cdn.cbd.int
 tile2.intervals.icu
@@ -1045,7 +1039,7 @@ searchserverapi.com
 static.planetminecraft.com
 +.pipedriveassets.com
 openseauserdata.com
-fs2.onlyhentaistuff.com
+ca2.onlyhentaistuff.com
 ca1.onlyhentaistuff.com
 cdn.northropgrumman.com
 irp-cdn.multiscreensite.com
@@ -1063,7 +1057,7 @@ ui-cdn.digitalocean-ui.com
 imgssl.constantcontact.com
 conf.config-security.com
 +.cloudflare-ipfs.com
-shopify.cleverecommerce.com
+detectportal.brave-http-only.com
 thumbnails.applegamingwiki.com
 images.applegamingwiki.com
 amazon-omni-cdn.com
@@ -1146,6 +1140,7 @@ assets-cdn.watchdisneyfe.com
 +.walmartimages.com
 explorer-api.walletconnect.com
 js.verygoodvault.com
+cdn.tvpagewidgets.com
 +.transcend-cdn.com
 tile.thunderforest.com
 +.bundle.thimatic-apps.com
@@ -1546,7 +1541,6 @@ firebase-settings.crashlytics.com
 +.settings.crashlytics.com
 +.e.crashlytics.com
 cdn.comparitech.com
-cloudfront.codeproject.com
 +.cloudatacdn.com
 +.cdn-website.com
 events.ld.catamorphic.com
@@ -1628,7 +1622,6 @@ ui-statics-cf.streamable.com
 cdn-cf-east.streamable.com
 statics.streamable.com
 +.sthlstatic.com
-image.stheadline.com
 cdn.staticswin.com
 tiles.stadiamaps.com
 s3.stackabuse.com
@@ -1856,6 +1849,7 @@ cdn-www.bluestacks.com
 widgets.automizely.com
 widget.automizely.com
 sdks.automizely.com
++.assets-gap.com
 cdnb.artstation.com
 cdna.artstation.com
 cdn.artstation.com
@@ -1885,7 +1879,6 @@ jetpack.wordpress.com
 +.files.wordpress.com
 s0.wordpress.com
 +.wixstatic.com
-image.westinyou.com
 s3.eu-central-2.wasabisys.com
 +.s3.wasabisys.com
 assets.videowise.com
@@ -1963,6 +1956,7 @@ js.qualified.com
 plugins.pubtailer.com
 vpncdn.protonweb.com
 pmecdn.protonweb.com
+content.presspage.com
 content.powerapps.com
 cdnstatic.porno-cum.com
 static.polldaddy.com
@@ -2171,8 +2165,7 @@ i.xxxshake.com
 images-eds-ssl.xboxlive.com
 dlassets-ssl.xboxlive.com
 bundler.wix-code.com
-assets.wikiwand.com
-cdn.wikiwand.com
+img.wikiwand.com
 cdn.wccftech.com
 apps.voxmedia.com
 +.vimeocdn.com
@@ -2221,6 +2214,11 @@ cdn.substack.com
 assets.stickpng.com
 +.stapecdn.com
 img.sparemin.com
+liveimg.sooplive.com
+static.sooplive.com
+stimg.sooplive.com
+res.sooplive.com
++.img.sooplive.com
 rv-assets.softonic.com
 static.snapchat.com
 +.smushcdn.com
@@ -2285,7 +2283,6 @@ d.newsweek.com
 js.navattic.com
 c.navattic.com
 static.narrativ.com
-static.namebeta.com
 sg-thumbnail-drive.mypikpak.com
 res-etl-ssl.mypikpak.com
 static.mypikpak.com
@@ -2479,6 +2476,7 @@ assets.apilayer.com
 static.animaapp.com
 c.animaapp.com
 cdn.amcharts.com
+bcdn.alotporn.com
 oaos-resources.allstate.com
 +.contenthub.allstate.com
 resources.allstate.com
@@ -2922,6 +2920,7 @@ cdn.vuukle.com
 mcdnds.vrporn.com
 mcdns.vrporn.com
 mcdn.vrporn.com
+assets.vrchat.com
 marketplace-web-assets.vinted.com
 static-assets.vinted.com
 static.vinted.com
@@ -3088,7 +3087,6 @@ cdn-client.medium.com
 glyph.medium.com
 miro.medium.com
 twemoji.maxcdn.com
-tile.mapzen.com
 static-assets.mapbox.com
 +.tiles.mapbox.com
 test.manyse.com
@@ -3163,6 +3161,7 @@ static.garmin.com
 fonts.garmin.com
 res.garmin.com
 share-assets.fe.garmin.com
+content.gapinc.com
 +.fw-cdn.com
 +.fsvod1.com
 assets.foxdcg.com
@@ -3245,7 +3244,6 @@ cdn-swell-assets.yotpo.com
 cdn-loyalty.yotpo.com
 staticw2.yotpo.com
 img1.yeggi.com
-yep.video.yahoo.com
 +.xhcdn.com
 +.wsimg.com
 +.wixmp.com
@@ -3575,7 +3573,6 @@ assets.fe.itv.com
 sm.ign.com
 +.assets.ibm.com
 widgets.coaches.gnc.com
-certona.gap.com
 m3.gab.com
 static-media.fox.com
 contents-thumbnail2.fc2.com
@@ -3592,7 +3589,6 @@ cdn3.dan.com
 cdn2.dan.com
 cdn1.dan.com
 cdn0.dan.com
-static-landing.probiplacehold.cot.com
 lightning.cnn.com
 media.cnn.com
 cdn.cnn.com
@@ -3647,6 +3643,7 @@ oss.moe.cat
 +.tile.openstreetmap.bzh
 ns-cdn.neustar.biz
 media.currys.biz
+assets.zpic.biz
 pics.mf8.biz
 static.sdkassets.chime.aws
 +.ipfs.kaleido.art
@@ -3761,6 +3758,7 @@ embed.twitch.tv
 +.storry.tv
 starlight.nebula.tv
 images.nebula.tv
+f.upanh.tv
 static.tella.tv
 static-homepage-en.pluto.tv
 images.pluto.tv
@@ -3829,7 +3827,7 @@ images.spr.so
 +.gcr.si
 assets.vantage.sh
 avatar.tangled.sh
-cdn.cracked.sh
+static.cracked.sh
 api-frameworks.vercel.sh
 gitpkg-fork.vercel.sh
 openapi.vercel.sh
@@ -3942,6 +3940,7 @@ media.webtoo.ls
 +.javcdn.li
 pomf2.lain.la
 +.ipfs.lain.la
++.files.sooplive.co.kr
 static.pfrt.yna.co.kr
 img9.yna.co.kr
 img8.yna.co.kr
@@ -4056,8 +4055,6 @@ www.envoyproxy.io
 analytics.canarymail.io
 status.canarymail.io
 cdn.brandfetch.io
-loutre.blockchair.io
-js-cdn.blockchair.io
 +.bigcontent.io
 +.wixstudio.io
 cdn.transcend.io
@@ -4114,7 +4111,6 @@ images.prismic.io
 +.cdn.prismic.io
 cdn.pagefly.io
 +.pagecdn.io
-static.opensea.io
 favicons.nextdns.io
 cdn.logbase.io
 media.lantern.io
@@ -4306,6 +4302,7 @@ www.acgpix.de
 cdn.ionos.de
 tile.mtbmap.cz
 +.ipfs.slang.cx
++.zpi.cx
 assets.openalternative.co
 cdn.stackoverflow.co
 +.cdn-lfs-us-1.huggingface.co
@@ -4413,6 +4410,7 @@ cdn4.focus.bg
 components.cyclingfactory.be
 images.cyclingfactory.be
 tile.osm.be
+static.cracked.ax
 +.abc-cdn.net.au
 res.abc.net.au
 styleguide-assets.shannons.com.au
@@ -4431,16 +4429,15 @@ assets.cloudpilot.ai
 api.instantly.ai
 sdk.customfit.ai
 static.returngo.ai
-file.xiaohai.ai
 prod-cdn.webtune.ai
 cms.mistral.ai
 widget.docsbot.ai
 cdn.aimerce.ai
+static.zanmei.ai
 vetted.ai
 static.netify.ai
 r2.leadsy.ai
 cdn.fellou.ai
-play.xiaoh.ai
 tag.tvads.ai
 s3.masto.ai
 participants.evolv.ai
