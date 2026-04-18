@@ -1,7 +1,7 @@
 #########################################
 # Sukka's Ruleset - Apple CDN
-# Last Updated: 2026-03-10T14:56:40.694Z
-# Size: 165
+# Last Updated: 2026-04-18T18:34:48.303Z
+# Size: 164
 # License: AGPL 3.0
 # Homepage: https://ruleset.skk.moe
 # GitHub: https://github.com/SukkaW/Surge
@@ -152,7 +152,6 @@
 +.pba0.apple.com
 +.ocsp.apple.com
 +.mesu.apple.com
-+.apps.apple.com
 +.www.apple.com
 +.init.ess.apple.com
 +.crl.apple.com
