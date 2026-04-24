@@ -118,15 +118,15 @@ strm: &strm {type: select, proxies: ["♻️ 智能选择","👆 手动选择","
 
 manu: &manu {<<: *sel, filter: *blk}
 
-hk: &hk '^(?=.*(?i)(港|🇭🇰|HK|Hong|HKG))(?!.*(排除1|排除2|5x)).*$'
-tw: &tw '^(?=.*(?i)(台|🇼🇸|🇹🇼|TW|tai|TPE|TSA|KHH))(?!.*(排除1|排除2|5x)).*$'
-jp: &jp '^(?=.*(?i)(日|🇯🇵|JP|Japan|NRT|HND|KIX|CTS|FUK))(?!.*(尼日利亚|排除2|5x)).*$'
-kr: &kr '^(?=.*(?i)(韩|🇰🇷|韓|首尔|南朝鲜|KR|KOR|Korea|South))(?!.*(排除1|排除2|5x)).*$'
-sg: &sg '^(?=.*(?i)(坡|🇸🇬|SG|Sing|SIN|XSP))(?!.*(排除1|排除2|5x)).*$'
-us: &us '^(?=.*(?i)(美|🇺🇸|US|USA|JFK|SJC|LAX|ORD|ATL|DFW|SFO|MIA|SEA|IAD))(?!.*(Plus|Australia|5x)).*$'
-uk: &uk '^(?=.*(?i)(英|英国|UK|大不列颠|伦敦|Kingdom))(?!.*(排除1|排除2|5x)).*$'
-fr: &fr '^(?=.*(?i)(法|🇫🇷|法国|FR|France))(?!.*(排除1|排除2|5x)).*$'
-de: &de '^(?=.*(?i)(德|🇩🇪|德国|DE|Germany))(?!.*(排除1|排除2|5x)).*$'
+hk: &hk '^(?=.*(?i)(港|🇭🇰|HK|Hong|HKG))(?!.*(?i)(5x)).*$'
+tw: &tw '^(?=.*(?i)(台|🇼🇸|🇹🇼|TW|tai|TPE|TSA|KHH))(?!.*(?i)(5x)).*$'
+jp: &jp '^(?=.*(?i)(日|🇯🇵|JP|Japan|NRT|HND|KIX|CTS|FUK))(?!.*(?i)(尼日利亚|5x)).*$'
+kr: &kr '^(?=.*(?i)(韩|🇰🇷|韓|首尔|南朝鲜|KR|KOR|Korea|South))(?!.*(?i)(5x)).*$'
+sg: &sg '^(?=.*(?i)(坡|🇸🇬|SG|Sing|SIN|XSP))(?!.*(?i)(5x)).*$'
+us: &us '^(?=.*(?i)(美|🇺🇸|US|USA|JFK|SJC|LAX|ORD|ATL|DFW|SFO|MIA|SEA|IAD))(?!.*(?i)(Plus|Australia|5x)).*$'
+uk: &uk '^(?=.*(?i)(英|英国|UK|大不列颠|伦敦|Kingdom))(?!.*(?i)(5x)).*$'
+fr: &fr '^(?=.*(?i)(法|🇫🇷|法国|FR|France))(?!.*(?i)(5x)).*$'
+de: &de '^(?=.*(?i)(德|🇩🇪|德国|DE|Germany))(?!.*(?i)(5x)).*$'
 
 
 # ========================= proxy-groups =========================
