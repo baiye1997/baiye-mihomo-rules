@@ -27,7 +27,7 @@ proxy-providers:
 
 # ======================= 以下内容建议小白勿修改 =======================
 # ========================== 基础配置 ==========================
-mixed-port: 7897
+mixed-port: 7890
 allow-lan: true
 bind-address: '*'
 mode: rule
@@ -35,7 +35,6 @@ log-level: warning
 unified-delay: true
 tcp-concurrent: true
 find-process-mode: off
-global-client-fingerprint: chrome
 
 external-controller: 127.0.0.1:9090
 # external-ui: ui
@@ -62,48 +61,43 @@ profile:
 # ============================ DNS ============================
 dns:
   enable: true
-  prefer-h3: false
+  prefer-h3: true
   listen: 0.0.0.0:1053
-  ipv6: true
+  ipv6: false
   enhanced-mode: fake-ip
   fake-ip-range: 198.18.0.1/16
   use-hosts: true
 
-  # 主解析（国内 DoH，直连可达）
   nameserver:
-    - "https://doh.pub/dns-query"
-    - "https://dns.alidns.com/dns-query"
-    - "https://223.5.5.5/dns-query"
+    - https://223.5.5.5/dns-query
+    - https://doh.pub/dns-query
+    - https://1.1.1.1/dns-query
+    - https://8.8.8.8/dns-query
 
-  # 用于解析 DoH 服务器域名本身
   default-nameserver:
-    - "223.5.5.5"
-    - "119.29.29.29"
-    - "180.184.1.1"
-    - "[2400:3200::1]"
-    - "[2402:4e00::]"
+    - 223.5.5.5
+    - 119.29.29.29
 
-  # 国内域名走国内 DNS
   nameserver-policy:
     'geosite:cn':
-      - "223.5.5.5"
-      - "119.29.29.29"
-      - "180.184.1.1"
-      - "[2400:3200::1]"
-      - "[2402:4e00::]"
+      - 223.5.5.5
+      - 119.29.29.29
 
-  # 节点域名解析
+    'geosite:geolocation-!cn':
+      - https://1.1.1.1/dns-query
+      - https://8.8.8.8/dns-query
+
   proxy-server-nameserver:
-    - "https://223.5.5.5/dns-query"
-    - "https://doh.pub/dns-query"
-    - "system"
+    - https://1.1.1.1/dns-query
+    - https://8.8.8.8/dns-query
 
   fake-ip-filter:
     - rule-set:fake-ip
     - geosite:cn
-    - geosite:connectivity-check
     - geosite:private
-
+    - geosite:connectivity-check
+    - "*.lan"
+    - "*.local"
 
 # ========================== 嗅探设置 ==========================
 sniffer:
@@ -137,8 +131,6 @@ geo-update-interval: 24
 geox-url:
   geoip:   "https://cdn.jsdelivr.net/gh/Loyalsoldier/v2ray-rules-dat@release/geoip.dat"
   geosite: "https://cdn.jsdelivr.net/gh/Loyalsoldier/v2ray-rules-dat@release/geosite.dat"
-  mmdb:    "https://cdn.jsdelivr.net/gh/Loyalsoldier/geoip@release/Country.mmdb"
-  asn:     "https://cdn.jsdelivr.net/gh/Loyalsoldier/geoip@release/GeoLite2-ASN.mmdb"
 
 
 # ============================ 锚点 ============================
@@ -154,15 +146,15 @@ strm: &strm {type: select, proxies: ["♻️ 智能选择","👆 手动选择","
 
 manu: &manu {<<: *sel, filter: *blk}
 
-hk: &hk '^(?=.*(?i)(港|🇭🇰|HK|Hong|HKG))(?!.*(排除1|排除2|5x)).*$'
-tw: &tw '^(?=.*(?i)(台|🇼🇸|🇹🇼|TW|tai|TPE|TSA|KHH))(?!.*(排除1|排除2|5x)).*$'
-jp: &jp '^(?=.*(?i)(日|🇯🇵|JP|Japan|NRT|HND|KIX|CTS|FUK))(?!.*(尼日利亚|排除2|5x)).*$'
-kr: &kr '^(?=.*(?i)(韩|🇰🇷|韓|首尔|南朝鲜|KR|KOR|Korea|South))(?!.*(排除1|排除2|5x)).*$'
-sg: &sg '^(?=.*(?i)(坡|🇸🇬|SG|Sing|SIN|XSP))(?!.*(排除1|排除2|5x)).*$'
-us: &us '^(?=.*(?i)(美|🇺🇸|US|USA|JFK|SJC|LAX|ORD|ATL|DFW|SFO|MIA|SEA|IAD))(?!.*(Plus|Australia|5x)).*$'
-uk: &uk '^(?=.*(?i)(英|英国|UK|大不列颠|伦敦|Kingdom))(?!.*(排除1|排除2|5x)).*$'
-fr: &fr '^(?=.*(?i)(法|🇫🇷|法国|FR|France))(?!.*(排除1|排除2|5x)).*$'
-de: &de '^(?=.*(?i)(德|🇩🇪|德国|DE|Germany))(?!.*(排除1|排除2|5x)).*$'
+hk: &hk '^(?=.*(?i)(港|🇭🇰|HK|Hong|HKG))(?!.*(?i)(5x)).*$'
+tw: &tw '^(?=.*(?i)(台|🇼🇸|🇹🇼|TW|tai|TPE|TSA|KHH))(?!.*(?i)(5x)).*$'
+jp: &jp '^(?=.*(?i)(日|🇯🇵|JP|Japan|NRT|HND|KIX|CTS|FUK))(?!.*(?i)(尼日利亚|5x)).*$'
+kr: &kr '^(?=.*(?i)(韩|🇰🇷|韓|首尔|南朝鲜|KR|KOR|Korea|South))(?!.*(?i)(5x)).*$'
+sg: &sg '^(?=.*(?i)(坡|🇸🇬|SG|Sing|SIN|XSP))(?!.*(?i)(5x)).*$'
+us: &us '^(?=.*(?i)(美|🇺🇸|US|USA|JFK|SJC|LAX|ORD|ATL|DFW|SFO|MIA|SEA|IAD))(?!.*(?i)(Plus|Australia|5x)).*$'
+uk: &uk '^(?=.*(?i)(英|英国|UK|大不列颠|伦敦|Kingdom))(?!.*(?i)(5x)).*$'
+fr: &fr '^(?=.*(?i)(法|🇫🇷|法国|FR|France))(?!.*(?i)(5x)).*$'
+de: &de '^(?=.*(?i)(德|🇩🇪|德国|DE|Germany))(?!.*(?i)(5x)).*$'
 
 
 # ========================= proxy-groups =========================
