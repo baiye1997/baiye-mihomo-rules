@@ -1,33 +1,6 @@
-# 基础锚点
-url:  &url  "http://www.gstatic.com/generate_204"
-blk:  &blk '^(?!.*(DIRECT|直接连接|群|邀请|返利|循环|官网|客服|网站|网址|获取|订阅|流量|到期|机场|下次|版本|官址|备用|过期|已用|联系|邮箱|工单|贩卖|通知|倒卖|防止|国内|地址|频道|无法|说明|使用|提示|特别|访问|支持|教程|关注|更新|作者|加入|USE|USED|TOTAL|EXPIRE|EMAIL|Panel|Channel|Author))'
-prov: &prov {type: http, interval: 86400, health-check: {enable: true, url: *url, interval: 300}}
-
-
-# ======================= 建议仅修改此部分内容 ======================
-# ========================= 订阅 Providers =======================
-proxy-providers:
-  Sub-1:
-    <<: *prov
-    url: "替换订阅链接1"
-    path: "./proxy_provider/providers-1.yaml"
-    override:
-      additional-prefix: "[显示名称1]"
-    filter: *blk
-  Sub-2:
-    <<: *prov
-    url: "替换订阅链接2"
-    path: "./proxy_provider/providers-2.yaml"
-    override:
-      additional-prefix: "[显示名称2]"
-    filter: *blk
-
-# ======================  ⬆️⬆️⬆️⬆️⬆️  ========================
-
-
 # ======================= 以下内容建议小白勿修改 =======================
 # ========================== 基础配置 ==========================
-mixed-port: 7897
+mixed-port: 7890
 allow-lan: true
 bind-address: '*'
 mode: rule
@@ -35,7 +8,6 @@ log-level: warning
 unified-delay: true
 tcp-concurrent: true
 find-process-mode: off
-global-client-fingerprint: chrome
 
 external-controller: 127.0.0.1:9090
 # external-ui: ui
@@ -62,48 +34,43 @@ profile:
 # ============================ DNS ============================
 dns:
   enable: true
-  prefer-h3: false
+  prefer-h3: true
   listen: 0.0.0.0:1053
-  ipv6: true
+  ipv6: false
   enhanced-mode: fake-ip
   fake-ip-range: 198.18.0.1/16
   use-hosts: true
 
-  # 主解析（国内 DoH，直连可达）
   nameserver:
-    - "https://doh.pub/dns-query"
-    - "https://dns.alidns.com/dns-query"
-    - "https://223.5.5.5/dns-query"
+    - https://223.5.5.5/dns-query
+    - https://doh.pub/dns-query
+    - https://1.1.1.1/dns-query
+    - https://8.8.8.8/dns-query
 
-  # 用于解析 DoH 服务器域名本身
   default-nameserver:
-    - "223.5.5.5"
-    - "119.29.29.29"
-    - "180.184.1.1"
-    - "[2400:3200::1]"
-    - "[2402:4e00::]"
+    - 223.5.5.5
+    - 119.29.29.29
 
-  # 国内域名走国内 DNS
   nameserver-policy:
     'geosite:cn':
-      - "223.5.5.5"
-      - "119.29.29.29"
-      - "180.184.1.1"
-      - "[2400:3200::1]"
-      - "[2402:4e00::]"
+      - 223.5.5.5
+      - 119.29.29.29
 
-  # 节点域名解析
+    'geosite:geolocation-!cn':
+      - https://1.1.1.1/dns-query
+      - https://8.8.8.8/dns-query
+
   proxy-server-nameserver:
-    - "https://223.5.5.5/dns-query"
-    - "https://doh.pub/dns-query"
-    - "system"
+    - https://1.1.1.1/dns-query
+    - https://8.8.8.8/dns-query
 
   fake-ip-filter:
     - rule-set:fake-ip
     - geosite:cn
-    - geosite:connectivity-check
     - geosite:private
-
+    - geosite:connectivity-check
+    - "*.lan"
+    - "*.local"
 
 # ========================== 嗅探设置 ==========================
 sniffer:
@@ -128,7 +95,6 @@ tun:
   strict-route: true
   mtu: 1500
 
-
 # ========================== Geodata ==========================
 geodata-mode: true
 geodata-loader: memconservative
@@ -137,8 +103,6 @@ geo-update-interval: 24
 geox-url:
   geoip:   "https://cdn.jsdelivr.net/gh/Loyalsoldier/v2ray-rules-dat@release/geoip.dat"
   geosite: "https://cdn.jsdelivr.net/gh/Loyalsoldier/v2ray-rules-dat@release/geosite.dat"
-  mmdb:    "https://cdn.jsdelivr.net/gh/Loyalsoldier/geoip@release/Country.mmdb"
-  asn:     "https://cdn.jsdelivr.net/gh/Loyalsoldier/geoip@release/GeoLite2-ASN.mmdb"
 
 
 # ============================ 锚点 ============================
