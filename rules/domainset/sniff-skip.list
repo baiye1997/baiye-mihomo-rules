@@ -1,9 +1,4 @@
-# =====================================
-# sniff-skip.list (Optimized)
-# 作用：跳过流量嗅探，避免长连误判
-# =====================================
-
-# ------ Apple & Microsoft 推送 ------
+# Apple & Microsoft 推送
 *.push.apple.com
 courier.push.apple.com
 api.push.apple.com
@@ -11,7 +6,7 @@ api.push.apple.com
 wns.windows.com
 *.notify.windows.com
 
-# ------ Google & 厂商推送 ------
+# Google & 厂商推送
 *.push.google.com
 mtalk.google.com
 fcm.googleapis.com
@@ -19,18 +14,23 @@ push.hicloud.com
 push.oppomobile.com
 push.xiaomi.com
 
-# ------ 协作 / 会议（RTC 长连） ------
+# 协作 / 会议
 *.zoom.us
 *.teams.microsoft.com
 *.skype.com
 *.slack.com
 *.webex.com
 
-# ------ 邮件服务 (IMAP/SMTP) ------
+# 邮件服务
 imap.*
 smtp.*
 pop.*
 
-# ------ 游戏下载 / QUIC 流量 ------
+# 游戏下载 / QUIC
 *.steamcontent.com
-*.googlevideo.com # 优化 YouTube QUIC 体验
+*.googlevideo.com
+
+# NAT / RTC
+stun.*
+*.stun.*
++.stun.*
