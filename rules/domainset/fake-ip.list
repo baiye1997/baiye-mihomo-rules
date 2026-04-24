@@ -1,17 +1,12 @@
-# =====================================
-# fake-ip-filter.list (Optimized)
-# 作用：绕过 fake-ip，使用真实解析
-# =====================================
-
-# ------ 内网 / 本地域名 ------
+# 内网 / 本地域名
 *.lan
 *.local
 *.localdomain
 *.home.arpa
 *.localhost
-localhost.ptlogin2.qq.com # 解决腾讯系登录问题
+localhost.ptlogin2.qq.com
 
-# ------ 时间同步 / NTP ------
+# 时间同步 / NTP
 pool.ntp.org
 *.ntp.org.cn
 ntp.aliyun.com
@@ -20,54 +15,28 @@ time*.apple.com
 time*.google.com
 time.windows.com
 
-# ------ STUN / NAT 打洞（会议、语音） ------
+# STUN / NAT 打洞
 stun.*
+*.stun.*
++.stun.*
 
-# ------ IoT / 小米生态 ------
-*.mi.com
-*.xiaomi.com
+# Apple / Microsoft / Google 推送和联网检测
+*.push.apple.com
+courier.push.apple.com
+api.push.apple.com
+mtalk.google.com
+fcm.googleapis.com
++.msftncsi.com
++.msftconnecttest.com
+
+# 游戏 / 主机 / 特殊连接
+*.srv.nintendo.net
++.stun.playstation.net
+xbox.*.*.microsoft.com
+*.*.xboxlive.com
+
+# 小米 IoT，保守保留
 api.io.mi.com
 dig.io.mi.com
 push.xiaomi.com
 miot-spec.org
-*.miui.com
-
-# ------ Microsoft (Outlook / Teams) ------
-*.outlook.com
-outlook.office365.com
-*.office.com
-*.microsoft.com
-*.microsoftonline.com
-*.teams.microsoft.com
-login.microsoftonline.com
-
-# ------ Google (Gmail / Drive) ------
-mail.google.com
-meet.google.com
-drive.google.com
-*.google.com
-*.gstatic.com
-
-# ------ Apple (iCloud / Push) ------
-*.icloud.com
-*.icloud-content.com
-*.apple.com
-*.push.apple.com
-courier.push.apple.com
-
-# ------ 协作 & 即时通讯 ------
-*.zoom.us
-*.slack.com
-*.notion.so
-*.figma.com
-*.github.com
-*.telegram.org
-*.whatsapp.com
-*.wechat.com
-*.discord.com
-
-# ------ 游戏平台内容分发 ------
-*.steamcontent.com
-*.battlenet.com.cn
-*.playstation.com
-*.xboxlive.com
