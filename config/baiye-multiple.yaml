@@ -71,8 +71,7 @@ dns:
   nameserver:
     - https://223.5.5.5/dns-query
     - https://doh.pub/dns-query
-    - https://1.1.1.1/dns-query
-    - https://8.8.8.8/dns-query
+    - https://dns.alidns.com/dns-query
 
   default-nameserver:
     - 223.5.5.5
@@ -217,6 +216,8 @@ rule-providers:
   microsoft_non_ip:     {<<: *cls, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/non_ip/microsoft.txt,                path: ./rules/non_ip/microsoft.txt}
   download_domainset:   {<<: *dom, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/domainset/download.txt,              path: ./rules/domainset/download.txt}
   download_non_ip:      {<<: *cls, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/non_ip/download.txt,                 path: ./rules/non_ip/download.txt}
+  telegram_non_ip:      {<<: *cls, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/non_ip/telegram.txt,                path: ./rules/non_ip/telegram.txt}
+  apple_intelligence:   {<<: *cls, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/non_ip/apple_intelligence.txt,       path: ./rules/non_ip/apple_intelligence.txt}
 
 
 # =========================== 分流规则 ==========================
@@ -225,22 +226,32 @@ rules:
   - RULE-SET,FuckAD,REJECT
   - DOMAIN-SUFFIX,bing.com,DIRECT
   - DOMAIN-SUFFIX,oaiusercontent.com,🤖 AI  平台
+
+  # 特定 CDN 直连（必须在通用 CDN 之前）
+  - RULE-SET,apple_cdn,🌐 全球直连
+  - RULE-SET,apple_cn_non_ip,🌐 全球直连
+  - RULE-SET,microsoft_cdn_non_ip,🌐 全球直连
+
+  # 通用 CDN 代理
   - RULE-SET,cdn_domainset,🚀 节点选择
   - RULE-SET,cdn_non_ip,🚀 节点选择
+
+  # 服务分流
   - GEOSITE,spotify,🎵 Spotify
   - RULE-SET,stream_non_ip,📺 视频媒体
   - RULE-SET,ai_non_ip,🤖 AI  平台
+  - RULE-SET,apple_intelligence,🤖 AI  平台
+  - RULE-SET,apple_services,🍎 苹果服务
+  - RULE-SET,microsoft_non_ip,Ⓜ️ 微软服务
+  - GEOSITE,onedrive,☁️ Onedrive
+  - GEOSITE,google-cn,🌐 全球直连
   - GEOSITE,category-games@cn,🌐 全球直连
   - RULE-SET,Game,🎮 游戏平台
-  - GEOSITE,google-cn,🌐 全球直连
-  - RULE-SET,apple_cdn,🌐 全球直连
-  - RULE-SET,apple_cn_non_ip,🌐 全球直连
-  - RULE-SET,apple_services,🍎 苹果服务
-  - GEOSITE,onedrive,☁️ Onedrive
-  - RULE-SET,microsoft_cdn_non_ip,🌐 全球直连
-  - RULE-SET,microsoft_non_ip,Ⓜ️ 微软服务
   - RULE-SET,download_domainset,🚀 节点选择
   - RULE-SET,download_non_ip,🚀 节点选择
+  - RULE-SET,telegram_non_ip,🚀 节点选择
+
+  # 国内/全球兜底
   - GEOSITE,cn,DIRECT
   - GEOSITE,geolocation-!cn,🚀 节点选择
 

@@ -1,3 +1,30 @@
+# 基础锚点
+url:  &url  "http://www.gstatic.com/generate_204"
+blk:  &blk '^(?!.*(DIRECT|直接连接|群|邀请|返利|循环|官网|客服|网站|网址|获取|订阅|流量|到期|机场|下次|版本|官址|备用|过期|已用|联系|邮箱|工单|贩卖|通知|倒卖|防止|国内|地址|频道|无法|说明|使用|提示|特别|访问|支持|教程|关注|更新|作者|加入|USE|USED|TOTAL|EXPIRE|EMAIL|Panel|Channel|Author))'
+prov: &prov {type: http, interval: 86400, health-check: {enable: true, url: *url, interval: 300}}
+
+
+# ======================= 建议仅修改此部分内容 ======================
+# ========================= 订阅 Providers =======================
+proxy-providers:
+  Sub-1:
+    <<: *prov
+    url: "替换订阅链接1"
+    path: "./proxy_provider/providers-1.yaml"
+    override:
+      additional-prefix: "[显示名称1]"
+    filter: *blk
+  Sub-2:
+    <<: *prov
+    url: "替换订阅链接2"
+    path: "./proxy_provider/providers-2.yaml"
+    override:
+      additional-prefix: "[显示名称2]"
+    filter: *blk
+
+# ======================  ⬆️⬆️⬆️⬆️⬆️  ========================
+
+
 # ======================= 以下内容建议小白勿修改 =======================
 # ========================== 基础配置 ==========================
 mixed-port: 7890
@@ -44,8 +71,7 @@ dns:
   nameserver:
     - https://223.5.5.5/dns-query
     - https://doh.pub/dns-query
-    - https://1.1.1.1/dns-query
-    - https://8.8.8.8/dns-query
+    - https://dns.alidns.com/dns-query
 
   default-nameserver:
     - 223.5.5.5
