@@ -32,3 +32,7 @@ https://ruleset.skk.moe/Clash/non_ip/microsoft.txt rules/non_ip/microsoft.txt
 # ===== 下载/大文件 =====
 https://ruleset.skk.moe/Clash/domainset/download.txt rules/domainset/download.txt
 https://ruleset.skk.moe/Clash/non_ip/download.txt rules/non_ip/download.txt
+
+# ===== 国内/全球分流 =====
+https://ruleset.skk.moe/Clash/non_ip/domestic.txt rules/non_ip/domestic.txt
+https://ruleset.skk.moe/Clash/non_ip/global.txt rules/non_ip/global.txt

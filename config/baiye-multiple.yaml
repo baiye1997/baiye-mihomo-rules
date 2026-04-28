@@ -119,7 +119,6 @@ tun:
   auto-detect-interface: true
   dns-hijack:
     - any:53
-    - tcp://any:53
   strict-route: true
   mtu: 1500
 
@@ -218,6 +217,8 @@ rule-providers:
   download_non_ip:      {<<: *cls, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/non_ip/download.txt,                 path: ./rules/non_ip/download.txt}
   telegram_non_ip:      {<<: *cls, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/non_ip/telegram.txt,                path: ./rules/non_ip/telegram.txt}
   apple_intelligence:   {<<: *cls, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/non_ip/apple_intelligence.txt,       path: ./rules/non_ip/apple_intelligence.txt}
+  domestic_non_ip:      {<<: *cls, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/non_ip/domestic.txt,                   path: ./rules/non_ip/domestic.txt}
+  global_non_ip:        {<<: *cls, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/non_ip/global.txt,                    path: ./rules/non_ip/global.txt}
 
 
 # =========================== 分流规则 ==========================
@@ -251,7 +252,15 @@ rules:
   - RULE-SET,download_non_ip,🚀 节点选择
   - RULE-SET,telegram_non_ip,🚀 节点选择
 
-  # 国内/全球兜底
+  # 精准分流
+  - RULE-SET,domestic_non_ip,DIRECT
+  - RULE-SET,global_non_ip,🚀 节点选择
+
+  # GEOSITE 补充
+  - GEOSITE,category-ai-cn,🌐 全球直连
+  - GEOSITE,category-media-cn,🌐 全球直连
+
+  # GEOSITE 兜底
   - GEOSITE,cn,DIRECT
   - GEOSITE,geolocation-!cn,🚀 节点选择
 
