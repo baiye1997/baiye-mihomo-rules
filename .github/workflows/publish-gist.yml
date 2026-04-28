@@ -52,8 +52,8 @@ jobs:
             ${{ secrets.SUB_URL_2 }}
           
           SUB_NAMES: |
-            [YouTu]
-            [BoostNet]
+            [天照]
+            [月读]
 
           COMMIT_SHORT: ${{ github.sha }}
 
