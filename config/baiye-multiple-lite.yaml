@@ -221,6 +221,7 @@ rules:
   - GEOSITE,apple-cn,🌐 全球直连
   - GEOSITE,apple,🍎 苹果服务
   - GEOSITE,category-media-cn,🌐 全球直连
+  - GEOSITE,category-ai-cn,🌐 全球直连
   - GEOSITE,spotify,🎵 Spotify
   - RULE-SET,stream_non_ip,📺 视频媒体
   - GEOSITE,cn,DIRECT
