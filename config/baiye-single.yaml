@@ -18,14 +18,6 @@ proxy-providers:
       additional-prefix: "[显示名称1]"
     filter: *blk
 
-  Sub-2:
-    <<: *prov
-    url: "替换订阅链接2"
-    path: "./proxy_provider/providers-2.yaml"
-    override:
-      additional-prefix: "[显示名称2]"
-    filter: *blk
-
 # ======================= 基础配置 =======================
 mixed-port: 7890
 allow-lan: false
