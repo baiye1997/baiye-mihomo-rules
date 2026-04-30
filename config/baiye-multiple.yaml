@@ -80,20 +80,9 @@ dns:
     - geosite:cn
     - geosite:private
     - geosite:connectivity-check
-    - "*.lan"
-    - "*.local"
-    - "*.localdomain"
-    - "*.home.arpa"
-    - "localhost.ptlogin2.qq.com"
     - "+.miwifi.com"
     - "+.mijia.tech"
-    - "+.miot-spec.org"
-    - "+.push.apple.com"
     - "+.market.xiaomi.com"
-    - "+.srv.nintendo.net"
-    - "stun.*"
-    - "*.stun.*"
-    - "*.xboxlive.com"
 
 # ======================= 嗅探 =======================
 sniffer:
@@ -105,10 +94,8 @@ sniffer:
   skip-domain:
     - rule-set:sniff-skip
     - "Mijia Cloud"
-    - "+.push.apple.com"
     - "+.miwifi.com"
     - "+.mijia.tech"
-    - "+.miot-spec.org"
 
 # ======================= TUN：默认关闭，电脑需要全局接管再开 =======================
 tun:
@@ -222,7 +209,7 @@ rules:
   - DOMAIN-SUFFIX,oaiusercontent.com,🤖 AI 平台
   - DOMAIN-SUFFIX,bing.com,🌐 全球直连
 
-  # CDN / 系统服务
+  # 直连
   - RULE-SET,apple_cdn,🌐 全球直连
   - RULE-SET,apple_cn_non_ip,🌐 全球直连
   - RULE-SET,microsoft_cdn_non_ip,🌐 全球直连
