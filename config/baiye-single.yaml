@@ -80,20 +80,9 @@ dns:
     - geosite:cn
     - geosite:private
     - geosite:connectivity-check
-    - "*.lan"
-    - "*.local"
-    - "*.localdomain"
-    - "*.home.arpa"
-    - "localhost.ptlogin2.qq.com"
     - "+.miwifi.com"
     - "+.mijia.tech"
-    - "+.miot-spec.org"
-    - "+.push.apple.com"
     - "+.market.xiaomi.com"
-    - "+.srv.nintendo.net"
-    - "stun.*"
-    - "*.stun.*"
-    - "*.xboxlive.com"
 
 # ======================= 嗅探 =======================
 sniffer:
@@ -105,10 +94,8 @@ sniffer:
   skip-domain:
     - rule-set:sniff-skip
     - "Mijia Cloud"
-    - "+.push.apple.com"
     - "+.miwifi.com"
     - "+.mijia.tech"
-    - "+.miot-spec.org"
 
 # ======================= TUN：默认关闭，电脑需要全局接管再开 =======================
 tun:
@@ -207,10 +194,8 @@ rule-providers:
 
 # ======================= 分流规则 =======================
 rules:
+  # 1. 私有 / 局域网 / 设备互联
   - GEOSITE,private,DIRECT
-  - RULE-SET,FuckAD,REJECT
-
-  # 小米互联 / 局域网 / 系统连通性优先直连
   - DOMAIN-SUFFIX,miwifi.com,DIRECT
   - DOMAIN-SUFFIX,mijia.tech,DIRECT
   - DOMAIN-SUFFIX,miot-spec.org,DIRECT
@@ -218,18 +203,21 @@ rules:
   - DOMAIN-SUFFIX,push.apple.com,DIRECT
   - GEOSITE,connectivity-check,DIRECT
 
-  # AI / 搜索特殊处理
+  # 2. 广告拦截
+  - RULE-SET,FuckAD,REJECT
+
+  # 3. 精准特殊处理
   - DOMAIN-SUFFIX,oaiusercontent.com,🤖 AI 平台
   - DOMAIN-SUFFIX,bing.com,🌐 全球直连
 
-  # CDN / 系统服务
+  # 4. CDN / 系统服务
   - RULE-SET,apple_cdn,🌐 全球直连
   - RULE-SET,apple_cn_non_ip,🌐 全球直连
   - RULE-SET,microsoft_cdn_non_ip,🌐 全球直连
   - RULE-SET,cdn_domainset,🚀 节点选择
   - RULE-SET,cdn_non_ip,🚀 节点选择
 
-  # 服务分流
+  # 5. 专项服务
   - GEOSITE,spotify,🎵 Spotify
   - RULE-SET,stream_non_ip,📺 视频媒体
   - RULE-SET,ai_non_ip,🤖 AI 平台
@@ -244,20 +232,21 @@ rules:
   - RULE-SET,download_domainset,🚀 节点选择
   - RULE-SET,download_non_ip,🚀 节点选择
 
-  # 精准分流
+  # 6. 自建精准兜底
   - RULE-SET,domestic_non_ip,DIRECT
   - RULE-SET,global_non_ip,🚀 节点选择
 
-  # GEOSITE 兜底
+  # 7. GEOSITE 大类兜底
   - GEOSITE,category-ai-cn,🌐 全球直连
   - GEOSITE,category-media-cn,🌐 全球直连
   - GEOSITE,cn,DIRECT
   - GEOSITE,geolocation-!cn,🚀 节点选择
 
-  # IP 规则
+  # 8. IP 规则
   - GEOIP,private,DIRECT,no-resolve
   - RULE-SET,telegram_ip,✈️ Telegram,no-resolve
   - RULE-SET,stream_ip,📺 视频媒体,no-resolve
   - GEOIP,cn,DIRECT,no-resolve
 
+  # 9. 最终兜底
   - MATCH,🚀 节点选择
