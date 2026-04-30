@@ -28,10 +28,6 @@ tcp-concurrent: true
 find-process-mode: off
 
 external-controller: 127.0.0.1:9090
-external-ui: ui
-external-ui-name: zashboard
-external-ui-url: https://github.com/Zephyruso/zashboard/releases/latest/download/dist.zip
-# secret: "请自行设置强密码"
 
 keep-alive-idle: 600
 keep-alive-interval: 60
