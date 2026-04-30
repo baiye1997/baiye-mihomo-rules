@@ -12,7 +12,7 @@ prov: &prov {type: http, interval: 86400, health-check: {enable: true, url: *url
 proxy-providers:
   Node:
     <<: *prov
-    url: "替换订阅链接"
+    url: "替换订阅链接1"
     path: "./proxy_provider/providers.yaml"
     filter: *blk
 
