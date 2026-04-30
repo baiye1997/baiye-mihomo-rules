@@ -1,89 +1,70 @@
-# 基础锚点
-url:  &url  "http://www.gstatic.com/generate_204"   # 健康检查 URL
-blk:  &blk '^(?!.*(DIRECT|直接连接|群|邀请|返利|循环|官网|客服|网站|网址|获取|订阅|流量|到期|机场|下次|版本|官址|备用|过期|已用|联系|邮箱|工单|贩卖|通知|倒卖|防止|国内|地址|频道|无法|说明|使用|提示|特别|访问|支持|教程|关注|更新|作者|加入|USE|USED|TOTAL|EXPIRE|EMAIL|Panel|Channel|Author))'
-prov: &prov {type: http, interval: 86400, health-check: {enable: true, url: *url, interval: 300}}
+# ============================================================
+# Baiye Mihomo Lite：手机 / 低性能设备 / 稳定省心
+# 适合：Android / iOS / 日常轻量使用
+# 特点：TUN 关闭、规则少、分组少、降低耗电和奇怪兼容问题
+# ============================================================
 
+url: &url "http://www.gstatic.com/generate_204"
+blk: &blk '^(?!.*(?i)(DIRECT|直接连接|群|邀请|官网|客服|网站|网址|获取|订阅|流量|到期|机场|下次|版本|备用|过期|已用|联系|邮箱|工单|通知|地址|频道|说明|教程|USE|USED|TOTAL|EXPIRE|EMAIL|Panel|Channel|Author)).*$'
+prov: &prov {type: http, interval: 86400, health-check: {enable: true, url: *url, interval: 600}}
 
-# ======================= 建议仅修改此部分内容======================
-# ========================= 订阅 Providers =======================
-# [替换订阅链接]里填入你的机场订阅链接
-
+# ======================= 只改这里：订阅 =======================
 proxy-providers:
   Node:
-    url: "替换订阅链接1"
     <<: *prov
-    path: './proxy_provider/providers.yaml'
+    url: "替换订阅链接"
+    path: "./proxy_provider/providers.yaml"
     filter: *blk
 
-# ======================  ⬆️⬆️⬆️⬆️⬆️  ========================
-
-
-# ======================= 以下内容建议小白勿修改 =======================
-# ========================== 基础配置 ==========================
+# ======================= 基础配置 =======================
 mixed-port: 7890
-allow-lan: true
-bind-address: '*'
+allow-lan: false
+bind-address: 127.0.0.1
 mode: rule
 log-level: warning
+ipv6: false
 unified-delay: true
 tcp-concurrent: true
 find-process-mode: off
 
 external-controller: 127.0.0.1:9090
 # external-ui: ui
-# secret: "yourpassword"
-
-keep-alive-idle: 600
-keep-alive-interval: 60
-
-skip-auth-prefixes:
-  - 127.0.0.0/8
-  - 10.0.0.0/8
-  - 172.16.0.0/12
-  - 192.168.0.0/16
-  - 100.64.0.0/10
-  - ::1/128
-  - fc00::/7
-  - fe80::/10
+# external-ui-name: zashboard
+# external-ui-url: https://github.com/Zephyruso/zashboard/releases/latest/download/dist.zip
 
 profile:
   store-selected: true
   store-fake-ip: true
 
-
-# ============================ DNS ============================
+# ======================= DNS =======================
 dns:
   enable: true
-  prefer-h3: true
-  listen: 0.0.0.0:1053
+  prefer-h3: false
+  listen: 127.0.0.1:1053
   ipv6: false
   enhanced-mode: fake-ip
   fake-ip-range: 198.18.0.1/16
   use-hosts: true
 
-  nameserver:
-    - https://223.5.5.5/dns-query
-    - https://doh.pub/dns-query
-    - https://dns.alidns.com/dns-query
-
   default-nameserver:
     - 223.5.5.5
     - 119.29.29.29
 
+  nameserver:
+    - https://dns.alidns.com/dns-query
+    - https://doh.pub/dns-query
+
+  proxy-server-nameserver:
+    - https://dns.alidns.com/dns-query
+    - https://doh.pub/dns-query
+
   nameserver-policy:
-    'geosite:cn':
+    "geosite:cn":
       - 223.5.5.5
       - 119.29.29.29
-
-    'geosite:geolocation-!cn':
-      - https://1.1.1.1/dns-query
-      - https://8.8.8.8/dns-query
-      - https://223.5.5.5/dns-query
-      
-  proxy-server-nameserver:
-    - https://223.5.5.5/dns-query
-    - https://doh.pub/dns-query
-    - https://dns.alidns.com/dns-query
+    "geosite:private":
+      - 223.5.5.5
+      - 119.29.29.29
 
   fake-ip-filter:
     - rule-set:fake-ip
@@ -92,139 +73,119 @@ dns:
     - geosite:connectivity-check
     - "*.lan"
     - "*.local"
+    - "*.localdomain"
+    - "+.miwifi.com"
+    - "+.mijia.tech"
+    - "+.miot-spec.org"
+    - "+.market.xiaomi.com"
+    - "+.push.apple.com"
+    - "stun.*"
 
-# ========================== 嗅探设置 ==========================
+# ======================= 嗅探 =======================
 sniffer:
   enable: true
   sniff:
     HTTP: {ports: [80, 8080-8880], override-destination: true}
     TLS:  {ports: [443, 8443]}
-    QUIC: {ports: [443, 8443]}
   skip-domain:
     - rule-set:sniff-skip
+    - "Mijia Cloud"
+    - "+.push.apple.com"
+    - "+.miwifi.com"
+    - "+.mijia.tech"
+    - "+.miot-spec.org"
 
-
-# ============================ TUN ============================
+# ======================= TUN：Lite 默认关闭 =======================
 tun:
-  enable: true
-  stack: mixed
-  auto-route: true
-  auto-detect-interface: true
-  dns-hijack:
-    - any:53
-  strict-route: true
-  mtu: 1500
+  enable: false
 
-# ========================== Geodata ==========================
+# ======================= Geodata =======================
 geodata-mode: true
 geodata-loader: memconservative
 geo-auto-update: true
 geo-update-interval: 24
 geox-url:
-  geoip:   "https://cdn.jsdelivr.net/gh/Loyalsoldier/v2ray-rules-dat@release/geoip.dat"
+  geoip: "https://cdn.jsdelivr.net/gh/Loyalsoldier/v2ray-rules-dat@release/geoip.dat"
   geosite: "https://cdn.jsdelivr.net/gh/Loyalsoldier/v2ray-rules-dat@release/geosite.dat"
 
-
-# ============================ 锚点 ============================
-tmpl: &tmpl {url: *url, interval: 300, lazy: true, timeout: 5000, disable-udp: false, max-failed-times: 3, hidden: true, include-all: true}
-sel:  &sel  {type: select, url: *url, disable-udp: false, hidden: false, include-all: true}
-test: &test {type: url-test, <<: *tmpl, tolerance: 50}
-fall: &fall {type: fallback, <<: *tmpl}
-
-entr: &entr {type: select, proxies: ["♻️ 智能选择","👆 手动选择","DIRECT"]}
-app:  &app  {type: select, proxies: ["♻️ 智能选择","👆 手动选择","DIRECT","🇭🇰 - 择优节点","🇹🇼 - 择优节点","🇯🇵 - 择优节点","🇰🇷 - 择优节点","🇸🇬 - 择优节点","🇺🇸 - 择优节点","🇬🇧 - 择优节点","🇫🇷 - 择优节点","🇩🇪 - 择优节点"]}
-drc:  &drc  {type: select, proxies: ["DIRECT","♻️ 智能选择","👆 手动选择","🇭🇰 - 择优节点","🇹🇼 - 择优节点","🇯🇵 - 择优节点","🇰🇷 - 择优节点","🇸🇬 - 择优节点","🇺🇸 - 择优节点","🇬🇧 - 择优节点","🇫🇷 - 择优节点","🇩🇪 - 择优节点"]}
-strm: &strm {type: select, proxies: ["♻️ 智能选择","👆 手动选择","DIRECT","🇭🇰 - 择优节点","🇹🇼 - 择优节点","🇯🇵 - 择优节点","🇰🇷 - 择优节点","🇸🇬 - 择优节点","🇺🇸 - 择优节点","🇬🇧 - 择优节点","🇫🇷 - 择优节点","🇩🇪 - 择优节点","🇭🇰 - 自动回退","🇹🇼 - 自动回退","🇯🇵 - 自动回退","🇰🇷 - 自动回退","🇸🇬 - 自动回退","🇺🇸 - 自动回退","🇬🇧 - 自动回退","🇫🇷 - 自动回退","🇩🇪 - 自动回退"]}
-
-manu: &manu {<<: *sel, filter: *blk}
+# ======================= 策略组 =======================
+tmpl: &tmpl {url: *url, interval: 600, lazy: true, timeout: 5000, disable-udp: false, max-failed-times: 3, hidden: true, include-all-providers: true, exclude-filter: "(?i)(DIRECT|直接连接|官网|订阅|流量|到期|套餐|客服|群|邀请|网址|剩余|过期|LAN)"}
+sel:  &sel  {type: select, url: *url, disable-udp: false, hidden: false, include-all-providers: true, exclude-filter: "(?i)(DIRECT|直接连接|官网|订阅|流量|到期|套餐|客服|群|邀请|网址|剩余|过期|LAN)"}
+test: &test {type: url-test, <<: *tmpl, tolerance: 80}
 
 hk: &hk '^(?=.*(?i)(港|🇭🇰|HK|Hong|HKG))(?!.*(?i)(5x)).*$'
-tw: &tw '^(?=.*(?i)(台|🇼🇸|🇹🇼|TW|tai|TPE|TSA|KHH))(?!.*(?i)(5x)).*$'
+tw: &tw '^(?=.*(?i)(台|台湾|臺|🇹🇼|TW|Taiwan|Taipei|TPE|TSA|KHH))(?!.*(?i)(5x)).*$'
 jp: &jp '^(?=.*(?i)(日|🇯🇵|JP|Japan|NRT|HND|KIX|CTS|FUK))(?!.*(?i)(尼日利亚|5x)).*$'
-kr: &kr '^(?=.*(?i)(韩|🇰🇷|韓|首尔|南朝鲜|KR|KOR|Korea|South))(?!.*(?i)(5x)).*$'
 sg: &sg '^(?=.*(?i)(坡|🇸🇬|SG|Sing|SIN|XSP))(?!.*(?i)(5x)).*$'
-us: &us '^(?=.*(?i)(美|🇺🇸|US|USA|JFK|SJC|LAX|ORD|ATL|DFW|SFO|MIA|SEA|IAD))(?!.*(?i)(Plus|Australia|5x)).*$'
-uk: &uk '^(?=.*(?i)(英|英国|UK|大不列颠|伦敦|Kingdom))(?!.*(?i)(5x)).*$'
-fr: &fr '^(?=.*(?i)(法|🇫🇷|法国|FR|France))(?!.*(?i)(5x)).*$'
-de: &de '^(?=.*(?i)(德|🇩🇪|德国|DE|Germany))(?!.*(?i)(5x)).*$'
+us: &us '^(?=.*(?i)(美|🇺🇸|US|USA|United States|JFK|SJC|LAX|SFO|SEA|IAD))(?!.*(?i)(Australia|5x)).*$'
 
-
-# ========================= proxy-groups =========================
 proxy-groups:
-  - {name: "🚀 节点选择", <<: *entr, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/choice.png"}
-  - {name: "👆 手动选择", <<: *manu, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/select.png"}
-  - {name: "♻️ 智能选择", type: url-test, proxies: ["🇭🇰 - 择优节点","🇹🇼 - 择优节点","🇯🇵 - 择优节点","🇸🇬 - 择优节点"], url: *url, interval: 300, tolerance: 50, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/auto.png"}
-
-  - {name: "🌐 全球直连", <<: *drc,  icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/link.png"}
-  - {name: "🤖 AI  平台", <<: *app,  icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/openai.png"}
-  - {name: "☁️ Onedrive", <<: *app,  icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/onedrive.png"}
-  - {name: "Ⓜ️ 微软服务", <<: *app,  icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/microsoft.png"}
-  - {name: "🍎 苹果服务", <<: *app,  icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/apple.png"}
-  - {name: "🎮 游戏平台", <<: *app,  icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/game.png"}
-  - {name: "🎵 Spotify",  <<: *strm, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/spotify.png"}
-  - {name: "📺 视频媒体", <<: *strm, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/netflix.png"}
+  - {name: "🚀 节点选择", type: select, proxies: ["♻️ 智能选择","👆 手动选择","DIRECT"], icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/choice.png"}
+  - {name: "👆 手动选择", <<: *sel, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/select.png"}
+  - {name: "♻️ 智能选择", type: url-test, proxies: ["🇭🇰 - 择优节点","🇹🇼 - 择优节点","🇯🇵 - 择优节点","🇸🇬 - 择优节点"], url: *url, interval: 600, tolerance: 80, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/auto.png"}
+  - {name: "🤖 AI 平台", type: select, proxies: ["🇺🇸 - 择优节点","🚀 节点选择","🇭🇰 - 择优节点","🇯🇵 - 择优节点","🇸🇬 - 择优节点"], icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/openai.png"}
+  - {name: "📺 视频媒体", type: select, proxies: ["🚀 节点选择","🇭🇰 - 择优节点","🇹🇼 - 择优节点","🇯🇵 - 择优节点","🇸🇬 - 择优节点","🇺🇸 - 择优节点"], icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/netflix.png"}
+  - {name: "✈️ Telegram", type: select, proxies: ["🚀 节点选择","🇸🇬 - 择优节点","🇭🇰 - 择优节点","🇯🇵 - 择优节点","🇺🇸 - 择优节点"], icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/telegram.png"}
+  - {name: "🍎 苹果服务", type: select, proxies: ["DIRECT","🚀 节点选择","🇭🇰 - 择优节点","🇺🇸 - 择优节点"], icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/apple.png"}
+  - {name: "Ⓜ️ 微软服务", type: select, proxies: ["DIRECT","🚀 节点选择","🇭🇰 - 择优节点","🇸🇬 - 择优节点","🇺🇸 - 择优节点"], icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/microsoft.png"}
 
   - {name: "🇭🇰 - 择优节点", <<: *test, filter: *hk}
+  - {name: "🇹🇼 - 择优节点", <<: *test, filter: *tw}
   - {name: "🇯🇵 - 择优节点", <<: *test, filter: *jp}
-  - {name: "🇰🇷 - 择优节点", <<: *test, filter: *kr}
   - {name: "🇸🇬 - 择优节点", <<: *test, filter: *sg}
   - {name: "🇺🇸 - 择优节点", <<: *test, filter: *us}
-  - {name: "🇬🇧 - 择优节点", <<: *test, filter: *uk}
-  - {name: "🇫🇷 - 择优节点", <<: *test, filter: *fr}
-  - {name: "🇩🇪 - 择优节点", <<: *test, filter: *de}
-  - {name: "🇹🇼 - 择优节点", <<: *test, filter: *tw}
 
-  - {name: "🇭🇰 - 自动回退", <<: *fall, filter: *hk}
-  - {name: "🇯🇵 - 自动回退", <<: *fall, filter: *jp}
-  - {name: "🇰🇷 - 自动回退", <<: *fall, filter: *kr}
-  - {name: "🇸🇬 - 自动回退", <<: *fall, filter: *sg}
-  - {name: "🇺🇸 - 自动回退", <<: *fall, filter: *us}
-  - {name: "🇬🇧 - 自动回退", <<: *fall, filter: *uk}
-  - {name: "🇫🇷 - 自动回退", <<: *fall, filter: *fr}
-  - {name: "🇩🇪 - 自动回退", <<: *fall, filter: *de}
-  - {name: "🇹🇼 - 自动回退", <<: *fall, filter: *tw}
-
-
-# =========================== 规则集 ===========================
+# ======================= 规则集 =======================
 cls: &cls {type: http, behavior: classical, interval: 43200, format: text, proxy: "🚀 节点选择"}
-dom: &dom {type: http, behavior: domain,    interval: 43200, format: text, proxy: "🚀 节点选择"}
+dom: &dom {type: http, behavior: domain, interval: 43200, format: text, proxy: "🚀 节点选择"}
 
 rule-providers:
-  FuckAD:               {<<: *dom, format: yaml, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/yaml/fuckAds.yaml,     path: ./rules/yaml/fuckAds.yaml}
-  sniff-skip:           {<<: *dom, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/domainset/sniff-skip.list,           path: ./rules/domainset/sniff-skip.list}
-  fake-ip:              {<<: *dom, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/domainset/fake-ip.list,              path: ./rules/domainset/fake-ip.list}
-  stream_non_ip:        {<<: *cls, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/non_ip/stream.txt,                   path: ./rules/non_ip/stream.txt}
-  stream_ip:            {<<: *cls, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/ip/stream.txt,                       path: ./rules/ip/stream.txt}
+  FuckAD:          {<<: *dom, format: yaml, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/yaml/fuckAds.yaml, path: ./rules/yaml/fuckAds.yaml}
+  sniff-skip:      {<<: *dom, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/domainset/sniff-skip.list, path: ./rules/domainset/sniff-skip.list}
+  fake-ip:         {<<: *dom, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/domainset/fake-ip.list, path: ./rules/domainset/fake-ip.list}
+  stream_non_ip:   {<<: *cls, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/non_ip/stream.txt, path: ./rules/non_ip/stream.txt}
+  stream_ip:       {<<: *cls, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/ip/stream.txt, path: ./rules/ip/stream.txt}
+  ai_non_ip:       {<<: *cls, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/non_ip/ai.txt, path: ./rules/non_ip/ai.txt}
+  telegram_non_ip: {<<: *cls, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/non_ip/telegram.txt, path: ./rules/non_ip/telegram.txt}
+  telegram_ip:     {<<: *cls, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/ip/telegram.txt, path: ./rules/ip/telegram.txt}
 
-# =========================== 分流规则 ==========================
+# ======================= 分流规则 =======================
 rules:
-  # 非 IP 类
   - GEOSITE,private,DIRECT
   - RULE-SET,FuckAD,REJECT
-  - DOMAIN-SUFFIX,bing.com,DIRECT
-  - DOMAIN-SUFFIX,oaiusercontent.com,🤖 AI  平台
-  - GEOSITE,onedrive,☁️ Onedrive
-  - GEOSITE,category-ai-cn,🌐 全球直连
-  - GEOSITE,category-ai-!cn,🤖 AI  平台
-  - GEOSITE,category-games@cn,🌐 全球直连
-  - GEOSITE,category-games,🎮 游戏平台
-  - GEOSITE,google-cn,🌐 全球直连
-  - GEOSITE,microsoft@cn,🌐 全球直连
-  - GEOSITE,microsoft,Ⓜ️ 微软服务
-  - GEOSITE,apple-cn,🌐 全球直连
-  - GEOSITE,apple,🍎 苹果服务
-  - GEOSITE,category-media-cn,🌐 全球直连
-  - GEOSITE,category-ai-cn,🌐 全球直连
-  - GEOSITE,spotify,🎵 Spotify
+
+  # 小米互联 / 局域网 / 系统连通性
+  - DOMAIN-SUFFIX,miwifi.com,DIRECT
+  - DOMAIN-SUFFIX,mijia.tech,DIRECT
+  - DOMAIN-SUFFIX,miot-spec.org,DIRECT
+  - DOMAIN-SUFFIX,market.xiaomi.com,DIRECT
+  - GEOSITE,connectivity-check,DIRECT
+
+  # AI / 搜索特殊处理
+  - DOMAIN-SUFFIX,oaiusercontent.com,🤖 AI 平台
+  - DOMAIN-SUFFIX,bing.com,🌐 全球直连
+
+  # 核心服务
+  - RULE-SET,ai_non_ip,🤖 AI 平台
+  - RULE-SET,telegram_non_ip,✈️ Telegram
   - RULE-SET,stream_non_ip,📺 视频媒体
+
+  # GEOSITE 轻量兜底
+  - GEOSITE,category-ai-cn,DIRECT
+  - GEOSITE,google-cn,DIRECT
+  - GEOSITE,apple-cn,DIRECT
+  - GEOSITE,apple,🍎 苹果服务
+  - GEOSITE,microsoft@cn,DIRECT
+  - GEOSITE,microsoft,Ⓜ️ 微软服务
+  - GEOSITE,category-games@cn,DIRECT
+  - GEOSITE,category-media-cn,DIRECT
   - GEOSITE,cn,DIRECT
   - GEOSITE,geolocation-!cn,🚀 节点选择
 
-  # IP 类
+  # IP
   - GEOIP,private,DIRECT,no-resolve
+  - RULE-SET,telegram_ip,✈️ Telegram,no-resolve
   - RULE-SET,stream_ip,📺 视频媒体,no-resolve
-  - GEOIP,telegram,🚀 节点选择,no-resolve
   - GEOIP,cn,DIRECT,no-resolve
 
-  # 兜底
   - MATCH,🚀 节点选择
