@@ -15,7 +15,7 @@ proxy-providers:
     url: "替换订阅链接1"
     path: "./proxy_provider/providers-1.yaml"
     override:
-      additional-prefix: "[订阅1] "
+      additional-prefix: "[显示名称1]"
     filter: *blk
 
   Sub-2:
@@ -23,7 +23,7 @@ proxy-providers:
     url: "替换订阅链接2"
     path: "./proxy_provider/providers-2.yaml"
     override:
-      additional-prefix: "[订阅2] "
+      additional-prefix: "[显示名称2]"
     filter: *blk
 
 # ======================= 基础配置 =======================
