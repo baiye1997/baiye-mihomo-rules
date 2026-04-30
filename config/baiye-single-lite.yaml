@@ -71,15 +71,9 @@ dns:
     - geosite:cn
     - geosite:private
     - geosite:connectivity-check
-    - "*.lan"
-    - "*.local"
-    - "*.localdomain"
     - "+.miwifi.com"
     - "+.mijia.tech"
-    - "+.miot-spec.org"
     - "+.market.xiaomi.com"
-    - "+.push.apple.com"
-    - "stun.*"
 
 # ======================= 嗅探 =======================
 sniffer:
@@ -108,32 +102,53 @@ geox-url:
   geoip: "https://cdn.jsdelivr.net/gh/Loyalsoldier/v2ray-rules-dat@release/geoip.dat"
   geosite: "https://cdn.jsdelivr.net/gh/Loyalsoldier/v2ray-rules-dat@release/geosite.dat"
 
-# ======================= 策略组 =======================
-tmpl: &tmpl {url: *url, interval: 600, lazy: true, timeout: 5000, disable-udp: false, max-failed-times: 3, hidden: true, include-all-providers: true, exclude-filter: "(?i)(DIRECT|直接连接|官网|订阅|流量|到期|套餐|客服|群|邀请|网址|剩余|过期|LAN)"}
+# ======================= 策略组锚点 =======================
+tmpl: &tmpl {url: *url, interval: 300, lazy: true, timeout: 5000, disable-udp: false, max-failed-times: 3, hidden: true, include-all-providers: true, exclude-filter: "(?i)(DIRECT|直接连接|官网|订阅|流量|到期|套餐|客服|群|邀请|网址|剩余|过期|LAN)"}
 sel:  &sel  {type: select, url: *url, disable-udp: false, hidden: false, include-all-providers: true, exclude-filter: "(?i)(DIRECT|直接连接|官网|订阅|流量|到期|套餐|客服|群|邀请|网址|剩余|过期|LAN)"}
-test: &test {type: url-test, <<: *tmpl, tolerance: 80}
+test: &test {type: url-test, <<: *tmpl, tolerance: 50}
+fall: &fall {type: fallback, <<: *tmpl}
+
+entr: &entr {type: select, proxies: ["♻️ 智能选择","👆 手动选择","DIRECT"]}
+app:  &app  {type: select, proxies: ["♻️ 智能选择","👆 手动选择","DIRECT","🇭🇰 - 择优节点","🇹🇼 - 择优节点","🇯🇵 - 择优节点","🇰🇷 - 择优节点","🇸🇬 - 择优节点","🇺🇸 - 择优节点"]}
+drc:  &drc  {type: select, proxies: ["DIRECT","♻️ 智能选择","👆 手动选择","🇭🇰 - 择优节点","🇹🇼 - 择优节点","🇯🇵 - 择优节点","🇸🇬 - 择优节点","🇺🇸 - 择优节点"]}
+strm: &strm {type: select, proxies: ["♻️ 智能选择","👆 手动选择","DIRECT","🇭🇰 - 择优节点","🇹🇼 - 择优节点","🇯🇵 - 择优节点","🇰🇷 - 择优节点","🇸🇬 - 择优节点","🇺🇸 - 择优节点","🇭🇰 - 自动回退","🇹🇼 - 自动回退","🇯🇵 - 自动回退","🇸🇬 - 自动回退","🇺🇸 - 自动回退"]}
+tg:   &tg   {type: select, proxies: ["♻️ 智能选择","👆 手动选择","DIRECT","🇸🇬 - 择优节点","🇭🇰 - 择优节点","🇯🇵 - 择优节点","🇺🇸 - 择优节点"]}
 
 hk: &hk '^(?=.*(?i)(港|🇭🇰|HK|Hong|HKG))(?!.*(?i)(5x)).*$'
 tw: &tw '^(?=.*(?i)(台|台湾|臺|🇹🇼|TW|Taiwan|Taipei|TPE|TSA|KHH))(?!.*(?i)(5x)).*$'
 jp: &jp '^(?=.*(?i)(日|🇯🇵|JP|Japan|NRT|HND|KIX|CTS|FUK))(?!.*(?i)(尼日利亚|5x)).*$'
+kr: &kr '^(?=.*(?i)(韩|🇰🇷|韓|首尔|南朝鲜|KR|KOR|Korea|South))(?!.*(?i)(5x)).*$'
 sg: &sg '^(?=.*(?i)(坡|🇸🇬|SG|Sing|SIN|XSP))(?!.*(?i)(5x)).*$'
-us: &us '^(?=.*(?i)(美|🇺🇸|US|USA|United States|JFK|SJC|LAX|SFO|SEA|IAD))(?!.*(?i)(Australia|5x)).*$'
+us: &us '^(?=.*(?i)(美|🇺🇸|US|USA|United States|JFK|SJC|LAX|ORD|ATL|DFW|SFO|MIA|SEA|IAD))(?!.*(?i)(Australia|5x)).*$'
 
+# ======================= 策略组 =======================
 proxy-groups:
-  - {name: "🚀 节点选择", type: select, proxies: ["♻️ 智能选择","👆 手动选择","DIRECT"], icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/choice.png"}
+  - {name: "🚀 节点选择", <<: *entr, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/choice.png"}
   - {name: "👆 手动选择", <<: *sel, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/select.png"}
-  - {name: "♻️ 智能选择", type: url-test, proxies: ["🇭🇰 - 择优节点","🇹🇼 - 择优节点","🇯🇵 - 择优节点","🇸🇬 - 择优节点"], url: *url, interval: 600, tolerance: 80, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/auto.png"}
-  - {name: "🤖 AI 平台", type: select, proxies: ["🇺🇸 - 择优节点","🚀 节点选择","🇭🇰 - 择优节点","🇯🇵 - 择优节点","🇸🇬 - 择优节点"], icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/openai.png"}
-  - {name: "📺 视频媒体", type: select, proxies: ["🚀 节点选择","🇭🇰 - 择优节点","🇹🇼 - 择优节点","🇯🇵 - 择优节点","🇸🇬 - 择优节点","🇺🇸 - 择优节点"], icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/netflix.png"}
-  - {name: "✈️ Telegram", type: select, proxies: ["🚀 节点选择","🇸🇬 - 择优节点","🇭🇰 - 择优节点","🇯🇵 - 择优节点","🇺🇸 - 择优节点"], icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/telegram.png"}
-  - {name: "🍎 苹果服务", type: select, proxies: ["DIRECT","🚀 节点选择","🇭🇰 - 择优节点","🇺🇸 - 择优节点"], icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/apple.png"}
-  - {name: "Ⓜ️ 微软服务", type: select, proxies: ["DIRECT","🚀 节点选择","🇭🇰 - 择优节点","🇸🇬 - 择优节点","🇺🇸 - 择优节点"], icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/microsoft.png"}
+  - {name: "♻️ 智能选择", type: url-test, proxies: ["🇭🇰 - 择优节点","🇹🇼 - 择优节点","🇯🇵 - 择优节点","🇸🇬 - 择优节点"], url: *url, interval: 300, tolerance: 50, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/auto.png"}
+
+  - {name: "🌐 全球直连", <<: *drc, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/link.png"}
+  - {name: "🤖 AI 平台", <<: *app, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/openai.png"}
+  - {name: "✈️ Telegram", <<: *tg, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/telegram.png"}
+  - {name: "☁️ OneDrive", <<: *app, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/onedrive.png"}
+  - {name: "Ⓜ️ 微软服务", <<: *app, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/microsoft.png"}
+  - {name: "🍎 苹果服务", <<: *app, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/apple.png"}
+  - {name: "🎮 游戏平台", <<: *app, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/game.png"}
+  - {name: "🎵 Spotify", <<: *strm, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/spotify.png"}
+  - {name: "📺 视频媒体", <<: *strm, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/netflix.png"}
 
   - {name: "🇭🇰 - 择优节点", <<: *test, filter: *hk}
   - {name: "🇹🇼 - 择优节点", <<: *test, filter: *tw}
   - {name: "🇯🇵 - 择优节点", <<: *test, filter: *jp}
+  - {name: "🇰🇷 - 择优节点", <<: *test, filter: *kr}
   - {name: "🇸🇬 - 择优节点", <<: *test, filter: *sg}
   - {name: "🇺🇸 - 择优节点", <<: *test, filter: *us}
+
+  - {name: "🇭🇰 - 自动回退", <<: *fall, filter: *hk}
+  - {name: "🇹🇼 - 自动回退", <<: *fall, filter: *tw}
+  - {name: "🇯🇵 - 自动回退", <<: *fall, filter: *jp}
+  - {name: "🇸🇬 - 自动回退", <<: *fall, filter: *sg}
+  - {name: "🇺🇸 - 自动回退", <<: *fall, filter: *us}
 
 # ======================= 规则集 =======================
 cls: &cls {type: http, behavior: classical, interval: 43200, format: text, proxy: "🚀 节点选择"}
@@ -141,6 +156,7 @@ dom: &dom {type: http, behavior: domain, interval: 43200, format: text, proxy: "
 
 rule-providers:
   FuckAD:          {<<: *dom, format: yaml, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/yaml/fuckAds.yaml, path: ./rules/yaml/fuckAds.yaml}
+  Game:            {<<: *cls, format: yaml, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/yaml/Game.yaml, path: ./rules/yaml/Game.yaml}
   sniff-skip:      {<<: *dom, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/domainset/sniff-skip.list, path: ./rules/domainset/sniff-skip.list}
   fake-ip:         {<<: *dom, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/domainset/fake-ip.list, path: ./rules/domainset/fake-ip.list}
   stream_non_ip:   {<<: *cls, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/non_ip/stream.txt, path: ./rules/non_ip/stream.txt}
@@ -165,20 +181,23 @@ rules:
   - DOMAIN-SUFFIX,oaiusercontent.com,🤖 AI 平台
   - DOMAIN-SUFFIX,bing.com,🌐 全球直连
 
-  # 核心服务
+  # 直连
+  - GEOSITE,category-ai-cn,DIRECT
+  - GEOSITE,google-cn,DIRECT
+  - GEOSITE,category-games@cn,DIRECT
+  - GEOSITE,category-media-cn,DIRECT
+  - GEOSITE,apple-cn,DIRECT
+  - GEOSITE,microsoft@cn,DIRECT  
+  - GEOSITE,apple,🍎 苹果服务
+  - GEOSITE,microsoft,Ⓜ️ 微软服务
+  - GEOSITE,spotify,🎵 Spotify
+  - GEOSITE,onedrive,☁️ OneDrive
   - RULE-SET,ai_non_ip,🤖 AI 平台
   - RULE-SET,telegram_non_ip,✈️ Telegram
   - RULE-SET,stream_non_ip,📺 视频媒体
-
+  - RULE-SET,Game,🎮 游戏平台
+  
   # GEOSITE 轻量兜底
-  - GEOSITE,category-ai-cn,DIRECT
-  - GEOSITE,google-cn,DIRECT
-  - GEOSITE,apple-cn,DIRECT
-  - GEOSITE,apple,🍎 苹果服务
-  - GEOSITE,microsoft@cn,DIRECT
-  - GEOSITE,microsoft,Ⓜ️ 微软服务
-  - GEOSITE,category-games@cn,DIRECT
-  - GEOSITE,category-media-cn,DIRECT
   - GEOSITE,cn,DIRECT
   - GEOSITE,geolocation-!cn,🚀 节点选择
 
