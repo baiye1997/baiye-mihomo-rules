@@ -1,7 +1,7 @@
 #########################################
 # Sukka's Ruleset - Large Files Hosting Domains
-# Last Updated: 2026-04-21T03:37:05.218Z
-# Size: 1918
+# Last Updated: 2026-05-04T13:44:04.887Z
+# Size: 1919
 # License: AGPL 3.0
 # Homepage: https://ruleset.skk.moe
 # GitHub: https://github.com/SukkaW/Surge
@@ -1225,6 +1225,7 @@ apache.cbox.biz
 +.public.ecr.aws
 su.virtualbuddy.app
 cdn.organicmaps.app
+updates.vibeisland.app
 dl.vibeisland.app
 updates.istatmenus.app
 dl.vanadium.app
