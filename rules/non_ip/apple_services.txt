@@ -1,6 +1,6 @@
 #########################################
 # Sukka's Ruleset - Apple Domains
-# Last Updated: 2026-03-10T14:56:40.479Z
+# Last Updated: 2026-05-09T06:58:35.067Z
 # Size: 26
 # License: AGPL 3.0
 # Homepage: https://ruleset.skk.moe
@@ -25,7 +25,6 @@ DOMAIN-SUFFIX,apple.com
 DOMAIN-SUFFIX,me.com
 DOMAIN-SUFFIX,appsto.re
 DOMAIN-SUFFIX,apple.co
-PROCESS-NAME,netbiosd
 PROCESS-NAME,com.apple.geod
 PROCESS-NAME,mapspushd
 PROCESS-NAME,com.apple.Maps
@@ -34,4 +33,5 @@ PROCESS-NAME,fmfd
 PROCESS-NAME,findmydevice-user-agent
 PROCESS-NAME,CoreLocationAgent
 PROCESS-NAME,WeatherWidget
+IP-CIDR,17.0.0.0/8,no-resolve
 ################## EOF ##################
