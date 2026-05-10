@@ -1,7 +1,7 @@
 #########################################
 # Sukka's Ruleset - Apple CDN
-# Last Updated: 2026-04-18T18:34:48.303Z
-# Size: 164
+# Last Updated: 2026-05-10T06:25:18.685Z
+# Size: 158
 # License: AGPL 3.0
 # Homepage: https://ruleset.skk.moe
 # GitHub: https://github.com/SukkaW/Surge
@@ -18,6 +18,7 @@
 +.images.apple.com.edgekey.net.globalredir.akadns.net
 +.store.apple.com.edgekey.net.globalredir.akadns.net
 +.www.apple.com.edgekey.net.globalredir.akadns.net
++.cl2.apple.com.edgekey.net.globalredir.akadns.net
 +.gsp4-cn.ls.apple.com.edgekey.net.globalredir.akadns.net
 +.iphone-ld.origin-apple.com.akadns.net
 +.cl5-cdn.origin-apple.com.akadns.net
@@ -32,10 +33,8 @@
 +.init-p01st-lb.push-apple.com.akadns.net
 +.init-p01md-lb.push-apple.com.akadns.net
 +.updates-http.cdn-apple.com.akadns.net
-+.pancake.cdn-apple.com.akadns.net
 +.gspe19-2-cn-ssl.ls-apple.com.akadns.net
 +.gspe19-cn.ls-apple.com.akadns.net
-+.icloud-cdn.icloud.com.akadns.net
 +.stocks-sparkline-lb.apple.com.akadns.net
 +.swcatalog-cdn.apple.com.akadns.net
 +.configuration.apple.com.akadns.net
@@ -45,9 +44,7 @@
 +.swscan-cdn.apple.com.akadns.net
 +.mesu-china.apple.com.akadns.net
 +.clientflow.apple.com.akadns.net
-+.ocsp2-lb.apple.com.akadns.net
 +.mesu-cdn.apple.com.akadns.net
-+.ocsp-lb.apple.com.akadns.net
 +.swdist.apple.com.akadns.net
 +.cds.apple.com.akadns.net
 +.cdn-cn4.apple-mapkit.com
@@ -66,7 +63,6 @@
 +.store.storeimages.cdn-apple.com
 +.updates.cdn-apple.com
 +.appleid.cdn-apple.com
-+.icloud.cdn-apple.com
 +.cstat.cdn-apple.com
 +.ml.cdn-apple.com
 +.is5-ssl.mzstatic.com
@@ -99,7 +95,6 @@
 +.sh-pod2-smp-device.apple.com
 +.stocks-sparkline.apple.com
 +.devstreaming-cdn.apple.com
-+.reserve-prime.apple.com
 +.itunesconnect.apple.com
 +.devimages-cdn.apple.com
 +.configuration.apple.com
@@ -147,8 +142,6 @@
 +.seed-sequoia.siri.apple.com
 +.probe.siri.apple.com
 +.seed.siri.apple.com
-+.init-s01st.push.apple.com
-+.init-p01st.push.apple.com
 +.pba0.apple.com
 +.ocsp.apple.com
 +.mesu.apple.com
@@ -172,6 +165,7 @@
 +.gspe19-cn.ls.apple.com
 +.gsp13-cn.ls.apple.com
 +.gsp12-cn.ls.apple.com
++.gsp11-cn.ls.apple.com
 +.gsp5-cn.ls.apple.com
 +.gsp4-cn.ls.apple.com
 +.static.gc.apple.com

@@ -1,7 +1,7 @@
 #########################################
 # Sukka's Ruleset - Large Files Hosting Domains
-# Last Updated: 2026-05-04T13:44:04.887Z
-# Size: 1919
+# Last Updated: 2026-05-10T07:35:31.917Z
+# Size: 1939
 # License: AGPL 3.0
 # Homepage: https://ruleset.skk.moe
 # GitHub: https://github.com/SukkaW/Surge
@@ -110,6 +110,7 @@ ftp.ubuntu-tw.org
 mirror2.tuxinator.org
 static.rust-lang.org
 mirrors.rpmfusion.org
+mirror.pyratelan.org
 +.packagist.org
 +.ossplanet.org
 mirrorbits.lineageos.org
@@ -158,11 +159,11 @@ debian.osuosl.org
 ftp.osuosl.org
 cdn.oneget.org
 lzip.nongnu.org
+mirror2.krfoss.org
 mirror.krfoss.org
 http.krfoss.org
 mirrors.kernel.org
-mirrors.edge.kernel.org
-eu.edge.kernel.org
++.edge.kernel.org
 mirrors.us.kernel.org
 plugins-artifacts.gradle.org
 repo.gradle.org
@@ -233,6 +234,7 @@ packages.sury.org
 deb.sury.org
 +.pypi.org
 ftp.ktug.org
+archive-4.kali.org
 cdimage.kali.org
 archive.kali.org
 http.kali.org
@@ -366,6 +368,7 @@ blzddist3-a.akamaihd.net
 blzddist2-a.akamaihd.net
 blzddist1-a.akamaihd.net
 origin-a.akamaihd.net
+mirror.wonchan.net
 +.file.core.windows.net
 +.blob.core.windows.net
 mirror.vorboss.net
@@ -421,6 +424,7 @@ mirror.lchost.net
 mirror-hk.koddos.net
 mirror.koddos.net
 mirrors.hopbox.net
+mirror.hemino.net
 +.mirror.gtcomm.net
 mirrors.glesys.net
 cloudfront.debian.net
@@ -565,6 +569,7 @@ mirrors.advancedhosters.com
 ubuntu.securedservers.com
 mirror.raiolanetworks.com
 mirror2.evolution-host.com
+mirror.cspacehostings.com
 ctldl.windowsupdate.com
 mirror.mythic-beasts.com
 +.mvnrepository.com
@@ -584,7 +589,10 @@ content-origin.steampowered.com
 +.steamcontent.com
 downloads.lemonsqueezy.com
 +.epicgamescdn.com
+mirror.us.cdn-perfprod.com
 mirror.nl.cdn-perfprod.com
+mirror.fr.cdn-perfprod.com
+mirror.es.cdn-perfprod.com
 +.mirror.wearetriple.com
 +.mirror.vhosting-it.com
 mirror.softaculous.com
@@ -995,6 +1003,7 @@ mirror.nl.altushost.com
 +.allawnofs.com
 app-updates.agilebits.com
 cache.agilebits.com
+mirror.africloud.com
 mirror.eu.4psacloud.com
 downloads.1password.com
 c.1password.com
@@ -1034,6 +1043,7 @@ repo.powerdns.com
 download.mikrotik.com
 downloads.majestic.com
 mirror.linkdata.com
+mirror2.keiminem.com
 mirror.keiminem.com
 mirror.us-ny2.kamatera.com
 mirror.us-tx.kamatera.com
@@ -1182,6 +1192,7 @@ registry.npmjs.com
 skimdb.npmjs.com
 mirror.mvizn.com
 mirror.kakao.com
++.mirror.ionos.com
 free.hands.com
 addins.deepl.com
 download.cpuid.com
@@ -1327,6 +1338,7 @@ ftp.upjs.sk
 cpan.lnx.sk
 +.apache.si
 ftp.arnes.si
+kali.darklab.sh
 binaries.prisma.sh
 repo.carbon.sh
 +.temp.sh
@@ -1414,7 +1426,7 @@ mirror.squ.edu.om
 mirror.2degrees.nz
 +.mega.nz
 ubuntu.btit.nz
-mirror.fsmg.org.nz
++.fsmg.org.nz
 cpan.inspire.net.nz
 +.mega.co.nz
 ucmirror.canterbury.ac.nz
@@ -1475,6 +1487,7 @@ mirror.cloudhosting.lv
 centos-stream.koyanet.lv
 ubuntu.koyanet.lv
 debian.koyanet.lv
+kali.koyanet.lv
 ftp.linux.edu.lv
 +.mirror.root.lu
 +.mirror.serveriai.lt
@@ -1489,6 +1502,7 @@ mirror.ps.kz
 repo.morgan.kr
 +.rsync.kr
 ftp.lanet.kr
+mirror.wane.kr
 mirror.techlabs.co.kr
 blizzard.gcdn.cloudn.co.kr
 ftp.kaist.ac.kr
@@ -1538,6 +1552,7 @@ go.opentelemetry.io
 packagecloud.io
 assets-production.packagecloud.io
 mirror.realcompute.io
+xsrv.moratelindo.io
 download.ameliorated.io
 +.dl.elementary.io
 docker.cloudsmith.io
@@ -1608,6 +1623,7 @@ cdn.ubuntu.repo.cloudeka.id
 cdn.repo.cloudeka.id
 mirror-gw.elastis.id
 mr.heru.id
+mirror.primelink.net.id
 kartolo.sby.datautama.net.id
 cpan.pesat.net.id
 mirror.papua.go.id
@@ -1675,6 +1691,7 @@ ctan.crest.fr
 www-ftp.lip6.fr
 ftp.lip6.fr
 mirror.ibcp.fr
+ftp.free.fr
 ftp.ec-m.fr
 +.nic.funet.fi
 ftp.funet.fi
@@ -1920,8 +1937,11 @@ mirror.sitsa.com.ar
 ubuntu.zero.com.ar
 apache.mesi.com.ar
 mirrors.teamcloud.am
+kali.itsec.am
 mirrors.asnet.am
 updates.64gr.am
++.mirror2.gnc.am
++.mirror1.gnc.am
 +.mirror.gnc.am
 +.mirror.homacloud.ai
 downloads.claude.ai
