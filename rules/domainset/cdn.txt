@@ -1,7 +1,7 @@
 #########################################
 # Sukka's Ruleset - CDN Domains
-# Last Updated: 2026-05-05T16:21:47.782Z
-# Size: 4462
+# Last Updated: 2026-05-12T15:43:33.564Z
+# Size: 4466
 # License: AGPL 3.0
 # Homepage: https://ruleset.skk.moe
 # GitHub: https://github.com/SukkaW/Surge
@@ -309,7 +309,7 @@ cdn.sciencecast.org
 +.qbittorrent.org
 +.stream.publicradio.org
 play.publicradio.org
-tile.opentopomap.org
++.tile.opentopomap.org
 covers.openlibrary.org
 tiles.openfreemap.org
 media.hentaifreak.org
@@ -2983,6 +2983,7 @@ heatmap-external-a.strava.com
 web-assets.strava.com
 content-a.strava.com
 wre-assets.prod.mapping.strava.com
+tiles.strava.com
 cdn-1.strava.com
 cdn.stonly.com
 +.tile.stamen.com
@@ -3833,6 +3834,7 @@ assets.cello.so
 cdn.mida.so
 images.spr.so
 +.cdn-zlib.sk
++.tiles.freemap.sk
 +.registry.gitplac.si
 +.gitpage.si
 +.gitapp.si
@@ -4313,6 +4315,7 @@ cdn.prod.www.spiegel.de
 www.acgpix.de
 cdn.ionos.de
 tile.mtbmap.cz
+mapserver.mapy.cz
 +.ipfs.slang.cx
 +.zpi.cx
 assets.openalternative.co
@@ -4353,6 +4356,7 @@ img.ifunny.co
 +.erocdn.co
 +.widget.clutch.co
 us-js.zonka.co
+cdn.videy.co
 +.unpkg.co
 app-static.turtl.co
 +.prcdn.co
