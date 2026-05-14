@@ -1,7 +1,7 @@
 #########################################
 # Sukka's Ruleset - CDN Domains
-# Last Updated: 2026-05-13T12:52:48.501Z
-# Size: 4470
+# Last Updated: 2026-05-14T09:28:31.353Z
+# Size: 4471
 # License: AGPL 3.0
 # Homepage: https://ruleset.skk.moe
 # GitHub: https://github.com/SukkaW/Surge
@@ -914,6 +914,7 @@ logos.composio.dev
 +.apac.orbitor.dev
 +.eu.orbitor.dev
 biomejs.dev
+img.appledb.dev
 +.angular.dev
 +.vercel.dev
 shields.rbtlog.dev
