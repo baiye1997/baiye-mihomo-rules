@@ -1,7 +1,7 @@
 #########################################
 # Sukka's Ruleset - Large Files Hosting Domains
-# Last Updated: 2026-05-10T07:35:31.917Z
-# Size: 1939
+# Last Updated: 2026-05-15T09:25:15.775Z
+# Size: 1941
 # License: AGPL 3.0
 # Homepage: https://ruleset.skk.moe
 # GitHub: https://github.com/SukkaW/Surge
@@ -1027,6 +1027,7 @@ dl.snipaste.com
 repo2.shinjiru.com
 download.proxyman.com
 repo.powerdns.com
++.mirror.pkgbuild.com
 +.cos.na-siliconvalley.myqcloud.com
 +.cos.eu-frankfurt.myqcloud.com
 +.cos.ap-singapore.myqcloud.com
@@ -1297,6 +1298,7 @@ cpan.ip-connect.vn.ua
 kde.ip-connect.vn.ua
 gimp.astra.in.ua
 mirror.aptus.co.tz
+mirror.archlinux.tw
 ftp.mirror.tw
 opensource.nchc.org.tw
 free.nchc.org.tw
