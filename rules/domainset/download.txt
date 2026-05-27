@@ -1,7 +1,7 @@
 #########################################
 # Sukka's Ruleset - Large Files Hosting Domains
-# Last Updated: 2026-05-15T09:25:15.775Z
-# Size: 1941
+# Last Updated: 2026-05-27T18:10:37.977Z
+# Size: 1943
 # License: AGPL 3.0
 # Homepage: https://ruleset.skk.moe
 # GitHub: https://github.com/SukkaW/Surge
@@ -1119,6 +1119,8 @@ mirror.evowise.com
 mirrors.evoluso.com
 +.mirror.edgeuno.com
 mirror.dewabiz.com
+updateinfo.devmate.com
+updates.devmate.com
 dl.devmate.com
 +.mirror.coganng.com
 mirror.bacloud.com
