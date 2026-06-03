@@ -1,7 +1,7 @@
 #########################################
 # Sukka's Ruleset - Large Files Hosting Domains
-# Last Updated: 2026-06-02T18:35:59.328Z
-# Size: 1944
+# Last Updated: 2026-06-03T12:11:19.128Z
+# Size: 1946
 # License: AGPL 3.0
 # Homepage: https://ruleset.skk.moe
 # GitHub: https://github.com/SukkaW/Surge
@@ -327,6 +327,7 @@ ota.googlezip.net
 pf-cdn-content-prod.azureedge.net
 playwright-akamai.azureedge.net
 playwright.azureedge.net
+cdn-ota.azureedge.net
 mirror.applebred.net
 gamedownloads-rockstargames-com.akamaized.net
 officecdn-microsoft-com.akamaized.net
@@ -1213,6 +1214,7 @@ download.xbox.com
 +.mirrors.pair.com
 cpan.pair.com
 cdnorg.d.miui.com
+bn.d.miui.com
 download01.logi.com
 cdn.kagi.com
 +.mirror.iweb.com
