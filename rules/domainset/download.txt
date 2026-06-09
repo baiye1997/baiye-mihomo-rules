@@ -1,7 +1,7 @@
 #########################################
 # Sukka's Ruleset - Large Files Hosting Domains
-# Last Updated: 2026-06-03T12:11:19.128Z
-# Size: 1946
+# Last Updated: 2026-06-09T08:42:19.239Z
+# Size: 1947
 # License: AGPL 3.0
 # Homepage: https://ruleset.skk.moe
 # GitHub: https://github.com/SukkaW/Surge
@@ -46,6 +46,7 @@ mirrors.ubuntu.dimit.cloud
 cdn-builds.paw.cloud
 repo.sleeping.town
 +.mirror.globo.tech
+edge.zerofs.link
 centos-stream.ip-connect.info
 gimp.ip-connect.info
 ubuntu.servering.info
