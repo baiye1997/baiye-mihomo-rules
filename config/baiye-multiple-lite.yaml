@@ -119,9 +119,9 @@ test: &test {type: url-test, <<: *tmpl, tolerance: 50}
 fall: &fall {type: fallback, <<: *tmpl}
 
 entr: &entr {type: select, proxies: ["♻️ 智能选择","👆 手动选择","DIRECT"]}
-app:  &app  {type: select, proxies: ["♻️ 智能选择","👆 手动选择","DIRECT","🇭🇰 - 择优节点","🇹🇼 - 择优节点","🇯🇵 - 择优节点","🇰🇷 - 择优节点","🇸🇬 - 择优节点","🇺🇸 - 择优节点"]}
-drc:  &drc  {type: select, proxies: ["DIRECT","♻️ 智能选择","👆 手动选择","🇭🇰 - 择优节点","🇹🇼 - 择优节点","🇯🇵 - 择优节点","🇸🇬 - 择优节点","🇺🇸 - 择优节点"]}
-strm: &strm {type: select, proxies: ["♻️ 智能选择","👆 手动选择","DIRECT","🇭🇰 - 择优节点","🇹🇼 - 择优节点","🇯🇵 - 择优节点","🇰🇷 - 择优节点","🇸🇬 - 择优节点","🇺🇸 - 择优节点","🇭🇰 - 自动回退","🇹🇼 - 自动回退","🇯🇵 - 自动回退","🇸🇬 - 自动回退","🇺🇸 - 自动回退"]}
+app:  &app  {type: select, proxies: ["♻️ 智能选择","👆 手动选择","DIRECT","🇭🇰 - 择优节点","🇨🇳 - 择优节点","🇯🇵 - 择优节点","🇰🇷 - 择优节点","🇸🇬 - 择优节点","🇺🇸 - 择优节点"]}
+drc:  &drc  {type: select, proxies: ["DIRECT","♻️ 智能选择","👆 手动选择","🇭🇰 - 择优节点","🇨🇳 - 择优节点","🇯🇵 - 择优节点","🇸🇬 - 择优节点","🇺🇸 - 择优节点"]}
+strm: &strm {type: select, proxies: ["♻️ 智能选择","👆 手动选择","DIRECT","🇭🇰 - 择优节点","🇨🇳 - 择优节点","🇯🇵 - 择优节点","🇰🇷 - 择优节点","🇸🇬 - 择优节点","🇺🇸 - 择优节点","🇭🇰 - 自动回退","🇨🇳 - 自动回退","🇯🇵 - 自动回退","🇸🇬 - 自动回退","🇺🇸 - 自动回退"]}
 tg:   &tg   {type: select, proxies: ["♻️ 智能选择","👆 手动选择","DIRECT","🇸🇬 - 择优节点","🇭🇰 - 择优节点","🇯🇵 - 择优节点","🇺🇸 - 择优节点"]}
 
 hk: &hk '^(?=.*(?i)(港|🇭🇰|HK|Hong|HKG))(?!.*(?i)(5x)).*$'
@@ -135,7 +135,7 @@ us: &us '^(?=.*(?i)(美|🇺🇸|US|USA|United States|JFK|SJC|LAX|ORD|ATL|DFW|SF
 proxy-groups:
   - {name: "🚀 节点选择", <<: *entr, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/choice.png"}
   - {name: "👆 手动选择", <<: *sel, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/select.png"}
-  - {name: "♻️ 智能选择", type: url-test, proxies: ["🇭🇰 - 择优节点","🇹🇼 - 择优节点","🇯🇵 - 择优节点","🇸🇬 - 择优节点"], url: *url, interval: 300, tolerance: 50, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/auto.png"}
+  - {name: "♻️ 智能选择", type: url-test, proxies: ["🇭🇰 - 择优节点","🇨🇳 - 择优节点","🇯🇵 - 择优节点","🇸🇬 - 择优节点"], url: *url, interval: 300, tolerance: 50, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/auto.png"}
 
   - {name: "🌐 全球直连", <<: *drc, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/link.png"}
   - {name: "🤖 AI 平台", <<: *app, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/openai.png"}
@@ -148,14 +148,14 @@ proxy-groups:
   - {name: "📺 视频媒体", <<: *strm, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/netflix.png"}
 
   - {name: "🇭🇰 - 择优节点", <<: *test, filter: *hk}
-  - {name: "🇹🇼 - 择优节点", <<: *test, filter: *tw}
+  - {name: "🇨🇳 - 择优节点", <<: *test, filter: *tw}
   - {name: "🇯🇵 - 择优节点", <<: *test, filter: *jp}
   - {name: "🇰🇷 - 择优节点", <<: *test, filter: *kr}
   - {name: "🇸🇬 - 择优节点", <<: *test, filter: *sg}
   - {name: "🇺🇸 - 择优节点", <<: *test, filter: *us}
 
   - {name: "🇭🇰 - 自动回退", <<: *fall, filter: *hk}
-  - {name: "🇹🇼 - 自动回退", <<: *fall, filter: *tw}
+  - {name: "🇨🇳 - 自动回退", <<: *fall, filter: *tw}
   - {name: "🇯🇵 - 自动回退", <<: *fall, filter: *jp}
   - {name: "🇸🇬 - 自动回退", <<: *fall, filter: *sg}
   - {name: "🇺🇸 - 自动回退", <<: *fall, filter: *us}
