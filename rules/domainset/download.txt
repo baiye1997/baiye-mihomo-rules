@@ -1,7 +1,7 @@
 #########################################
 # Sukka's Ruleset - Large Files Hosting Domains
-# Last Updated: 2026-06-11T00:09:22.168Z
-# Size: 1948
+# Last Updated: 2026-06-18T06:22:06.858Z
+# Size: 1949
 # License: AGPL 3.0
 # Homepage: https://ruleset.skk.moe
 # GitHub: https://github.com/SukkaW/Surge
@@ -1825,6 +1825,7 @@ mirrors.pardisco.co
 mirrors.atlas.net.co
 mirror.unimagdalena.edu.co
 cas-bridge.xethub.hf.co
++.cdn.hf.co
 elmirror.cl
 ubuntu-mirror.puq.apoapsis.cl
 debian-mirror.puq.apoapsis.cl
