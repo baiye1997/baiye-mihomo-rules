@@ -1,7 +1,7 @@
 #########################################
 # Sukka's Ruleset - CDN Domains
-# Last Updated: 2026-06-19T10:26:43.718Z
-# Size: 4507
+# Last Updated: 2026-06-22T09:36:21.247Z
+# Size: 4508
 # License: AGPL 3.0
 # Homepage: https://ruleset.skk.moe
 # GitHub: https://github.com/SukkaW/Surge
@@ -2109,6 +2109,7 @@ assets.endorsely.com
 static.assets-stash.eet-china.com
 +.design-system.economist.com
 marber-cdn.economist.com
+wall-ui-cdn.p.aws.economist.com
 cmp-cdn.p.aws.economist.com
 +.dummyjson.com
 +.dubassets.com
