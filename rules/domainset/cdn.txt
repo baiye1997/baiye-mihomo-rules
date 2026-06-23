@@ -1,7 +1,7 @@
 #########################################
 # Sukka's Ruleset - CDN Domains
-# Last Updated: 2026-06-22T09:36:21.247Z
-# Size: 4508
+# Last Updated: 2026-06-23T12:52:02.130Z
+# Size: 4517
 # License: AGPL 3.0
 # Homepage: https://ruleset.skk.moe
 # GitHub: https://github.com/SukkaW/Surge
@@ -849,6 +849,7 @@ static.plus.net
 +.ipfs.mttk.net
 +.loli.net
 texture.laby.net
+cdn1.espn.net
 static1.e621.net
 +.c-dn.net
 static.blip.net
@@ -1085,6 +1086,8 @@ img.washingtonpost.com
 +.warnermediacdn.com
 static.global.visioncritical.com
 static.na1.visioncritical.com
+stories.usestoryteller.com
++.cdn.usestoryteller.com
 +.trafficdeposit.com
 media.telanganatoday.com
 image.telanganatoday.com
@@ -1816,6 +1819,7 @@ assets.dictionary.com
 +.descopecdn.com
 cdn.delight-vr.com
 static.websites.data-crypt.com
++.cursor-cdn.com
 static-beta.curseforge.com
 images.crunchbase.com
 cdn.conveythis.com
@@ -2637,7 +2641,9 @@ cdn.readmoo.com
 cdn-rdstaticassets.readdle.com
 +.ravenjs.com
 static.rakuten.com
+luminaire.railway.com
 devicons.railway.com
+cms.railway.com
 +.rackcdn.com
 cdn.quadpay.com
 +.pxlecdn.com
@@ -2646,8 +2652,7 @@ st.prntscr.com
 cdn.privacy.com
 app-static-prod.posthog.com
 app-static.eu.posthog.com
-us-assets.i.posthog.com
-eu-assets.i.posthog.com
++.i.posthog.com
 cdn77-t.pornoxo.com
 cdn77.pornoxo.com
 pics.pornfhd.com
@@ -2663,6 +2668,7 @@ www.pngmart.com
 cdn-main.plus500.com
 cdn.plus500.com
 cdn.pixabay.com
+assets.pingone.com
 static.pingcap.com
 +.phprcdn.com
 hawky.pcgamer.com
@@ -2863,6 +2869,7 @@ static.comicbz.com
 image.comicbz.com
 cover.comicbz.com
 css.comicbz.com
+unleash.codeium.com
 player-frontend.cnevids.com
 embed-audio.cnevids.com
 player.cnevids.com
@@ -3562,6 +3569,7 @@ cms-cdn.goat.com
 assets.goat.com
 image.goat.com
 +.fsdn.com
+digitalhub.fifa.com
 img04.en25.com
 images.dmca.com
 website-media.deel.com
@@ -4356,6 +4364,7 @@ tile.mtbmap.cz
 mapserver.mapy.cz
 +.ipfs.slang.cx
 +.zpi.cx
+img.kemono.cr
 assets.openalternative.co
 cdn.stackoverflow.co
 +.cdn-lfs-us-1.huggingface.co
