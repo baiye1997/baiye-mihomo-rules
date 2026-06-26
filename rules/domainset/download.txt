@@ -1,7 +1,7 @@
 #########################################
 # Sukka's Ruleset - Large Files Hosting Domains
-# Last Updated: 2026-06-25T13:01:22.045Z
-# Size: 1956
+# Last Updated: 2026-06-26T16:27:50.717Z
+# Size: 1958
 # License: AGPL 3.0
 # Homepage: https://ruleset.skk.moe
 # GitHub: https://github.com/SukkaW/Surge
@@ -127,6 +127,7 @@ index.rubygems.org
 static.redox-os.org
 download.opensuse.org
 cdn.opensuse.org
+updates.openlogi.org
 ciscobinary.openh264.org
 cpan.metacpan.org
 ubuntu.linux-bg.org
@@ -668,6 +669,7 @@ download.parallels.com
 desktop.parallels.com
 update.parallels.com
 +.mirrors.omnilance.com
+persistent.oaistatic.com
 mirror.nevacloud.com
 store.nethunter.com
 mirror.navercorp.com
