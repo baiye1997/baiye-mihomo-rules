@@ -55,6 +55,10 @@ jobs:
             [天照]
             [月读]
 
+          # Optional manual additions, comma/newline separated.
+          # Usually unnecessary because the script extracts proxy server domains from SUB_URLS.
+          SUB_SERVER_DOMAINS: ${{ secrets.SUB_SERVER_DOMAINS }}
+
           COMMIT_SHORT: ${{ github.sha }}
 
           # === Files

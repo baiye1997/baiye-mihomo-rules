@@ -154,11 +154,11 @@ proxy-groups:
   - {name: "Ⓜ️ 微软服务", <<: *app, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/microsoft.png"}
   - {name: "🍎 苹果服务", <<: *app, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/apple.png"}
   - {name: "🎮 游戏平台", <<: *app, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/game.png"}
-  - {name: "📦 CDN 低倍率", type: select, proxies: ["♻️ 低倍率自动","🚀 节点选择","👆 手动选择","DIRECT"], url: *url, disable-udp: false, hidden: false, include-all-providers: true, filter: *low, exclude-filter: "(?i)(DIRECT|直接连接|官网|订阅|流量|到期|套餐|客服|群|邀请|网址|剩余|过期|LAN)", icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/low.png"}
+  - {name: "📦 CDN 低倍率", type: select, proxies: ["♻️ 低倍率自动","🚀 节点选择","👆 手动选择","DIRECT"], use: ["Sub-1"], url: *url, disable-udp: false, hidden: false, filter: *low, exclude-filter: "(?i)(DIRECT|直接连接|官网|订阅|流量|到期|套餐|客服|群|邀请|网址|剩余|过期|LAN)", icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/low.png"}
   - {name: "🎵 Spotify", <<: *strm, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/spotify.png"}
   - {name: "📺 视频媒体", <<: *strm, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/netflix.png"}
 
-  - {name: "♻️ 低倍率自动", <<: *test, filter: *low}
+  - {name: "♻️ 低倍率自动", type: url-test, use: ["Sub-1"], url: *url, interval: 300, lazy: true, timeout: 5000, tolerance: 50, disable-udp: false, hidden: true, filter: *low, exclude-filter: "(?i)(DIRECT|直接连接|官网|订阅|流量|到期|套餐|客服|群|邀请|网址|剩余|过期|LAN)"}
 
   - {name: "🇭🇰 - 择优节点", <<: *test, filter: *hk}
   - {name: "🇨🇳 - 择优节点", <<: *test, filter: *tw}

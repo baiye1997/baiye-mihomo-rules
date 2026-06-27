@@ -13,6 +13,7 @@ const {
 
   SUB_URLS = "",
   SUB_NAMES = "",
+  SUB_SERVER_DOMAINS = "",
 
   CONFIG_MULTIPLE_STD,
   CONFIG_SINGLE_STD,
@@ -72,8 +73,121 @@ function maskUrl(raw = "") {
 /* ===================== Subscriptions ===================== */
 const subUrls = SUB_URLS.split(/\r?\n/).map(s => s.trim()).filter(Boolean);
 const subNames = SUB_NAMES.split(/\r?\n/).map(s => s.trim()).filter(Boolean);
+const manualServerDomains = SUB_SERVER_DOMAINS
+  .split(/[\r\n,]+/)
+  .map(s => normalizeDomainFilter(s))
+  .filter(Boolean);
 
-function applySubscriptions(template) {
+function normalizeDomainFilter(raw = "") {
+  let s = String(raw).trim();
+  if (!s) return "";
+  s = s.replace(/^server\s*:\s*/i, "").trim();
+  s = s.replace(/^['"]|['"]$/g, "").trim();
+  if (!s || /^\d+\.\d+\.\d+\.\d+$/.test(s) || s.includes(":")) return "";
+  s = s.replace(/^\+\./, "").replace(/^\*\./, "");
+  return `+.${s}`;
+}
+
+function parentDomainFilter(server = "") {
+  const host = String(server)
+    .trim()
+    .replace(/^['"]|['"]$/g, "")
+    .replace(/\.$/, "");
+  if (!host || /^\d+\.\d+\.\d+\.\d+$/.test(host) || host.includes(":")) return "";
+
+  const labels = host.split(".").filter(Boolean);
+  if (labels.length < 2) return "";
+
+  const twoLabelSuffixes = new Set([
+    "com.cn", "net.cn", "org.cn", "gov.cn",
+    "com.hk", "net.hk", "org.hk",
+    "com.tw", "net.tw", "org.tw",
+    "co.uk", "org.uk", "ac.uk",
+    "co.jp", "ne.jp", "or.jp",
+    "com.au", "net.au", "org.au",
+    "us.kg",
+  ]);
+  const tail2 = labels.slice(-2).join(".");
+  const tail3 = labels.slice(-3).join(".");
+  const parent = labels.length >= 3 && twoLabelSuffixes.has(tail2) ? tail3 : tail2;
+  return normalizeDomainFilter(parent);
+}
+
+function extractServerDomainFilters(text = "") {
+  const filters = new Set();
+  const serverRe = /(?:^|[,{]\s*)server\s*:\s*['"]?([^'",}\s#]+)['"]?/gim;
+  let match;
+  while ((match = serverRe.exec(text))) {
+    const filter = parentDomainFilter(match[1]);
+    if (filter) filters.add(filter);
+  }
+  return [...filters];
+}
+
+function httpsText(url, redirects = 3) {
+  return new Promise((resolve, reject) => {
+    const req = https.get(url, {
+      headers: { "User-Agent": "github-actions" },
+      timeout: 20000,
+    }, res => {
+      if ([301, 302, 303, 307, 308].includes(res.statusCode) && res.headers.location && redirects > 0) {
+        res.resume();
+        const next = new URL(res.headers.location, url).toString();
+        resolve(httpsText(next, redirects - 1));
+        return;
+      }
+      if (res.statusCode < 200 || res.statusCode >= 300) {
+        res.resume();
+        reject(new Error(`HTTP ${res.statusCode}`));
+        return;
+      }
+      let data = "";
+      res.setEncoding("utf8");
+      res.on("data", d => data += d);
+      res.on("end", () => resolve(data));
+    });
+    req.on("timeout", () => req.destroy(new Error("timeout")));
+    req.on("error", reject);
+  });
+}
+
+async function collectServerDomainFilters() {
+  const filters = new Set(manualServerDomains);
+
+  await Promise.all(subUrls.map(async (url, i) => {
+    try {
+      const text = await httpsText(url);
+      extractServerDomainFilters(text).forEach(d => filters.add(d));
+    } catch (e) {
+      log(`WARN: 订阅 ${i + 1} server 域名提取失败，跳过自动 fake-ip-filter 注入：${e.message}`);
+    }
+  }));
+
+  return [...filters].sort((a, b) => a.localeCompare(b));
+}
+
+function appendFakeIpFilters(config, filters) {
+  if (!filters.length) return config;
+
+  return config.replace(
+    /(^\s{2}fake-ip-filter:\n(?:^\s{4}- .*(?:\n|$))+)/gm,
+    (block) => {
+      const existing = new Set();
+      block.split(/\r?\n/).forEach(line => {
+        const m = line.match(/^\s*-\s*['"]?([^'"]+?)['"]?\s*$/);
+        if (m) existing.add(m[1].trim());
+      });
+
+      const additions = filters
+        .filter(d => !existing.has(d))
+        .map(d => `    - "${d}"`);
+
+      return additions.length ? block + additions.join("\n") + "\n" : block;
+    }
+  );
+}
+
+function applySubscriptions(template, serverDomainFilters = []) {
   if (!template) return template;
   let out = bumpIconsV(template);
 
@@ -89,7 +203,7 @@ function applySubscriptions(template) {
     });
     out = out.replace(new RegExp(`\\[显示名称${i + 1}\\]`, "g"), name);
   });
-  return out;
+  return appendFakeIpFilters(out, serverDomainFilters);
 }
 
 function deriveMini(s) {
@@ -135,30 +249,34 @@ function httpJSON(method, url, body) {
     log("开始处理配置文件...");
     
     const outputs = { standard: {}, lite: {} };
+    const serverDomainFilters = await collectServerDomainFilters();
+    if (serverDomainFilters.length) {
+      log(`已为 Gist 配置注入 ${serverDomainFilters.length} 个代理服务器 fake-ip-filter 域名`);
+    }
 
     // --- 读取逻辑保持不变 ---
     const multiStd = readIfExists(CONFIG_MULTIPLE_STD);
     if (multiStd) {
-      const s = applySubscriptions(multiStd);
+      const s = applySubscriptions(multiStd, serverDomainFilters);
       outputs.standard[GIST_FILE_MULTIPLE_STD] = { content: s };
       outputs.standard[GIST_FILE_MINI_STD] = { content: deriveMini(s) };
     }
 
     const singleStd = readIfExists(CONFIG_SINGLE_STD);
     if (singleStd) {
-      outputs.standard[GIST_FILE_SINGLE_STD] = { content: applySubscriptions(singleStd) };
+      outputs.standard[GIST_FILE_SINGLE_STD] = { content: applySubscriptions(singleStd, serverDomainFilters) };
     }
 
     const multiLite = readIfExists(CONFIG_MULTIPLE_LITE);
     if (multiLite) {
-      const s = applySubscriptions(multiLite);
+      const s = applySubscriptions(multiLite, serverDomainFilters);
       outputs.lite[GIST_FILE_MULTIPLE_LITE] = { content: s };
       outputs.lite[GIST_FILE_MINI_LITE] = { content: deriveMini(s) };
     }
 
     const singleLite = readIfExists(CONFIG_SINGLE_LITE);
     if (singleLite) {
-      outputs.lite[GIST_FILE_SINGLE_LITE] = { content: applySubscriptions(singleLite) };
+      outputs.lite[GIST_FILE_SINGLE_LITE] = { content: applySubscriptions(singleLite, serverDomainFilters) };
     }
 
     log(`处理完成，Standard Gist 文件数: ${Object.keys(outputs.standard).length}, Lite/GEO Gist 文件数: ${Object.keys(outputs.lite).length}`);
