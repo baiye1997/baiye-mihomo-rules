@@ -66,14 +66,11 @@ function bumpIconsV(s) {
   );
 }
 
-function bumpUrlV(raw = "") {
-  try {
-    const u = new URL(raw);
-    u.searchParams.set("v", CACHE_BUST);
-    return u.toString();
-  } catch {
-    return raw;
-  }
+function bumpProviderPaths(s) {
+  return s.replace(
+    /(path:\s*["']?\.\/proxy_provider\/providers-)(\d+)(\.yaml["']?)/g,
+    `$1$2-${CACHE_BUST}$3`
+  );
 }
 
 function maskUrl(raw = "") {
@@ -200,18 +197,17 @@ function appendFakeIpFilters(config, filters) {
 
 function applySubscriptions(template, serverDomainFilters = []) {
   if (!template) return template;
-  let out = bumpIconsV(template);
+  let out = bumpProviderPaths(bumpIconsV(template));
 
   subUrls.forEach((url, i) => {
     const name = subNames[i] || `[Sub${i + 1}]`;
-    const providerUrl = bumpUrlV(url);
     const placeholders = [
       `替换订阅链接${i + 1}`,
       `[***]`,
       `***`
     ];
     placeholders.forEach(placeholder => {
-      out = out.replace(new RegExp(placeholder.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), "g"), providerUrl);
+      out = out.replace(new RegExp(placeholder.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), "g"), url);
     });
     out = out.replace(new RegExp(`\\[显示名称${i + 1}\\]`, "g"), name);
   });
