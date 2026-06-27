@@ -34,7 +34,6 @@ const {
 } = process.env;
 
 const COMMIT_SHORT = String(process.env.COMMIT_SHORT || "dev").slice(0, 7);
-const CACHE_BUST = String(process.env.GIST_CACHE_BUST || process.env.GITHUB_RUN_ID || COMMIT_SHORT);
 const statusFile = STATUS_FILE ? path.resolve(STATUS_FILE) : "";
 const isQuiet = QUIET === "true";
 
@@ -63,13 +62,6 @@ function bumpIconsV(s) {
         return m;
       }
     }
-  );
-}
-
-function bumpProviderPaths(s) {
-  return s.replace(
-    /(path:\s*["']?\.\/proxy_provider\/providers-)(\d+)(\.yaml["']?)/g,
-    `$1$2-${CACHE_BUST}$3`
   );
 }
 
@@ -197,7 +189,7 @@ function appendFakeIpFilters(config, filters) {
 
 function applySubscriptions(template, serverDomainFilters = []) {
   if (!template) return template;
-  let out = bumpProviderPaths(bumpIconsV(template));
+  let out = bumpIconsV(template);
 
   subUrls.forEach((url, i) => {
     const name = subNames[i] || `[Sub${i + 1}]`;
