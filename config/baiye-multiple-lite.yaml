@@ -1,7 +1,7 @@
 # ============================================================
-# Baiye Mihomo Lite：手机 / 低性能设备 / 稳定省心
-# 适合：Android / iOS / 日常轻量使用
-# 特点：TUN 关闭、规则少、分组少、降低耗电和奇怪兼容问题
+# Baiye Mihomo Lite：GEO 上游版
+# 适合：偏好 GEOSITE / GEOIP 上游规则的日常使用
+# 特点：主要使用 GEO 上游，规则文件较少；真正轻量版由 Gist 脚本生成 mini
 # ============================================================
 
 url: &url "http://www.gstatic.com/generate_204"
@@ -98,6 +98,18 @@ sniffer:
     - "+.miwifi.com"
     - "+.mijia.tech"
     - "+.miot-spec.org"
+    - "+.xiaomi.com"
+    - "+.xiaomi.net"
+    - "+.mi.com"
+    - "+.miui.com"
+    - "+.weixin.com"
+    - "+.wechat.com"
+    - "+.servicewechat.com"
+    - "+.wxs.qq.com"
+    - "+.wxqcloud.qq.com.cn"
+    - "+.wxamedia.com"
+    - "+.qpic.cn"
+    - "+.qlogo.cn"
 
 # ======================= TUN：Lite 默认关闭 =======================
 tun:
@@ -165,7 +177,6 @@ cls: &cls {type: http, behavior: classical, interval: 43200, format: text, proxy
 dom: &dom {type: http, behavior: domain, interval: 43200, format: text, proxy: "🚀 节点选择"}
 
 rule-providers:
-  FuckAD:          {<<: *dom, format: yaml, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/yaml/fuckAds.yaml, path: ./rules/yaml/fuckAds.yaml}
   Game:            {<<: *cls, format: yaml, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/yaml/Game.yaml, path: ./rules/yaml/Game.yaml}
   sniff-skip:      {<<: *dom, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/domainset/sniff-skip.list, path: ./rules/domainset/sniff-skip.list}
   fake-ip:         {<<: *dom, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/domainset/fake-ip.list, path: ./rules/domainset/fake-ip.list}
@@ -185,8 +196,22 @@ rules:
   - DOMAIN-SUFFIX,market.xiaomi.com,DIRECT
   - GEOSITE,connectivity-check,DIRECT
 
-  # 2. 广告拦截
-  - RULE-SET,FuckAD,REJECT
+  # 2. 微信 / 小米核心服务保活，防止广告规则误杀小程序、语音和设备互联
+  - DOMAIN-SUFFIX,weixin.com,DIRECT
+  - DOMAIN-SUFFIX,wechat.com,DIRECT
+  - DOMAIN-SUFFIX,servicewechat.com,DIRECT
+  - DOMAIN-SUFFIX,wxs.qq.com,DIRECT
+  - DOMAIN-SUFFIX,wxqcloud.qq.com.cn,DIRECT
+  - DOMAIN-SUFFIX,wxamedia.com,DIRECT
+  - DOMAIN-SUFFIX,qpic.cn,DIRECT
+  - DOMAIN-SUFFIX,qlogo.cn,DIRECT
+  - DOMAIN-SUFFIX,weixinbridge.com,DIRECT
+  - DOMAIN-SUFFIX,xiaomi.com,DIRECT
+  - DOMAIN-SUFFIX,xiaomi.net,DIRECT
+  - DOMAIN-SUFFIX,mi.com,DIRECT
+  - DOMAIN-SUFFIX,miui.com,DIRECT
+  - DOMAIN-SUFFIX,xiaomixiaoai.com,DIRECT
+  - DOMAIN-SUFFIX,xiaomiyoupin.com,DIRECT
 
   # 3. 精准特殊处理
   - DOMAIN-SUFFIX,oaiusercontent.com,🤖 AI 平台

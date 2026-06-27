@@ -90,12 +90,24 @@ sniffer:
   sniff:
     HTTP: {ports: [80, 8080-8880], override-destination: true}
     TLS:  {ports: [443, 8443]}
-    QUIC: {ports: [443, 8443]}
   skip-domain:
     - rule-set:sniff-skip
     - "Mijia Cloud"
     - "+.miwifi.com"
     - "+.mijia.tech"
+    - "+.miot-spec.org"
+    - "+.xiaomi.com"
+    - "+.xiaomi.net"
+    - "+.mi.com"
+    - "+.miui.com"
+    - "+.weixin.com"
+    - "+.wechat.com"
+    - "+.servicewechat.com"
+    - "+.wxs.qq.com"
+    - "+.wxqcloud.qq.com.cn"
+    - "+.wxamedia.com"
+    - "+.qpic.cn"
+    - "+.qlogo.cn"
 
 # ======================= TUN：默认关闭，电脑需要全局接管再开 =======================
 tun:
@@ -135,6 +147,7 @@ jp: &jp '^(?=.*(?i)(日|🇯🇵|JP|Japan|NRT|HND|KIX|CTS|FUK))(?!.*(?i)(尼日�
 kr: &kr '^(?=.*(?i)(韩|🇰🇷|韓|首尔|南朝鲜|KR|KOR|Korea|South))(?!.*(?i)(5x)).*$'
 sg: &sg '^(?=.*(?i)(坡|🇸🇬|SG|Sing|SIN|XSP))(?!.*(?i)(5x)).*$'
 us: &us '^(?=.*(?i)(美|🇺🇸|US|USA|United States|JFK|SJC|LAX|ORD|ATL|DFW|SFO|MIA|SEA|IAD))(?!.*(?i)(Australia|5x)).*$'
+low: &low '低倍率'
 
 # ======================= 策略组 =======================
 proxy-groups:
@@ -149,8 +162,11 @@ proxy-groups:
   - {name: "Ⓜ️ 微软服务", <<: *app, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/microsoft.png"}
   - {name: "🍎 苹果服务", <<: *app, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/apple.png"}
   - {name: "🎮 游戏平台", <<: *app, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/game.png"}
+  - {name: "📦 CDN 低倍率", type: select, proxies: ["♻️ 低倍率自动","🚀 节点选择","👆 手动选择","DIRECT"], url: *url, disable-udp: false, hidden: false, include-all-providers: true, filter: *low, exclude-filter: "(?i)(DIRECT|直接连接|官网|订阅|流量|到期|套餐|客服|群|邀请|网址|剩余|过期|LAN)", icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/low.png"}
   - {name: "🎵 Spotify", <<: *strm, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/spotify.png"}
   - {name: "📺 视频媒体", <<: *strm, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/netflix.png"}
+
+  - {name: "♻️ 低倍率自动", <<: *test, filter: *low}
 
   - {name: "🇭🇰 - 择优节点", <<: *test, filter: *hk}
   - {name: "🇨🇳 - 择优节点", <<: *test, filter: *tw}
@@ -170,7 +186,6 @@ cls: &cls {type: http, behavior: classical, interval: 43200, format: text, proxy
 dom: &dom {type: http, behavior: domain, interval: 43200, format: text, proxy: "🚀 节点选择"}
 
 rule-providers:
-  FuckAD:               {<<: *dom, format: yaml, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/yaml/fuckAds.yaml, path: ./rules/yaml/fuckAds.yaml}
   Game:                 {<<: *cls, format: yaml, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/yaml/Game.yaml, path: ./rules/yaml/Game.yaml}
   sniff-skip:           {<<: *dom, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/domainset/sniff-skip.list, path: ./rules/domainset/sniff-skip.list}
   fake-ip:              {<<: *dom, url: https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/domainset/fake-ip.list, path: ./rules/domainset/fake-ip.list}
@@ -203,8 +218,23 @@ rules:
   - DOMAIN-SUFFIX,push.apple.com,DIRECT
   - GEOSITE,connectivity-check,DIRECT
 
-  # 2. 广告拦截
-  - RULE-SET,FuckAD,REJECT
+  # 2. 微信 / 小米核心服务保活，防止广告规则误杀小程序、语音和设备互联
+  - DOMAIN-SUFFIX,weixin.com,DIRECT
+  - DOMAIN-SUFFIX,wechat.com,DIRECT
+  - DOMAIN-SUFFIX,servicewechat.com,DIRECT
+  - DOMAIN-SUFFIX,wxs.qq.com,DIRECT
+  - DOMAIN-SUFFIX,wxqcloud.qq.com.cn,DIRECT
+  - DOMAIN-SUFFIX,wxamedia.com,DIRECT
+  - DOMAIN-SUFFIX,qpic.cn,DIRECT
+  - DOMAIN-SUFFIX,qlogo.cn,DIRECT
+  - DOMAIN-SUFFIX,weixinbridge.com,DIRECT
+  - DOMAIN-SUFFIX,xiaomi.com,DIRECT
+  - DOMAIN-SUFFIX,xiaomi.net,DIRECT
+  - DOMAIN-SUFFIX,mi.com,DIRECT
+  - DOMAIN-SUFFIX,miui.com,DIRECT
+  - DOMAIN-SUFFIX,xiaomixiaoai.com,DIRECT
+  - DOMAIN-SUFFIX,xiaomiyoupin.com,DIRECT
+  - DOMAIN,cdnstatic.tencentcs.com,DIRECT
 
   # 3. 精准特殊处理
   - DOMAIN-SUFFIX,oaiusercontent.com,🤖 AI 平台
@@ -214,8 +244,8 @@ rules:
   - RULE-SET,apple_cdn,🌐 全球直连
   - RULE-SET,apple_cn_non_ip,🌐 全球直连
   - RULE-SET,microsoft_cdn_non_ip,🌐 全球直连
-  - RULE-SET,cdn_domainset,🚀 节点选择
-  - RULE-SET,cdn_non_ip,🚀 节点选择
+  - RULE-SET,cdn_domainset,📦 CDN 低倍率
+  - RULE-SET,cdn_non_ip,📦 CDN 低倍率
 
   # 5. 专项服务
   - GEOSITE,spotify,🎵 Spotify

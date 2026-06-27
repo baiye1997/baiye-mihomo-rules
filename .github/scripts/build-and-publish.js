@@ -93,7 +93,9 @@ function applySubscriptions(template) {
 }
 
 function deriveMini(s) {
-  return s.replace(/geodata-loader:\s*standard/gi, "geodata-loader: memconservative");
+  return s
+    .replace(/geodata-loader:\s*standard/gi, "geodata-loader: memconservative")
+    .replace(/(sniffer:\s*\n\s*)enable:\s*true/i, "$1enable: false");
 }
 
 /* ===================== HTTP ===================== */
@@ -159,7 +161,7 @@ function httpJSON(method, url, body) {
       outputs.lite[GIST_FILE_SINGLE_LITE] = { content: applySubscriptions(singleLite) };
     }
 
-    log(`处理完成，标准版文件数: ${Object.keys(outputs.standard).length}, 精简版文件数: ${Object.keys(outputs.lite).length}`);
+    log(`处理完成，Standard Gist 文件数: ${Object.keys(outputs.standard).length}, Lite/GEO Gist 文件数: ${Object.keys(outputs.lite).length}`);
 
     if (DRY_RUN === "true") {
       writeStatus("DRYRUN");
@@ -186,12 +188,12 @@ function httpJSON(method, url, body) {
     // 任务 2: Lite Gist
     if (GIST_ID_LITE && Object.keys(outputs.lite).length) {
       tasks.push((async () => {
-        log(`正在更新精简版 Gist: ${GIST_ID_LITE}...`);
+        log(`正在更新 Lite/GEO Gist: ${GIST_ID_LITE}...`);
         const resp = await httpJSON("PATCH", `https://api.github.com/gists/${GIST_ID_LITE}`, {
           files: outputs.lite,
           description: `update via CI | ${COMMIT_SHORT}`,
         });
-        log("✅ 精简版 Gist 更新成功");
+        log("✅ Lite/GEO Gist 更新成功");
         Object.keys(outputs.lite).forEach(f => log(`  ${f}: ${maskUrl(resp.files[f]?.raw_url)}`));
       })());
     }

@@ -14,6 +14,24 @@ push.hicloud.com
 push.oppomobile.com
 push.xiaomi.com
 
+# 微信 / 小米核心服务，避免嗅探改写导致小程序、语音和设备互联异常
+*.weixin.com
+*.wechat.com
+*.servicewechat.com
+*.wxs.qq.com
+*.wxqcloud.qq.com.cn
+*.wxamedia.com
+*.qpic.cn
+*.qlogo.cn
+*.weixinbridge.com
+*.miwifi.com
+*.mijia.tech
+*.miot-spec.org
+*.xiaomi.com
+*.xiaomi.net
+*.mi.com
+*.miui.com
+
 # 协作 / 会议
 *.zoom.us
 *.teams.microsoft.com

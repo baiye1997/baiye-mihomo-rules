@@ -40,3 +40,20 @@ api.io.mi.com
 dig.io.mi.com
 push.xiaomi.com
 miot-spec.org
+*.miwifi.com
+*.mijia.tech
+*.xiaomi.com
+*.xiaomi.net
+*.mi.com
+*.miui.com
+
+# 微信 / 小程序 / 腾讯图片与媒体，保守保留真实解析
+*.weixin.com
+*.wechat.com
+*.servicewechat.com
+*.wxs.qq.com
+*.wxqcloud.qq.com.cn
+*.wxamedia.com
+*.qpic.cn
+*.qlogo.cn
+*.weixinbridge.com
