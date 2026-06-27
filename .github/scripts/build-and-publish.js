@@ -34,6 +34,7 @@ const {
 } = process.env;
 
 const COMMIT_SHORT = String(process.env.COMMIT_SHORT || "dev").slice(0, 7);
+const CACHE_BUST = String(process.env.GIST_CACHE_BUST || process.env.GITHUB_RUN_ID || COMMIT_SHORT);
 const statusFile = STATUS_FILE ? path.resolve(STATUS_FILE) : "";
 const isQuiet = QUIET === "true";
 
@@ -63,6 +64,16 @@ function bumpIconsV(s) {
       }
     }
   );
+}
+
+function bumpUrlV(raw = "") {
+  try {
+    const u = new URL(raw);
+    u.searchParams.set("v", CACHE_BUST);
+    return u.toString();
+  } catch {
+    return raw;
+  }
 }
 
 function maskUrl(raw = "") {
@@ -193,13 +204,14 @@ function applySubscriptions(template, serverDomainFilters = []) {
 
   subUrls.forEach((url, i) => {
     const name = subNames[i] || `[Sub${i + 1}]`;
+    const providerUrl = bumpUrlV(url);
     const placeholders = [
       `替换订阅链接${i + 1}`,
       `[***]`,
       `***`
     ];
     placeholders.forEach(placeholder => {
-      out = out.replace(new RegExp(placeholder.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), "g"), url);
+      out = out.replace(new RegExp(placeholder.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), "g"), providerUrl);
     });
     out = out.replace(new RegExp(`\\[显示名称${i + 1}\\]`, "g"), name);
   });
