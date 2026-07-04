@@ -1,7 +1,7 @@
 #########################################
 # Sukka's Ruleset - CDN Domains
-# Last Updated: 2026-06-30T21:51:48.457Z
-# Size: 4533
+# Last Updated: 2026-07-04T16:23:10.768Z
+# Size: 4537
 # License: AGPL 3.0
 # Homepage: https://ruleset.skk.moe
 # GitHub: https://github.com/SukkaW/Surge
@@ -768,6 +768,7 @@ s3.doujin.sh
 sdk.gleap.io
 sdk.split.io
 +.sitescdn.net
+sm.pcmag.com
 +.smassets.net
 +.smushcdn.com
 +.stapecdn.com
@@ -1093,6 +1094,7 @@ assets.garr.it
 +.assets.ibm.com
 assets.msn.com
 assets.orz.uno
+assets.pscp.tv
 b.manufact.com
 +.bestjavcdn.com
 +.boomio-cdn.com
@@ -2434,6 +2436,7 @@ assets.zendesk.com
 assetscdn.jable.tv
 avatar.freepik.com
 avatars.micro.blog
+b2b-contenthub.com
 +.b2c-contenthub.com
 badges.crowdin.net
 +.betterstackcdn.com
@@ -4393,6 +4396,7 @@ firebaselogging.googleapis.com
 identity-assets.getpostman.com
 image.email.microsoftemail.com
 learn-attachment.microsoft.com
+legacy-us-images.foundryco.app
 loader.mantis-intelligence.com
 next-images.opencollective.com
 nodebox-runtime.codesandbox.io
