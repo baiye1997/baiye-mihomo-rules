@@ -1,7 +1,7 @@
 #########################################
 # Sukka's Ruleset - CDN Domains
-# Last Updated: 2026-07-10T13:25:49.221Z
-# Size: 4548
+# Last Updated: 2026-07-13T06:30:02.736Z
+# Size: 4552
 # License: AGPL 3.0
 # Homepage: https://ruleset.skk.moe
 # GitHub: https://github.com/SukkaW/Surge
@@ -251,6 +251,7 @@ cdn.plu.mx
 +.eroimg.net
 eslint.org
 evt.24.com
+exbd.ex.co
 +.ezocdn.com
 f.start.me
 f.upanh.tv
@@ -690,6 +691,7 @@ img.lvv2.com
 img.noy.asia
 img.sflix.to
 imgfile.shop
++.imgproxy.org
 +.imhentai.xxx
 +.instant.page
 +.ipfs.1-2.dev
@@ -890,6 +892,7 @@ code.piano.io
 +.codeberg.page
 +.ctfassets.net
 data.pendo.io
++.dd-static.net
 +.disconnect.me
 +.disquscdn.com
 +.doppiocdn.com
@@ -2903,6 +2906,7 @@ img.news.ebc.net.tw
 img.openshop.com.hk
 img.shoplineapp.com
 img.thingiverse.com
+imgix.datadoghq.com
 info.cloudflare.com
 +.ingest.de.sentry.io
 +.ingest.us.sentry.io
