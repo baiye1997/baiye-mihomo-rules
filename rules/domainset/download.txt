@@ -1,7 +1,7 @@
 #########################################
 # Sukka's Ruleset - Large Files Hosting Domains
-# Last Updated: 2026-07-06T02:45:05.016Z
-# Size: 1963
+# Last Updated: 2026-07-14T18:53:56.472Z
+# Size: 1973
 # License: AGPL 3.0
 # Homepage: https://ruleset.skk.moe
 # GitHub: https://github.com/SukkaW/Surge
@@ -900,7 +900,9 @@ apache.mivzakim.net
 apt.tetaneutral.net
 artifacts.nixos.org
 cache.agilebits.com
+cdn-fi-1.comaps.app
 cdn-patch.swtor.com
+cdn-us-1.comaps.app
 cdn.evolution-x.org
 cdn.organicmaps.app
 cesium.di.uminho.pt
@@ -1024,6 +1026,7 @@ pubmirror.plutex.de
 release.runcloud.io
 replicate.npmjs.com
 repo.extreme-ix.org
++.s3-website.cloud.ru
 +.s3.fr-par.scw.cloud
 +.s3.nl-ams.scw.cloud
 +.s3.pl-waw.scw.cloud
@@ -1056,10 +1059,12 @@ assets.dataflare.app
 assets1.xboxlive.com
 assets2.xboxlive.com
 cdn-builds.paw.cloud
+cdn-us-2.comaps.tech
 cdn.repo.cloudeka.id
 charts.verdaccio.org
 +.circle-artifacts.com
 cloud.daporkchop.net
+comaps-it1.unfoxo.it
 cpan.cpantesters.org
 cpan.excellmedia.net
 ctan.tetaneutral.net
@@ -1290,6 +1295,7 @@ install.virtfusion.net
 ir.ubuntu.sindad.cloud
 +.launchpadlibrarian.net
 linux-mirrors.fnal.gov
+mapgen-fi-1.comaps.app
 meta.prismlauncher.org
 mirror.ams.macarne.com
 mirror.as.kamatera.com
@@ -1358,6 +1364,9 @@ archive.raspberrypi.com
 bigfiles.virustotal.com
 cas-bridge.xethub.hf.co
 cdn-images.orbstack.dev
+cdn-nl1.organicmaps.app
+cdn-uk1.organicmaps.app
+comaps.openstreetmap.fr
 ctldl.windowsupdate.com
 debian.ccns.ncku.edu.tw
 debian.netforce.hosting
@@ -1528,6 +1537,7 @@ ucmirror.canterbury.ac.nz
 updates.bravesoftware.com
 blizzard.gcdn.cloudn.co.kr
 blzddistkr1-a.akamaihd.net
+comaps.firewall-gateway.de
 componentupdater.brave.com
 +.cos.ap-mumbai.myqcloud.com
 debian-mirror.sakura.ne.jp
