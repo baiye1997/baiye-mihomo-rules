@@ -1,7 +1,7 @@
 #########################################
 # Sukka's Ruleset - CDN Domains
-# Last Updated: 2026-07-13T06:30:02.736Z
-# Size: 4552
+# Last Updated: 2026-07-15T19:46:26.179Z
+# Size: 4548
 # License: AGPL 3.0
 # Homepage: https://ruleset.skk.moe
 # GitHub: https://github.com/SukkaW/Surge
@@ -73,7 +73,6 @@ i.gzn.jp
 i.ibb.co
 i.vgy.me
 icons.ly
-img.m.mw
 +.jspm.dev
 +.jspm.org
 +.loli.net
@@ -766,7 +765,6 @@ s1.bycsi.com
 s1.qwant.com
 s2.qwant.com
 s3.arkjp.net
-s3.doujin.sh
 sdk.gleap.io
 sdk.split.io
 +.sitescdn.net
@@ -1171,6 +1169,7 @@ cdn.zapier.com
 cdn.zeabur.com
 cdn1.plesk.com
 cdn2.auth0.com
+cdn2.cameo.com
 +.cdnclouder.com
 cdns.gigya.com
 cdp.sph.com.sg
@@ -1237,7 +1236,6 @@ images.spot.im
 images.wsj.net
 +.imagetwist.com
 img.321cdn.com
-img.bttimg.com
 img.decrypt.co
 img.fzf404.art
 img.icons8.com
@@ -1323,6 +1321,9 @@ regmedia.co.uk
 res.abc.net.au
 res.garmin.com
 rt.rtoaster.jp
+rt1.maphub.net
+rt2.maphub.net
+rt3.maphub.net
 s.midishow.net
 s1.divhunt.com
 s3.2233778.xyz
@@ -1909,7 +1910,6 @@ img.olympics.com
 +.img.sooplive.com
 img.sparemin.com
 img.wikiwand.com
-img2.javdove.com
 img2.javmost.com
 img2.tnaflix.com
 img3.javmost.com
@@ -2171,7 +2171,6 @@ cdn.travis-ci.org
 cdn.ttgtmedia.com
 cdn.up-timely.com
 cdn.yinghuazy.xyz
-cdn.zhujiwiki.com
 cdn0.techbang.com
 cdn1.airdroid.com
 cdn1.edgedatg.com
@@ -2273,7 +2272,6 @@ images.vexels.com
 +.img.haiwaikan.com
 img.imoutomoe.net
 img.picacomic.com
-img.represent.com
 img.riskified.com
 img2.gelbooru.com
 img3.airdroid.com
@@ -2371,6 +2369,7 @@ static.gmgard.com
 static.guim.co.uk
 static.hotjar.com
 static.linear.app
+static.maphub.net
 +.static.mega.co.nz
 static.meiguo.com
 static.missav.com
@@ -3424,7 +3423,6 @@ images.emojiterra.com
 images.en.aptoide.com
 images.everyplate.com
 images.findagrave.com
-images.freeimages.com
 +.images.hentaicity.com
 images.icon-icons.com
 img.foresightnews.pro
@@ -3507,7 +3505,6 @@ static.buydomains.com
 +.static.chaosgroup.com
 static.chessarena.com
 static.clips4sale.com
-static.freeimages.com
 static.getpostman.com
 static.mytonwallet.io
 static.openreplay.com
@@ -3704,6 +3701,7 @@ static.foxbusiness.com
 static.fundraiseup.com
 static.gettyimages.com
 static.hugedomains.com
+static.istockphoto.com
 static.playstation.com
 static.staff-start.com
 static.telegraph.co.uk
@@ -3725,6 +3723,7 @@ thumbor.4gamers.com.tw
 +.tile.thunderforest.com
 tile2.opencyclemap.org
 tiles.arcticconnect.ca
++.tiles.openstreetmap.us
 +.tiles.virtualearth.net
 tileserver.memomaps.de
 tn.tubepornclassic.com
@@ -4054,7 +4053,6 @@ cdn.accounts.autodesk.com
 cdn.accounts.nintendo.com
 cdn.privacy.paramount.com
 cdn.registerdisney.go.com
-cdn.scripts.wtwhmedia.com
 changelog-widget.canny.io
 chunk-composing.canva.com
 components.justanswer.com
@@ -4107,7 +4105,6 @@ simplicity.trustpilot.com
 snyk-widget.herokuapp.com
 socialpic.video.friday.tw
 static-ca-cdn.eporner.com
-static-cdn.bytegiftia.top
 static-files.bitchute.com
 static-images.aptoide.com
 static-sg-cdn.eporner.com
@@ -4509,7 +4506,6 @@ screenshots.downloadtorrentfile.com
 static-assets-prod.unrealengine.com
 stubdownloader.services.mozilla.com
 cf-images.us-east-1.prod.boltdns.net
-chatwidgetmetrics-proxy.usepylon.com
 content-prod-live.cert.starbucks.com
 +.crashlyticsreports-pa.googleapis.com
 firebaseinstallations.googleapis.com
