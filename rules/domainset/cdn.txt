@@ -1,7 +1,7 @@
 #########################################
 # Sukka's Ruleset - CDN Domains
-# Last Updated: 2026-07-16T17:03:52.554Z
-# Size: 4549
+# Last Updated: 2026-07-18T20:11:19.214Z
+# Size: 4551
 # License: AGPL 3.0
 # Homepage: https://ruleset.skk.moe
 # GitHub: https://github.com/SukkaW/Surge
@@ -285,6 +285,7 @@ i.iwara.tv
 +.imagee.top
 +.imagef.top
 +.imageg.top
+img.aso.fr
 +.img.gmo.jp
 img.reg.ru
 img.xjh.me
@@ -1813,6 +1814,7 @@ cdn.playwire.com
 cdn.roboflow.com
 cdn.roseperl.com
 cdn.scaleflex.it
+cdn.seedance2.ai
 +.cdn.signalfx.com
 cdn.simplesat.io
 cdn.skymavis.com
