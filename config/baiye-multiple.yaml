@@ -93,21 +93,6 @@ sniffer:
   skip-domain:
     - rule-set:sniff-skip
     - "Mijia Cloud"
-    - "+.miwifi.com"
-    - "+.mijia.tech"
-    - "+.miot-spec.org"
-    - "+.xiaomi.com"
-    - "+.xiaomi.net"
-    - "+.mi.com"
-    - "+.miui.com"
-    - "+.weixin.com"
-    - "+.wechat.com"
-    - "+.servicewechat.com"
-    - "+.wxs.qq.com"
-    - "+.wxqcloud.qq.com.cn"
-    - "+.wxamedia.com"
-    - "+.qpic.cn"
-    - "+.qlogo.cn"
 
 # ======================= TUN：默认关闭，电脑需要全局接管再开 =======================
 tun:
@@ -218,16 +203,7 @@ rules:
   - DOMAIN-SUFFIX,push.apple.com,DIRECT
   - GEOSITE,connectivity-check,DIRECT
 
-  # 2. 微信 / 小米核心服务保活，防止广告规则误杀小程序、语音和设备互联
-  - DOMAIN-SUFFIX,weixin.com,DIRECT
-  - DOMAIN-SUFFIX,wechat.com,DIRECT
-  - DOMAIN-SUFFIX,servicewechat.com,DIRECT
-  - DOMAIN-SUFFIX,wxs.qq.com,DIRECT
-  - DOMAIN-SUFFIX,wxqcloud.qq.com.cn,DIRECT
-  - DOMAIN-SUFFIX,wxamedia.com,DIRECT
-  - DOMAIN-SUFFIX,qpic.cn,DIRECT
-  - DOMAIN-SUFFIX,qlogo.cn,DIRECT
-  - DOMAIN-SUFFIX,weixinbridge.com,DIRECT
+  # 2. 小米核心服务保活，防止设备互联异常
   - DOMAIN-SUFFIX,xiaomi.com,DIRECT
   - DOMAIN-SUFFIX,xiaomi.net,DIRECT
   - DOMAIN-SUFFIX,mi.com,DIRECT
