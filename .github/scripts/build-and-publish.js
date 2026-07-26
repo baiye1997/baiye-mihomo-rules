@@ -71,7 +71,10 @@ function maskUrl(raw = "") {
 }
 
 /* ===================== Subscriptions ===================== */
-const subUrls = SUB_URLS.split(/\r?\n/).map(s => s.trim()).filter(Boolean);
+const subUrls = SUB_URLS
+  .split(/\r?\n/)
+  .map(normalizeSubscriptionUrl)
+  .filter(Boolean);
 const subNames = SUB_NAMES.split(/\r?\n/).map(s => s.trim()).filter(Boolean);
 const manualServerDomains = SUB_SERVER_DOMAINS
   .split(/[\r\n,]+/)
@@ -86,6 +89,15 @@ function normalizeDomainFilter(raw = "") {
   if (!s || /^\d+\.\d+\.\d+\.\d+$/.test(s) || s.includes(":")) return "";
   s = s.replace(/^\+\./, "").replace(/^\*\./, "");
   return `+.${s}`;
+}
+
+function normalizeSubscriptionUrl(raw = "") {
+  return String(raw)
+    .trim()
+    .replace(
+      /^http:\/\/gist\.githubusercontent\.com\//i,
+      "https://gist.githubusercontent.com/"
+    );
 }
 
 function parentDomainFilter(server = "") {

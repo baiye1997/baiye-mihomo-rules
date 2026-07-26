@@ -4,9 +4,9 @@
 # 特点：主要使用 GEO 上游，规则文件较少；真正轻量版由 Gist 脚本生成 mini
 # ============================================================
 
-url: &url "http://www.gstatic.com/generate_204"
+url: &url "https://www.gstatic.com/generate_204"
 blk: &blk '^(?!.*(?i)(DIRECT|直接连接|群|邀请|官网|客服|网站|网址|获取|订阅|流量|到期|机场|下次|版本|备用|过期|已用|联系|邮箱|工单|通知|地址|频道|说明|教程|USE|USED|TOTAL|EXPIRE|EMAIL|Panel|Channel|Author)).*$'
-prov: &prov {type: http, interval: 86400, health-check: {enable: true, url: *url, interval: 600}}
+prov: &prov {type: http, interval: 3600, health-check: {enable: true, url: *url, interval: 600}}
 
 # ======================= 只改这里：订阅 =======================
 proxy-providers:
@@ -51,8 +51,8 @@ dns:
     - 119.29.29.29
 
   proxy-server-nameserver:
-    - 223.5.5.5
-    - 119.29.29.29
+    - https://doh.pub/dns-query
+    - https://dns.alidns.com/dns-query
 
   nameserver:
     - https://dns.alidns.com/dns-query
