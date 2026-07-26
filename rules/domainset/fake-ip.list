@@ -7,8 +7,8 @@
 localhost.ptlogin2.qq.com
 
 # 时间同步 / NTP
-pool.ntp.org
-*.ntp.org.cn
++.pool.ntp.org
++.ntp.org.cn
 ntp.aliyun.com
 ntp1.aliyun.com
 time*.apple.com
@@ -19,9 +19,13 @@ time.windows.com
 stun.*
 *.stun.*
 +.stun.*
++.stun.*.*
++.stun.*.*.*
++.stun.*.*.*.*
++.stun.*.*.*.*.*
 
 # Apple / Microsoft / Google 推送和联网检测
-*.push.apple.com
++.push.apple.com
 courier.push.apple.com
 api.push.apple.com
 mtalk.google.com
@@ -30,7 +34,7 @@ fcm.googleapis.com
 +.msftconnecttest.com
 
 # 游戏 / 主机 / 特殊连接
-*.srv.nintendo.net
++.srv.nintendo.net
 +.stun.playstation.net
 xbox.*.*.microsoft.com
 *.*.xboxlive.com
@@ -40,9 +44,6 @@ api.io.mi.com
 dig.io.mi.com
 push.xiaomi.com
 miot-spec.org
-*.miwifi.com
-*.mijia.tech
-*.xiaomi.com
-*.xiaomi.net
-*.mi.com
-*.miui.com
++.miwifi.com
++.mijia.tech
++.market.xiaomi.com

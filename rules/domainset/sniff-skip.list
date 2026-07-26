@@ -1,27 +1,31 @@
 # Apple & Microsoft 推送
-*.push.apple.com
++.push.apple.com
 courier.push.apple.com
 api.push.apple.com
-*.push.microsoft.com
++.push.microsoft.com
 wns.windows.com
-*.notify.windows.com
++.notify.windows.com
 
 # Google & 厂商推送
-*.push.google.com
++.push.google.com
 mtalk.google.com
 fcm.googleapis.com
 push.hicloud.com
 push.oppomobile.com
 push.xiaomi.com
 
+# 微信核心长连 / 小程序 / 语音服务
++.weixin.com
++.servicewechat.com
++.wxs.qq.com
++.wxqcloud.qq.com.cn
++.wxamedia.com
++.weixinbridge.com
+
 # 小米核心服务，避免嗅探改写导致设备互联异常
-*.miwifi.com
-*.mijia.tech
-*.miot-spec.org
-*.xiaomi.com
-*.xiaomi.net
-*.mi.com
-*.miui.com
++.miwifi.com
++.mijia.tech
++.miot-spec.org
 
 # 邮件服务
 imap.*
@@ -32,3 +36,7 @@ pop.*
 stun.*
 *.stun.*
 +.stun.*
++.stun.*.*
++.stun.*.*.*
++.stun.*.*.*.*
++.stun.*.*.*.*.*
