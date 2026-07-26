@@ -121,7 +121,7 @@ geox-url:
   geosite: "https://cdn.jsdelivr.net/gh/Loyalsoldier/v2ray-rules-dat@release/geosite.dat"
 
 # ======================= 策略组锚点 =======================
-tmpl: &tmpl {url: *url, interval: 300, lazy: true, timeout: 5000, disable-udp: false, max-failed-times: 3, hidden: true, include-all-providers: true, exclude-filter: "(?i)(DIRECT|直接连接|官网|订阅|流量|到期|套餐|客服|群|邀请|网址|剩余|过期|LAN|(?:^|[^0-9.])5x(?:$|[^0-9]))"}
+tmpl: &tmpl {url: *url, interval: 300, lazy: true, timeout: 5000, disable-udp: false, max-failed-times: 3, hidden: true, include-all-providers: true, exclude-filter: "(?i)(DIRECT|直接连接|官网|订阅|流量|到期|套餐|客服|群|邀请|网址|剩余|过期|LAN|(?:^|[^0-9.])0?\\.[0-9]+\\s*(?:x|×|倍(?:率)?)(?:$|[^0-9A-Za-z])|(?:^|[^0-9.])5x(?:$|[^0-9]))"}
 sel:  &sel  {type: select, url: *url, disable-udp: false, hidden: false, include-all-providers: true, exclude-filter: "(?i)(DIRECT|直接连接|官网|订阅|流量|到期|套餐|客服|群|邀请|网址|剩余|过期|LAN)"}
 test: &test {type: url-test, <<: *tmpl, tolerance: 50}
 fall: &fall {type: fallback, <<: *tmpl}
@@ -138,13 +138,13 @@ jp: &jp '^(?=.*(?i)(日|🇯🇵|Japan|(?:^|[^A-Za-z])(?:JP|NRT|HND|KIX|CTS|FUK)
 kr: &kr '^(?=.*(?i)(韩|🇰🇷|韓|首尔|南朝鲜|Korea|South Korea|(?:^|[^A-Za-z])(?:KR|KOR)(?:$|[^A-Za-z])))(?!.*(?i)(?:^|[^0-9.])5x(?:$|[^0-9])).*$'
 sg: &sg '^(?=.*(?i)(坡|🇸🇬|Sing|(?:^|[^A-Za-z])(?:SG|SIN|XSP)(?:$|[^A-Za-z])))(?!.*(?i)(?:^|[^0-9.])5x(?:$|[^0-9])).*$'
 us: &us '^(?=.*(?i)(美|🇺🇸|硅谷|Silicon|United States|(?:^|[^A-Za-z])(?:US|USA|JFK|SJC|LAX|ORD|ATL|DFW|SFO|MIA|SEA|IAD)(?:$|[^A-Za-z])))(?!.*(?i)(?:^|[^0-9.])5x(?:$|[^0-9])).*$'
-low: &low '(?i)(低倍率|0\.[0-9]+\s*(?:x|倍))'
+low: &low '(?i)(?:^|[^0-9.])0?\.[0-9]+\s*(?:x|×|倍(?:率)?)(?:$|[^0-9A-Za-z])'
 
 # ======================= 策略组 =======================
 proxy-groups:
   - {name: "🚀 节点选择", <<: *entr, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/choice.png"}
   - {name: "👆 手动选择", <<: *sel, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/select.png"}
-  - {name: "♻️ 智能选择", <<: *test, hidden: false, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/auto.png"}
+  - {name: "♻️ 智能选择", <<: *test, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/auto.png"}
 
   - {name: "🌐 全球直连", <<: *drc, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/link.png"}
   - {name: "🤖 AI 平台", <<: *app, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/openai.png"}
@@ -157,7 +157,7 @@ proxy-groups:
   - {name: "🎵 Spotify", <<: *strm, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/spotify.png"}
   - {name: "📺 视频媒体", <<: *strm, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/netflix.png"}
 
-  - {name: "♻️ 低倍率自动", type: url-test, proxies: ["♻️ 智能选择"], include-all-providers: true, url: *url, interval: 300, lazy: true, timeout: 5000, tolerance: 50, disable-udp: false, hidden: true, filter: *low, exclude-filter: "(?i)(DIRECT|直接连接|官网|订阅|流量|到期|套餐|客服|群|邀请|网址|剩余|过期|LAN)"}
+  - {name: "♻️ 低倍率自动", type: url-test, include-all-providers: true, url: *url, interval: 300, lazy: true, timeout: 5000, tolerance: 50, disable-udp: false, hidden: true, filter: *low, exclude-filter: "(?i)(DIRECT|直接连接|官网|订阅|流量|到期|套餐|客服|群|邀请|网址|剩余|过期|LAN)"}
 
   - {name: "🇭🇰 - 择优节点", <<: *test, filter: *hk}
   - {name: "🇨🇳 - 择优节点", <<: *test, filter: *tw}
