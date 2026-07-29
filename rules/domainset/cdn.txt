@@ -1,7 +1,7 @@
 #########################################
 # Sukka's Ruleset - CDN Domains
-# Last Updated: 2026-07-21T16:18:25.336Z
-# Size: 4555
+# Last Updated: 2026-07-29T02:59:05.810Z
+# Size: 4563
 # License: AGPL 3.0
 # Homepage: https://ruleset.skk.moe
 # GitHub: https://github.com/SukkaW/Surge
@@ -1910,6 +1910,10 @@ img.javstore.net
 img.jsdelivr.com
 img.kbhgames.com
 img.moviefap.com
+img.novipnoad.ca
+img.novipnoad.cc
+img.novipnoad.uk
+img.novipnoad.us
 img.olympics.com
 +.img.sooplive.com
 img.sparemin.com
@@ -2276,6 +2280,9 @@ images.svc.ui.com
 images.vexels.com
 +.img.haiwaikan.com
 img.imoutomoe.net
+img.novipnoad.com
+img.novipnoad.net
+img.novipnoad.xyz
 img.picacomic.com
 img.riskified.com
 img2.gelbooru.com
@@ -2988,6 +2995,7 @@ static.esimplus.net
 static.euronews.com
 static.formula1.com
 static.getbutton.io
+static.giffgaff.com
 static.gigabyte.com
 static.goaffpro.com
 static.mendeley.com
