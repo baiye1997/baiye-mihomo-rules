@@ -1,14 +1,16 @@
 #########################################
 # Sukka's Ruleset - Microsoft Domains
-# Last Updated: 2026-06-30T21:42:09.839Z
+# Last Updated: 2026-07-31T17:36:02.314Z
 # Size: 83
 # License: AGPL 3.0
 # Homepage: https://ruleset.skk.moe
 # GitHub: https://github.com/SukkaW/Surge
 #
 # This file contains domains of Microsoft.
+#
+# $content-hash-v1$:3DG2JlSb6SCyhnzHeX_Ub6YbMy97ioniEZMb6RcH3V4$
 #########################################
-DOMAIN,7h1s_rul35et_i5_mad3_by_5ukk4w-ruleset.skk.moe
+DOMAIN,7h15_ru1353t_1s_m4d3_by_5ukk4w.skk.moe
 DOMAIN-SUFFIX,aka.ms
 DOMAIN-SUFFIX,gfx.ms
 DOMAIN-SUFFIX,sfx.ms

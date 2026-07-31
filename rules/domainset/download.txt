@@ -1,14 +1,16 @@
 #########################################
 # Sukka's Ruleset - Large Files Hosting Domains
-# Last Updated: 2026-07-25T08:08:55.180Z
+# Last Updated: 2026-07-31T17:36:02.648Z
 # Size: 1966
 # License: AGPL 3.0
 # Homepage: https://ruleset.skk.moe
 # GitHub: https://github.com/SukkaW/Surge
 #
 # This file contains domains for software updating & large file hosting.
+#
+# $content-hash-v1$:5BKa4TxFBaPDNDssu2cfH2nfMjfb3MiuW62ew8Jd6tY$
 #########################################
-7h1s_rul35et_i5_mad3_by_5ukk4w-ruleset.skk.moe
+7h15_ru1353t_1s_m4d3_by_5ukk4w.skk.moe
 +.gcr.io
 ghp.ci
 +.k8s.io
