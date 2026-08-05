@@ -1,6 +1,6 @@
 #########################################
 # Sukka's Ruleset - Telegram Domains
-# Last Updated: 2026-07-31T17:36:02.338Z
+# Last Updated: 2026-08-05T12:33:04.439Z
 # Size: 15
 # License: AGPL 3.0
 # Homepage: https://ruleset.skk.moe
@@ -8,9 +8,9 @@
 #
 # This file contains domains used by Telegram Messenger.
 #
-# $content-hash-v1$:S853CwiG5G-0X34KeNz4BhmR_dTVn-x0Qp1BvQ7ON2U$
+# $content-hash-v1$:N5Chi4AVgtC3LLLZlmGjDDDOXFQFBqND031e-y63yX8$
 #########################################
-DOMAIN,7h15_ru1353t_1s_m4d3_by_5ukk4w.skk.moe
+DOMAIN,7h15.ru1353t.1s.m4d3.by.5ukk4w.skk.moe
 DOMAIN-SUFFIX,t.me
 DOMAIN-SUFFIX,tx.me
 DOMAIN-SUFFIX,tg.dev

@@ -1,6 +1,6 @@
 #########################################
 # Sukka's Ruleset - Domestic Domains
-# Last Updated: 2026-07-31T17:36:02.422Z
+# Last Updated: 2026-08-05T12:33:04.538Z
 # Size: 865
 # License: AGPL 3.0
 # Homepage: https://ruleset.skk.moe
@@ -8,9 +8,9 @@
 #
 # This file contains known addresses that are avaliable in the Mainland China.
 #
-# $content-hash-v1$:Wir_WTOPTq0vzre9whcxxHoTpL9-DG-CCM_usHYoIG4$
+# $content-hash-v1$:ilOh6xhURaRqudollbR1c5tluna1LZ7FUY-j4aE7WtM$
 #########################################
-DOMAIN,7h15_ru1353t_1s_m4d3_by_5ukk4w.skk.moe
+DOMAIN,7h15.ru1353t.1s.m4d3.by.5ukk4w.skk.moe
 DOMAIN-SUFFIX,3.cn
 DOMAIN-SUFFIX,6.cn
 DOMAIN-SUFFIX,t.cn
