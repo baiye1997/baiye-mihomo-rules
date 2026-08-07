@@ -1,14 +1,14 @@
 #########################################
 # Sukka's Ruleset - CDN Domains
-# Last Updated: 2026-08-05T12:33:04.691Z
-# Size: 4577
+# Last Updated: 2026-08-07T17:00:24.513Z
+# Size: 4581
 # License: AGPL 3.0
 # Homepage: https://ruleset.skk.moe
 # GitHub: https://github.com/SukkaW/Surge
 #
 # This file contains object storage and static assets CDN domains.
 #
-# $content-hash-v1$:itoQ3kpasHRImEZ0mkJpUyf2xm-8oRzr11aosslSdek$
+# $content-hash-v1$:_Ws6u0N8zMZxXqE7pghw4j0HY2RVlp9b8kVRdN5V5jM$
 #########################################
 7h15.ru1353t.1s.m4d3.by.5ukk4w.skk.moe
 0x0.st
@@ -220,6 +220,7 @@ a.pomf.cat
 +.ant.design
 +.aolcdn.com
 +.avximg.com
++.awxcdn.com
 +.badgen.net
 +.balley.top
 +.bblcdn.com
@@ -662,6 +663,7 @@ e.linear.app
 e3.365dm.com
 eightcha.com
 eslint.style
++.fast-sfc.com
 +.favicone.com
 +.fembeqv2.xyz
 file.ahu.moe
@@ -2804,6 +2806,7 @@ badges.frapsoft.com
 before.good-apps.co
 bundle.trysavvy.com
 cdn-blocks.karte.io
+cdn-city.livere.com
 cdn-fck.tnaflix.com
 cdn.amgreatness.com
 cdn.announcekit.app
@@ -4253,6 +4256,7 @@ antiqua-ux-cdn.monotype.com
 app-static-prod.posthog.com
 article-image-ix.nikkei.com
 assets.braintreegateway.com
+assets.weather-forecast.com
 +.cdn-lfs-us-1.huggingface.co
 cdn-live.foreignaffairs.com
 cdn-static-push.porndig.com
