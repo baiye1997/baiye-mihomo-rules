@@ -1,14 +1,14 @@
 #########################################
 # Sukka's Ruleset - Large Files Hosting Domains
-# Last Updated: 2026-08-05T12:33:04.695Z
-# Size: 1968
+# Last Updated: 2026-08-09T16:01:36.427Z
+# Size: 1965
 # License: AGPL 3.0
 # Homepage: https://ruleset.skk.moe
 # GitHub: https://github.com/SukkaW/Surge
 #
 # This file contains domains for software updating & large file hosting.
 #
-# $content-hash-v1$:dB7TkT3QOkQUZhYn0Hv9BNPSRu6oRJUsCOFfJgp4jQg$
+# $content-hash-v1$:cUn-4Ejv6ZbYtNlHQ_VV6SHqNTkqyfR5OuGLU5FXexo$
 #########################################
 7h15.ru1353t.1s.m4d3.by.5ukk4w.skk.moe
 +.gcr.io
@@ -113,6 +113,7 @@ ctan.math.ca
 d2.myani.org
 deb.sury.org
 debian.a1.bg
+dl.pikpak.io
 ftp.agdsn.de
 ftp.antik.sk
 ftp.arnes.si
@@ -227,6 +228,7 @@ mirrors.up.pt
 +.ossplanet.org
 +.packagist.org
 repository.su
++.s3.yandex.net
 sft.if.usp.br
 ubuntu.dts.mg
 ubuntu.nic.cz
@@ -456,7 +458,6 @@ ruleset.skk.moe
 tux.rainside.sk
 ubuntu.grena.ge
 ubuntu.lagis.at
-ubuntu.syxpi.fr
 ubuntu.uvigo.es
 updates.64gr.am
 www-ftp.lip6.fr
@@ -500,7 +501,6 @@ down.filen-5.net
 download.kde.org
 download.nust.na
 eclats.crans.org
-edge.zerofs.link
 +.epicgamescdn.com
 fedorapeople.org
 formulae.brew.sh
@@ -558,7 +558,6 @@ mirror.ufs.ac.za
 mirror.ufscar.br
 mirror.veesp.com
 mirror.yandex.ru
-mirror1.hcgen.de
 mirror1.ku.ac.th
 mirrors.asnet.am
 +.mirrors.blix.com
@@ -923,7 +922,6 @@ download.eassos.com
 download.edovia.com
 download.garmin.com
 download.mxfast.com
-download.nus.edu.sg
 +.download.nvidia.com
 download.osmand.net
 download.sketch.com
@@ -1117,7 +1115,6 @@ mirror.del.albony.in
 +.mirror.ftn.uns.ac.rs
 mirror.gotmyhost.com
 mirror.hashy0917.net
-mirror.hyperdedic.ru
 mirror.infomaniak.ch
 mirror.its.umich.edu
 mirror.low-orbit.net
@@ -1185,6 +1182,7 @@ desktop.parallels.com
 distcache.freebsd.org
 dl.orangefox.download
 +.download.autodesk.com
+download.fcitx-im.org
 download.geofabrik.de
 download.gigabyte.com
 download.iboysoft.com
@@ -1236,7 +1234,6 @@ mirrors.opensource.is
 mirrors.rpmfusion.org
 +.mirrors.spacedump.net
 mirrors.us.kernel.org
-mirrors.wikimedia.org
 mirrors.xmissions.com
 origin-a.akamaihd.net
 os-cdn.virtfusion.net
