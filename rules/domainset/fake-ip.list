@@ -11,8 +11,12 @@ localhost.ptlogin2.qq.com
 +.ntp.org.cn
 ntp.aliyun.com
 ntp1.aliyun.com
-time*.apple.com
-time*.google.com
+time.apple.com
+time.google.com
+time1.google.com
+time2.google.com
+time3.google.com
+time4.google.com
 time.windows.com
 
 # STUN / NAT 打洞

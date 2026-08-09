@@ -30,16 +30,20 @@
 
 ```yaml
 rule-providers:
-  Game:
+  game_non_ip:
     type: http
     behavior: classical
-    format: yaml
-    url: https://raw.githubusercontent.com/baiye1997/baiye-mihomo-rules/main/rules/yaml/Game.yaml
-    path: ./rules/yaml/Game.yaml
+    format: text
+    url: https://raw.githubusercontent.com/baiye1997/baiye-mihomo-rules/main/rules/non_ip/game.txt
+    path: ./rules/non_ip/game.txt
     interval: 86400
 ```
 
 > 默认不启用配置层广告拦截规则。广告过滤建议交给浏览器插件或 DNS 侧工具，避免误伤微信、小米互联、系统推送等 App 功能。
+
+> 安全默认值：代理端口仅监听本机。需要给局域网设备共享代理时，请自行开启 `allow-lan`，并同时配置 `lan-allowed-ips` 或 `authentication`，不要在不可信网络中裸露代理端口。
+
+Geo 数据采用分工配置：精简 `geoip-lite.dat` 负责实际使用的 `private/CN` IP 兜底，Loyalsoldier `geosite.dat` 保留完整域名分类；两者均由 Mihomo 自动更新。
 
 **内存优化（可选，iOS 推荐）**
 ```yaml
