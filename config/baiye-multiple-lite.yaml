@@ -28,8 +28,9 @@ proxy-providers:
 
 # ======================= 基础配置 =======================
 mixed-port: 7890
-allow-lan: true
-bind-address: '*'
+# 安全默认值：仅本机使用；需要局域网共享时请同时配置认证或 lan-allowed-ips
+allow-lan: false
+bind-address: 127.0.0.1
 mode: rule
 log-level: warning
 ipv6: false
@@ -41,6 +42,9 @@ external-controller: 127.0.0.1:9090
 # external-ui: ui
 # external-ui-name: zashboard
 # external-ui-url: "https://github.com/Zephyruso/zashboard/releases/latest/download/dist.zip"
+
+keep-alive-idle: 60
+keep-alive-interval: 30
 
 profile:
   store-selected: true
@@ -69,12 +73,12 @@ dns:
     - https://doh.pub/dns-query
 
   fallback:
-    - https://doh-pure.onedns.net/dns-query
     - "https://1.1.1.1/dns-query#🚀 节点选择"
     - "https://8.8.8.8/dns-query#🚀 节点选择"
 
   fallback-filter:
     geoip: true
+    geoip-code: CN
     ipcidr:
       - 240.0.0.0/4
       - 0.0.0.0/32
@@ -117,7 +121,7 @@ geodata-loader: standard
 geo-auto-update: true
 geo-update-interval: 24
 geox-url:
-  geoip: "https://cdn.jsdelivr.net/gh/Loyalsoldier/v2ray-rules-dat@release/geoip.dat"
+  geoip: "https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/geoip-lite.dat"
   geosite: "https://cdn.jsdelivr.net/gh/Loyalsoldier/v2ray-rules-dat@release/geosite.dat"
 
 # ======================= 策略组锚点 =======================
@@ -128,6 +132,7 @@ fall: &fall {type: fallback, <<: *tmpl}
 
 entr: &entr {type: select, proxies: ["♻️ 智能选择","👆 手动选择","DIRECT"]}
 app:  &app  {type: select, proxies: ["♻️ 智能选择","👆 手动选择","DIRECT","🇭🇰 - 择优节点","🇨🇳 - 择优节点","🇯🇵 - 择优节点","🇰🇷 - 择优节点","🇸🇬 - 择优节点","🇺🇸 - 择优节点"]}
+aiapp: &aiapp {type: select, proxies: ["🧠 AI 专用节点","👆 手动选择"]}
 drc:  &drc  {type: select, proxies: ["DIRECT","♻️ 智能选择","👆 手动选择","🇭🇰 - 择优节点","🇨🇳 - 择优节点","🇯🇵 - 择优节点","🇸🇬 - 择优节点","🇺🇸 - 择优节点"]}
 strm: &strm {type: select, proxies: ["♻️ 智能选择","👆 手动选择","DIRECT","🇭🇰 - 择优节点","🇨🇳 - 择优节点","🇯🇵 - 择优节点","🇰🇷 - 择优节点","🇸🇬 - 择优节点","🇺🇸 - 择优节点","🇭🇰 - 自动回退","🇨🇳 - 自动回退","🇯🇵 - 自动回退","🇸🇬 - 自动回退","🇺🇸 - 自动回退"]}
 tg:   &tg   {type: select, proxies: ["♻️ 智能选择","👆 手动选择","DIRECT","🇸🇬 - 择优节点","🇭🇰 - 择优节点","🇯🇵 - 择优节点","🇺🇸 - 择优节点"]}
@@ -138,6 +143,7 @@ jp: &jp '^(?=.*(?i)(日|🇯🇵|Japan|(?:^|[^A-Za-z])(?:JP|NRT|HND|KIX|CTS|FUK)
 kr: &kr '^(?=.*(?i)(韩|🇰🇷|韓|首尔|南朝鲜|Korea|South Korea|(?:^|[^A-Za-z])(?:KR|KOR)(?:$|[^A-Za-z])))(?!.*(?i)(?:^|[^0-9.])5x(?:$|[^0-9])).*$'
 sg: &sg '^(?=.*(?i)(坡|🇸🇬|Sing|(?:^|[^A-Za-z])(?:SG|SIN|XSP)(?:$|[^A-Za-z])))(?!.*(?i)(?:^|[^0-9.])5x(?:$|[^0-9])).*$'
 us: &us '^(?=.*(?i)(美|🇺🇸|硅谷|Silicon|United States|(?:^|[^A-Za-z])(?:US|USA|JFK|SJC|LAX|ORD|ATL|DFW|SFO|MIA|SEA|IAD)(?:$|[^A-Za-z])))(?!.*(?i)(?:^|[^0-9.])5x(?:$|[^0-9])).*$'
+ai: &ai '(?i)(AI专用|AI解锁)'
 
 # ======================= 策略组 =======================
 proxy-groups:
@@ -146,7 +152,8 @@ proxy-groups:
   - {name: "♻️ 智能选择", <<: *test, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/auto.png"}
 
   - {name: "🌐 全球直连", <<: *drc, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/link.png"}
-  - {name: "🤖 AI 平台", <<: *app, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/openai.png"}
+  - {name: "🤖 AI 平台", <<: *aiapp, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/openai.png"}
+  - {name: "🧠 AI 专用节点", <<: *sel, filter: *ai, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/openai.png"}
   - {name: "✈️ Telegram", <<: *tg, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/telegram.png"}
   - {name: "☁️ OneDrive", <<: *app, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/onedrive.png"}
   - {name: "Ⓜ️ 微软服务", <<: *app, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/microsoft.png"}
@@ -173,14 +180,22 @@ cls: &cls {type: http, behavior: classical, interval: 43200, format: text, proxy
 dom: &dom {type: http, behavior: domain, interval: 43200, format: text, proxy: "🚀 节点选择"}
 
 rule-providers:
-  Game:            {<<: *cls, format: yaml, url: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/yaml/Game.yaml", path: ./rules/yaml/Game.yaml}
+  game_non_ip:     {<<: *cls, url: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/non_ip/game.txt", path: ./rules/non_ip/game.txt}
+  game_ip:         {<<: *cls, url: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/ip/game.txt", path: ./rules/ip/game.txt}
   sniff-skip:      {<<: *dom, url: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/domainset/sniff-skip.list", path: ./rules/domainset/sniff-skip.list}
   fake-ip:         {<<: *dom, url: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/domainset/fake-ip.list", path: ./rules/domainset/fake-ip.list}
   stream_non_ip:   {<<: *cls, url: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/non_ip/stream.txt", path: ./rules/non_ip/stream.txt}
   stream_ip:       {<<: *cls, url: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/ip/stream.txt", path: ./rules/ip/stream.txt}
   ai_non_ip:       {<<: *cls, url: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/non_ip/ai.txt", path: ./rules/non_ip/ai.txt}
+  ai_ip:           {<<: *cls, url: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/ip/ai.txt", path: ./rules/ip/ai.txt}
   telegram_non_ip: {<<: *cls, url: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/non_ip/telegram.txt", path: ./rules/non_ip/telegram.txt}
   telegram_ip:     {<<: *cls, url: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/ip/telegram.txt", path: ./rules/ip/telegram.txt}
+  neteasemusic_non_ip: {<<: *cls, url: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/non_ip/neteasemusic.txt", path: ./rules/non_ip/neteasemusic.txt}
+  neteasemusic_ip: {<<: *cls, url: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/ip/neteasemusic.txt", path: ./rules/ip/neteasemusic.txt}
+  lan_non_ip:      {<<: *cls, url: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/non_ip/lan.txt", path: ./rules/non_ip/lan.txt}
+  lan_ip:          {<<: *cls, url: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/ip/lan.txt", path: ./rules/ip/lan.txt}
+  direct_non_ip:   {<<: *cls, url: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/non_ip/direct.txt", path: ./rules/non_ip/direct.txt}
+  domestic_ip:     {<<: *cls, url: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/ip/domestic.txt", path: ./rules/ip/domestic.txt}
 
 # ======================= 分流规则 =======================
 rules:
@@ -204,35 +219,47 @@ rules:
   - DOMAIN-SUFFIX,oaiusercontent.com,🤖 AI 平台
   - DOMAIN-SUFFIX,bing.com,🌐 全球直连
 
-  # 4. 专项规则
+  # 4. Sukka non_ip（保持上游 README 顺序）
+  - GEOSITE,spotify,🎵 Spotify
+  - RULE-SET,stream_non_ip,📺 视频媒体
   - RULE-SET,ai_non_ip,🤖 AI 平台
   - RULE-SET,telegram_non_ip,✈️ Telegram
-  - RULE-SET,stream_non_ip,📺 视频媒体
-  - RULE-SET,Game,🎮 游戏平台
+  - RULE-SET,neteasemusic_non_ip,DIRECT
+  - RULE-SET,lan_non_ip,DIRECT
 
-  # 5. 服务类 GEOSITE
-  - GEOSITE,spotify,🎵 Spotify
+  # 5. 自定义服务规则
+  - RULE-SET,game_non_ip,🎮 游戏平台
+
+  # 6. 服务类 GEOSITE
   - GEOSITE,onedrive,☁️ OneDrive
   - GEOSITE,apple-cn,DIRECT
   - GEOSITE,apple,🍎 苹果服务
   - GEOSITE,microsoft@cn,DIRECT
   - GEOSITE,microsoft,Ⓜ️ 微软服务
 
-  # 6. 国内分类直连
+  # 7. Sukka Misc / 国内分类直连
+  - RULE-SET,direct_non_ip,DIRECT
   - GEOSITE,category-ai-cn,DIRECT
   - GEOSITE,google-cn,DIRECT
   - GEOSITE,category-games@cn,DIRECT
   - GEOSITE,category-media-cn,DIRECT
   - GEOSITE,cn,DIRECT
 
-  # 7. 海外兜底
+  # 8. 海外兜底
   - GEOSITE,geolocation-!cn,🚀 节点选择
 
-  # 8. IP
-  - GEOIP,private,DIRECT,no-resolve
-  - RULE-SET,telegram_ip,✈️ Telegram,no-resolve
+  # 9. Sukka IP（保持上游 README 顺序）
   - RULE-SET,stream_ip,📺 视频媒体,no-resolve
+  - RULE-SET,ai_ip,🤖 AI 平台,no-resolve
+  - RULE-SET,telegram_ip,✈️ Telegram,no-resolve
+  - RULE-SET,neteasemusic_ip,DIRECT,no-resolve
+  - RULE-SET,lan_ip,DIRECT,no-resolve
+  - RULE-SET,domestic_ip,DIRECT,no-resolve
+  - RULE-SET,game_ip,🎮 游戏平台,no-resolve
+
+  # 10. GEOIP 兜底
+  - GEOIP,private,DIRECT,no-resolve
   - GEOIP,cn,DIRECT,no-resolve
 
-  # 9. 最终兜底
+  # 11. 最终兜底
   - MATCH,🚀 节点选择

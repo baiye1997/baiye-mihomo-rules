@@ -27,11 +27,6 @@ push.xiaomi.com
 +.mijia.tech
 +.miot-spec.org
 
-# 邮件服务
-imap.*
-smtp.*
-pop.*
-
 # NAT / RTC
 stun.*
 *.stun.*
