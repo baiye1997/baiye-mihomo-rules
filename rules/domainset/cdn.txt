@@ -1,14 +1,14 @@
 #########################################
 # Sukka's Ruleset - CDN Domains
-# Last Updated: 2026-08-09T16:01:36.426Z
-# Size: 4607
+# Last Updated: 2026-08-10T21:27:09.393Z
+# Size: 4617
 # License: AGPL 3.0
 # Homepage: https://ruleset.skk.moe
 # GitHub: https://github.com/SukkaW/Surge
 #
 # This file contains object storage and static assets CDN domains.
 #
-# $content-hash-v1$:hi3PyjlNIP7ZW-kS3RUoVc8Plg-k-7V_IqUbCmuF4Cw$
+# $content-hash-v1$:IadSSklNdvcTgKCZPNJByazpbcdDjhn1y_Sgg-RvJCw$
 #########################################
 7h15.ru1353t.1s.m4d3.by.5ukk4w.skk.moe
 0x0.st
@@ -494,6 +494,7 @@ ias.r10s.jp
 img.agrd.eu
 img.skk.moe
 img.toto.im
++.imgcdn8.com
 +.imgikzy.com
 +.imglink.win
 +.imgsmail.ru
@@ -1310,6 +1311,7 @@ nel.heroku.com
 +.newscdn.com.au
 +.nincontent.com
 +.ninjastream.to
+node.windy.com
 null.jsbin.com
 optimizely.com
 +.patientpop.com
@@ -1561,6 +1563,7 @@ files.slack.com
 fonts.bunny.net
 fonts.gishan.cc
 fonts.upset.dev
+fonts.wd40.info
 +.gannett-cdn.com
 +.gauthstatic.com
 gdb.voanews.com
@@ -1619,6 +1622,7 @@ media.giphy.com
 media.licdn.com
 media.smooch.io
 media.tenor.com
+media.wd40.asia
 media.webtoo.ls
 media.wired.com
 metrics.kapa.ai
@@ -1778,6 +1782,7 @@ blob.jortage.com
 +.bugly.qcloud.com
 bundlephobia.com
 cache.ip-api.com
+cache.sgvafs.com
 +.capcutstatic.com
 cdn-1.porn87.com
 cdn-1.strava.com
@@ -1883,6 +1888,7 @@ fscdn.eppo.cloud
 +.getaroom-cdn.com
 gis.pinkbike.org
 +.githubassets.com
++.githubstatus.com
 +.glass.adidas.com
 glyph.medium.com
 gravatar.cat.net
@@ -2413,6 +2419,8 @@ static.tumblr.com
 static.vinted.com
 static.vocadb.net
 static.zaobao.com
+status.claude.com
+status.openai.com
 stbff.newfold.com
 +.steemitimages.com
 storage.ko-fi.com
@@ -2595,6 +2603,7 @@ img.4gamers.com.tw
 img.fastcybers.com
 img.hellofresh.com
 img.sparknotes.com
+imgproxy.windy.com
 imgrs.apkcombo.com
 imgs3.hcaptcha.com
 +.intercomassets.com
@@ -3156,6 +3165,7 @@ cdn9.bigcommerce.com
 cdnjs.cloudflare.com
 chart.googleapis.com
 +.cloud.influxdata.com
++.cloudflarestatus.com
 +.cloudflarestream.com
 +.cloudinary.vpsvc.com
 cms.socialinsider.io
