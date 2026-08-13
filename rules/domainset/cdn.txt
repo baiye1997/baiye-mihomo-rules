@@ -1,14 +1,14 @@
 #########################################
 # Sukka's Ruleset - CDN Domains
-# Last Updated: 2026-08-12T18:15:16.115Z
-# Size: 4624
+# Last Updated: 2026-08-13T13:38:55.331Z
+# Size: 4626
 # License: AGPL 3.0
 # Homepage: https://ruleset.skk.moe
 # GitHub: https://github.com/SukkaW/Surge
 #
 # This file contains object storage and static assets CDN domains.
 #
-# $content-hash-v1$:iuml4tx2zncEdof-xia-yx2EABIpYig6MaXCpy7RLcU$
+# $content-hash-v1$:X6ekXc2WzYdBNW2dkmhmnogmSkk4aDDyg0xC9ZukG5s$
 #########################################
 7h15.ru1353t.1s.m4d3.by.5ukk4w.skk.moe
 0x0.st
@@ -1282,6 +1282,7 @@ imgcn.bgmbk.tv
 imgs.plurk.com
 imgsrc.dmm.com
 +.infura-ipfs.io
++.insightcdn.net
 int.mwbbiz.com
 +.intercomcdn.io
 +.ipfs.infura.io
@@ -3293,6 +3294,7 @@ shell.cdn.office.net
 sigma9.scpwikicn.com
 snippet.growsumo.com
 +.spreadshirtmedia.com
+sso-static.razer.com
 static-act.imoim.net
 static-cdn.123rf.com
 static-cdn.jtvnw.net

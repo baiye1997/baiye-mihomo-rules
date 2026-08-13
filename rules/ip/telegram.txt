@@ -1,7 +1,7 @@
 #########################################
 # Sukka's Ruleset - Telegram IP CIDR
-# Last Updated: 2026-08-05T12:33:05.782Z
-# Size: 16
+# Last Updated: 2026-08-13T14:34:35.340Z
+# Size: 15
 # License: AGPL 3.0
 # Homepage: https://ruleset.skk.moe
 # GitHub: https://github.com/SukkaW/Surge
@@ -11,7 +11,7 @@
 # This file contains data from:
 #   - https://core.telegram.org/resources/cidr.txt (last updated: 2021-10-01T16:51:55.000Z)
 #
-# $content-hash-v1$:q0nbw2-xQTGURwqoWuvtu7DxVLX7VncRFWbhng0GNBA$
+# $content-hash-v1$:m4nwfeQVBUEMqFes8QCpK8lYP_bF0GXmWzqjOTXMHZs$
 #########################################
 DOMAIN,7h15.ru1353t.1s.m4d3.by.5ukk4w.skk.moe
 IP-CIDR,91.105.192.0/23,no-resolve
@@ -20,7 +20,6 @@ IP-CIDR,91.108.8.0/21,no-resolve
 IP-CIDR,91.108.16.0/21,no-resolve
 IP-CIDR,91.108.56.0/22,no-resolve
 IP-CIDR,95.161.64.0/20,no-resolve
-IP-CIDR,139.59.210.98/32,no-resolve
 IP-CIDR,149.154.160.0/20,no-resolve
 IP-CIDR,185.76.151.0/24,no-resolve
 IP-CIDR,194.221.250.50/32,no-resolve
