@@ -1,14 +1,14 @@
 #########################################
 # Sukka's Ruleset - Direct Rules
-# Last Updated: 2026-08-05T12:33:04.538Z
-# Size: 217
+# Last Updated: 2026-08-14T11:27:06.562Z
+# Size: 218
 # License: AGPL 3.0
 # Homepage: https://ruleset.skk.moe
 # GitHub: https://github.com/SukkaW/Surge
 #
 # This file contains domains and process that should not be proxied.
 #
-# $content-hash-v1$:uT41PpoJJ9z11It4tUWpPrtLYMIFjveeagQqPDDr0As$
+# $content-hash-v1$:sRK4B_n3Nou9G0ZCEPEo8cgr_8_EHBOizFvR6ir13Xw$
 #########################################
 DOMAIN,7h15.ru1353t.1s.m4d3.by.5ukk4w.skk.moe
 DOMAIN-SUFFIX,lan
@@ -138,6 +138,7 @@ DOMAIN-SUFFIX,routerlogin.net
 DOMAIN-SUFFIX,tplinkmodem.net
 DOMAIN-SUFFIX,aidoru-online.me
 DOMAIN-SUFFIX,cinemageddon.net
+DOMAIN-SUFFIX,collegeboard.org
 DOMAIN-SUFFIX,gazellegames.net
 DOMAIN-SUFFIX,myanonamouse.net
 DOMAIN-SUFFIX,researchgate.net
