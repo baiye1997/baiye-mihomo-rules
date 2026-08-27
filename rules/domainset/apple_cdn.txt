@@ -1,7 +1,7 @@
 #########################################
 # Sukka's Ruleset - Apple CDN
-# Last Updated: 2026-08-05T12:33:04.735Z
-# Size: 159
+# Last Updated: 2026-08-26T17:57:49.006Z
+# Size: 160
 # License: AGPL 3.0
 # Homepage: https://ruleset.skk.moe
 # GitHub: https://github.com/SukkaW/Surge
@@ -11,7 +11,7 @@
 # Data from:
 #  - https://github.com/felixonmars/dnsmasq-china-list
 #
-# $content-hash-v1$:nMaC7nrmbBW6soQC1XBbdQYmWMk40pbcGPMqpPwwDhY$
+# $content-hash-v1$:2PLh6YtFvod2fcXvbREuLCnUzm-BFQUtz8rSnUpO6cw$
 #########################################
 7h15.ru1353t.1s.m4d3.by.5ukk4w.skk.moe
 +.xp.apple.com
@@ -129,6 +129,7 @@
 +.store.apple.com.edgekey.net
 +.swdist.apple.com.akadns.net
 +.download.developer.apple.com
++.gspe11-2-cn-ssl.ls.apple.com
 +.gspe19-2-cn-ssl.ls.apple.com
 +.iosapps.itunes.g.aaplimg.com
 +.osxapps.itunes.g.aaplimg.com
