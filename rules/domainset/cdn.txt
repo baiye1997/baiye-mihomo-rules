@@ -1,14 +1,14 @@
 #########################################
 # Sukka's Ruleset - CDN Domains
-# Last Updated: 2026-08-27T16:33:13.948Z
-# Size: 4633
+# Last Updated: 2026-08-29T20:42:48.719Z
+# Size: 4640
 # License: AGPL 3.0
 # Homepage: https://ruleset.skk.moe
 # GitHub: https://github.com/SukkaW/Surge
 #
 # This file contains object storage and static assets CDN domains.
 #
-# $content-hash-v1$:oIg0BCXQ-2O34elvQKvTl8Pr4j1YNmk6Xm_IsQLvRno$
+# $content-hash-v1$:yZw8IDZmvsQkLQnduDknivwdoNvvhDcfgXYWxJakqjc$
 #########################################
 7h15.ru1353t.1s.m4d3.by.5ukk4w.skk.moe
 0x0.st
@@ -1032,6 +1032,7 @@ r2.dejavu.moe
 r2cdn.c7d.dev
 +.randomuser.me
 +.rawgithub.com
++.rcsobjects.it
 rdr.windy.com
 +.runkitcdn.com
 +.s-nbcnews.com
@@ -2584,6 +2585,7 @@ favicon.yandex.net
 files.gempages.net
 flows.trysavvy.com
 fonts.codeberg.org
++.gazzettaobjects.it
 genesis-cdn.ff.com
 global.divhunt.com
 graph.facebook.com
@@ -2921,6 +2923,7 @@ error.rakuten.co.jp
 event.ithome.com.tw
 +.events.backtrace.io
 favicons.nextdns.io
+files.blocktempo.ai
 files.namecheap.com
 +.files.wordpress.com
 geoserveis.icgc.cat
@@ -3213,6 +3216,7 @@ gstatic.olympics.com
 hubspotonwebflow.com
 icons.duckduckgo.com
 image-us.samsung.com
+image.blocktempo.com
 imageproxy.ifunny.co
 images.anandtech.com
 images.blockscan.com
@@ -3359,6 +3363,7 @@ uploads.pullfrog.com
 variations.brave.com
 vice-prod.sdiapi.com
 video-meta.humix.com
+video.giroditalia.it
 +.vodvideo.cbsnews.com
 vpncdn.protonweb.com
 wandi-6402.kxcdn.com
@@ -3783,6 +3788,7 @@ static.tradingview.com
 static.tryprofound.com
 static.underhentai.net
 static.webclicks24.com
+static2.giroditalia.it
 +.static2cdn.hubspot.com
 statics.streamable.com
 +.storage.googleapis.com
@@ -4033,6 +4039,7 @@ cms-assets.nodecraft.com
 conf.config-security.com
 cookie-cdn.cookiepro.com
 css.blackmagicdesign.com
+delivery.twentythree.com
 detectportal.firefox.com
 dynamic-cdn.cms.ayoba.me
 ecn.dev.virtualearth.net
