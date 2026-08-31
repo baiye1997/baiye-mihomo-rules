@@ -1,14 +1,14 @@
 #########################################
 # Sukka's Ruleset - CDN Domains
-# Last Updated: 2026-08-29T20:42:48.719Z
-# Size: 4640
+# Last Updated: 2026-08-30T07:31:52.951Z
+# Size: 4646
 # License: AGPL 3.0
 # Homepage: https://ruleset.skk.moe
 # GitHub: https://github.com/SukkaW/Surge
 #
 # This file contains object storage and static assets CDN domains.
 #
-# $content-hash-v1$:yZw8IDZmvsQkLQnduDknivwdoNvvhDcfgXYWxJakqjc$
+# $content-hash-v1$:XRX1WGPQj90IeKG8dtY2Dn-shB-YSdebNTmvsdRs0Rs$
 #########################################
 7h15.ru1353t.1s.m4d3.by.5ukk4w.skk.moe
 0x0.st
@@ -1529,9 +1529,11 @@ cdn1.telesco.pe
 cdn2.hextom.com
 cdn2.macpaw.com
 cdn2.stamped.io
+cdn2.telesco.pe
 cdn2.ttloli.com
 cdn3.hextom.com
 cdn3.stamped.io
+cdn3.telesco.pe
 cdn4.telesco.pe
 cdn5.hextom.com
 cdn5.telesco.pe
@@ -2167,6 +2169,7 @@ cdn.babylonjs.com
 cdn.blogarama.com
 cdn.brandfetch.io
 cdn.buttercms.com
+cdn.candycode.com
 cdn.cds.dmm.co.jp
 cdn.changelog.com
 cdn.cloudcraft.co
@@ -2890,9 +2893,11 @@ cdn1.telegram.space
 cdn1.tubeteen18.com
 cdn2.editmysite.com
 cdn2.iconfinder.com
+cdn2.telegram.space
 cdn2.tubeteen18.com
 cdn2.turboviplay.cc
 cdn3.iconfinder.com
+cdn3.telegram.space
 cdn3.tubeteen18.com
 cdn4.iconfinder.com
 cdn4.telegram.space
@@ -3600,6 +3605,7 @@ videos2-h.sendvid.com
 wac-cdn.atlassian.com
 web-assets.strava.com
 website-cdn.ipinfo.io
+websiteres.nmteam.xyz
 widget.allkeyshop.com
 widget.automizely.com
 widget.freshworks.com
