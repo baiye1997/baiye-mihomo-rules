@@ -1,14 +1,14 @@
 #########################################
 # Sukka's Ruleset - CDN Domains
-# Last Updated: 2026-09-12T18:18:09.839Z
-# Size: 4656
+# Last Updated: 2026-09-13T08:44:07.146Z
+# Size: 4662
 # License: AGPL 3.0
 # Homepage: https://ruleset.skk.moe
 # GitHub: https://github.com/SukkaW/Surge
 #
 # This file contains object storage and static assets CDN domains.
 #
-# $content-hash-v1$:v9GQaIz6S5bVUjwGEiFIU3o11itpv14Kybow-_Wdvnc$
+# $content-hash-v1$:0REgA04OT3rxT4nEnw4jKXuYvLCgnj2q-fmOMFVDeTs$
 #########################################
 7h15.ru1353t.1s.m4d3.by.5ukk4w.skk.moe
 0x0.st
@@ -601,6 +601,7 @@ zzz.wxw.moe
 aimg.fc2.com
 ajax.cat.net
 +.apperoni.top
++.axiom-cdn.io
 +.axis-cdn.net
 b.peatio.com
 b.sf-syn.com
@@ -1061,6 +1062,7 @@ st6-20.vk.com
 static.dw.com
 static.ffx.io
 static.iyf.tv
+static.jup.ag
 static.k2s.cc
 static.nrk.no
 static.ui.com
@@ -3080,6 +3082,7 @@ sync.getpublica.com
 tag.unifyintent.com
 tags.nationwide.com
 thumb.wikimedia.org
+thumbnails.padre.gg
 thumbs.onlyfans.com
 thumbs2.sendvid.com
 tile2.intervals.icu
@@ -4130,6 +4133,7 @@ tiles.openrailwaymap.org
 tools-static.wmflabs.org
 typescript.azureedge.net
 ubistatic2-a.ubisoft.com
+ugc.production.linktr.ee
 viu-static.akamaized.net
 web-assets.zendesk.co.jp
 wl-apps.yourwebsite.life
@@ -4153,6 +4157,7 @@ cdn.privacy.paramount.com
 cdn.registerdisney.go.com
 changelog-widget.canny.io
 chunk-composing.canva.com
+coin-images.coingecko.com
 components.justanswer.com
 cors-proxy.htmldriven.com
 +.crashlytics2.l.google.com
@@ -4325,6 +4330,7 @@ antiqua-ux-cdn.monotype.com
 app-static-prod.posthog.com
 article-image-ix.nikkei.com
 assets.braintreegateway.com
+assets.production.linktr.ee
 assets.weather-forecast.com
 +.cdn-lfs-us-1.huggingface.co
 cdn-live.foreignaffairs.com
