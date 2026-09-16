@@ -4,19 +4,23 @@ on:
   workflow_run:
     workflows: ["Purge CDN"]
     types: [completed]
+    branches: [main]
 
   workflow_dispatch: {}
   
   # 优化：增加 PR 触发，用于测试配置是否正确 (自动 Dry Run)
   pull_request:
     paths:
-      - '.github/scripts/build-and-publish.js'
+      - '.github/scripts/**'
       - 'config/**'
-      - '.github/workflows/publish-gist.yml'
+      - '.github/workflows/**'
+      - 'scripts/**'
+      - 'package*.json'
+      - 'rules/**'
 
 concurrency:
-  group: publish-gist
-  cancel-in-progress: true
+  group: publish-gist-${{ github.event.pull_request.number || 'production' }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 permissions:
   contents: read
@@ -24,9 +28,9 @@ permissions:
 jobs:
   publish:
     # 逻辑：如果是 PR，或者 workflow_dispatch，或者 workflow_run 成功时运行
-    if: ${{ github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch' || (github.event.workflow_run.conclusion == 'success') }}
+    if: ${{ github.event_name == 'pull_request' || (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main') || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main') }}
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 10
     
     steps:
       - name: Checkout main
@@ -38,6 +42,15 @@ jobs:
         uses: actions/setup-node@v5
         with:
           node-version: 20
+
+      - name: Install validation dependencies
+        run: npm ci --ignore-scripts
+
+      - name: Prepare pinned Mihomo and Geo data
+        run: bash .github/scripts/prepare-mihomo.sh
+
+      - name: Check generation and runtime behavior
+        run: npm test
 
       - name: Build & Publish to Gists
         env:
@@ -81,6 +94,10 @@ jobs:
 
         run: |
           set -euo pipefail
+          if [ "$DRY_RUN" = "true" ]; then
+            # PR checks need neither subscription credentials nor a publish token.
+            export SUB_URLS=$'https://example.invalid/one\nhttps://example.invalid/two'
+          fi
           node .github/scripts/build-and-publish.js
 
       - name: Show status file

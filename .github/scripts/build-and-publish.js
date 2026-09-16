@@ -4,6 +4,8 @@
 const fs = require("fs");
 const https = require("https");
 const path = require("path");
+const YAML = require("yaml");
+const { validateConfig, validateWithCore } = require("./validate-config.js");
 
 /* ===================== ENV ===================== */
 const {
@@ -47,7 +49,7 @@ function writeStatus(s) {
 function readIfExists(p) {
   if (!p) return null;
   const abs = path.resolve(p);
-  return fs.existsSync(abs) ? fs.readFileSync(abs, "utf8") : null;
+  return fs.readFileSync(abs, "utf8");
 }
 
 function bumpIconsV(s) {
@@ -73,9 +75,8 @@ function maskUrl(raw = "") {
 /* ===================== Subscriptions ===================== */
 const subUrls = SUB_URLS
   .split(/\r?\n/)
-  .map(normalizeSubscriptionUrl)
-  .filter(Boolean);
-const subNames = SUB_NAMES.split(/\r?\n/).map(s => s.trim()).filter(Boolean);
+  .map(normalizeSubscriptionUrl);
+const subNames = SUB_NAMES.split(/\r?\n/).map(s => s.trim());
 const manualServerDomains = SUB_SERVER_DOMAINS
   .split(/[\r\n,]+/)
   .map(s => normalizeDomainFilter(s))
@@ -100,40 +101,14 @@ function normalizeSubscriptionUrl(raw = "") {
     );
 }
 
-function parentDomainFilter(server = "") {
-  const host = String(server)
-    .trim()
-    .replace(/^['"]|['"]$/g, "")
-    .replace(/\.$/, "");
-  if (!host || /^\d+\.\d+\.\d+\.\d+$/.test(host) || host.includes(":")) return "";
-
-  const labels = host.split(".").filter(Boolean);
-  if (labels.length < 2) return "";
-
-  const twoLabelSuffixes = new Set([
-    "com.cn", "net.cn", "org.cn", "gov.cn",
-    "com.hk", "net.hk", "org.hk",
-    "com.tw", "net.tw", "org.tw",
-    "co.uk", "org.uk", "ac.uk",
-    "co.jp", "ne.jp", "or.jp",
-    "com.au", "net.au", "org.au",
-    "us.kg",
-  ]);
-  const tail2 = labels.slice(-2).join(".");
-  const tail3 = labels.slice(-3).join(".");
-  const parent = labels.length >= 3 && twoLabelSuffixes.has(tail2) ? tail3 : tail2;
-  return normalizeDomainFilter(parent);
-}
-
 function extractServerDomainFilters(text = "") {
-  const filters = new Set();
-  const serverRe = /(?:^|[,{]\s*)server\s*:\s*['"]?([^'",}\s#]+)['"]?/gim;
-  let match;
-  while ((match = serverRe.exec(text))) {
-    const filter = parentDomainFilter(match[1]);
-    if (filter) filters.add(filter);
-  }
-  return [...filters];
+  const data = YAML.parse(text, { merge: true, maxAliasCount: 10000 });
+  if (!Array.isArray(data?.proxies)) return [];
+  // Exact server hosts avoid exempting unrelated tenants of shared domains.
+  return [...new Set(data.proxies.map(p => {
+    const host = String(p?.server || "").trim().replace(/\.$/, "").toLowerCase();
+    return host && !require("net").isIP(host) && !host.includes(":") ? host : null;
+  }).filter(Boolean))];
 }
 
 function httpsText(url, redirects = 3) {
@@ -167,55 +142,43 @@ async function collectServerDomainFilters() {
   const filters = new Set(manualServerDomains);
 
   await Promise.all(subUrls.map(async (url, i) => {
+    if (!url) return;
     try {
       const text = await httpsText(url);
       extractServerDomainFilters(text).forEach(d => filters.add(d));
     } catch (e) {
-      log(`WARN: 订阅 ${i + 1} server 域名提取失败，跳过自动 fake-ip-filter 注入：${e.message}`);
+      console.warn(`WARN: 订阅 ${i + 1} server 域名提取失败，保留已有 DNS 配置。`);
     }
   }));
 
   return [...filters].sort((a, b) => a.localeCompare(b));
 }
 
-function appendFakeIpFilters(config, filters) {
-  if (!filters.length) return config;
-
-  return config.replace(
-    /(^\s{2}fake-ip-filter:\n(?:^\s{4}- .*(?:\n|$))+)/gm,
-    (block) => {
-      const existing = new Set();
-      block.split(/\r?\n/).forEach(line => {
-        const m = line.match(/^\s*-\s*['"]?([^'"]+?)['"]?\s*$/);
-        if (m) existing.add(m[1].trim());
-      });
-
-      const additions = filters
-        .filter(d => !existing.has(d))
-        .map(d => `    - "${d}"`);
-
-      return additions.length ? block + additions.join("\n") + "\n" : block;
+function applySubscriptions(template, serverDomainFilters = [], urls = subUrls, names = subNames) {
+  const doc = YAML.parseDocument(bumpIconsV(template), { merge: true });
+  if (doc.errors.length) throw new Error("配置模板不是有效 YAML");
+  const config = doc.toJS({ maxAliasCount: 10000 });
+  for (const [key, provider] of Object.entries(config["proxy-providers"] || {})) {
+    const slot = /^替换订阅链接([0-9]+)$/.exec(provider.url || "");
+    if (!slot) continue;
+    const index = Number(slot[1]) - 1;
+    const url = urls[index];
+    let parsed;
+    try { parsed = new URL(url); } catch { /* checked below */ }
+    if (!url || !["https:", "http:"].includes(parsed?.protocol)) {
+      throw new Error(`订阅 ${index + 1} 缺失或 URL 无效`);
     }
-  );
-}
-
-function applySubscriptions(template, serverDomainFilters = []) {
-  if (!template) return template;
-  let out = bumpIconsV(template);
-
-  subUrls.forEach((url, i) => {
-    const name = subNames[i] || `[Sub${i + 1}]`;
-    const placeholders = [
-      `替换订阅链接${i + 1}`,
-      `[***]`,
-      `***`
-    ];
-    placeholders.forEach(placeholder => {
-      out = out.replace(new RegExp(placeholder.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), "g"), url);
-    });
-    out = out.replace(new RegExp(`\\[显示名称${i + 1}\\]`, "g"), name);
-  });
-  return appendFakeIpFilters(out, serverDomainFilters);
+    doc.setIn(["proxy-providers", key, "url"], url);
+    doc.setIn(["proxy-providers", key, "override", "additional-prefix"], names[index] || `[Sub${index + 1}]`);
+  }
+  if (serverDomainFilters.length) {
+    const existing = config.dns?.["fake-ip-filter"] || [];
+    doc.setIn(["dns", "fake-ip-filter"], [...new Set([...existing, ...serverDomainFilters])]);
+  }
+  const output = doc.toString();
+  if (/替换订阅链接|\[显示名称|\[\*\*\*\]/.test(output)) throw new Error("生成配置仍有未替换占位符");
+  validateConfig(output);
+  return output;
 }
 
 function deriveMini(s) {
@@ -247,6 +210,7 @@ function httpJSON(method, url, body) {
         }
       });
     });
+    req.on("timeout", () => req.destroy(new Error("timeout")));
     req.on("error", reject);
     if (body) req.write(JSON.stringify(body));
     req.end();
@@ -254,14 +218,22 @@ function httpJSON(method, url, body) {
 }
 
 /* ===================== Main ===================== */
-(async () => {
+async function main() {
   try {
-    if (!GIST_TOKEN) throw new Error("Missing GIST_TOKEN");
+    if (DRY_RUN !== "true" && !GIST_TOKEN) throw new Error("Missing GIST_TOKEN");
+    if (DRY_RUN !== "true") {
+      if ((CONFIG_MULTIPLE_STD || CONFIG_SINGLE_STD) && !GIST_ID_STANDARD.trim()) throw new Error("Missing GIST_ID_STANDARD");
+      if ((CONFIG_MULTIPLE_LITE || CONFIG_SINGLE_LITE) && !GIST_ID_LITE.trim()) throw new Error("Missing GIST_ID_LITE");
+    }
 
     log("开始处理配置文件...");
     
     const outputs = { standard: {}, lite: {} };
-    const serverDomainFilters = await collectServerDomainFilters();
+    // Fail before network access if required slots/templates are invalid.
+    for (const file of [CONFIG_MULTIPLE_STD, CONFIG_SINGLE_STD, CONFIG_MULTIPLE_LITE, CONFIG_SINGLE_LITE]) {
+      if (file) applySubscriptions(readIfExists(file));
+    }
+    const serverDomainFilters = DRY_RUN === "true" ? manualServerDomains : await collectServerDomainFilters();
     if (serverDomainFilters.length) {
       log(`已为 Gist 配置注入 ${serverDomainFilters.length} 个代理服务器 fake-ip-filter 域名`);
     }
@@ -292,6 +264,14 @@ function httpJSON(method, url, body) {
     }
 
     log(`处理完成，Standard Gist 文件数: ${Object.keys(outputs.standard).length}, Lite/GEO Gist 文件数: ${Object.keys(outputs.lite).length}`);
+
+    const files = { ...outputs.standard, ...outputs.lite };
+    if (!Object.keys(files).length) throw new Error("没有可验证的输出配置");
+    if (Object.hasOwn(files, "undefined")) throw new Error("缺少输出文件名");
+    for (const [name, { content }] of Object.entries(files)) {
+      validateConfig(content);
+      validateWithCore(content, name);
+    }
 
     if (DRY_RUN === "true") {
       writeStatus("DRYRUN");
@@ -342,4 +322,7 @@ function httpJSON(method, url, body) {
     console.error("❌ Gist 更新失败:", e.message);
     process.exit(1);
   }
-})();
+}
+
+module.exports = { applySubscriptions, extractServerDomainFilters, deriveMini };
+if (require.main === module) main();

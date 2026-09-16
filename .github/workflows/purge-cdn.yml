@@ -2,7 +2,7 @@ name: Purge CDN
 
 on:
   push:
-    branches: ['**']
+    branches: [main]
     tags-ignore: ['**']
     paths:
       - "rules/ip/**"
@@ -20,16 +20,15 @@ on:
         required: false
         default: false
 
-concurrency:
-  group: purge-cdn
-  cancel-in-progress: true
+# Each push carries its own changed-file set; cancelling a run can lose a purge.
+# Purging the same URL more than once is safe, so these runs may overlap.
 
 permissions:
   contents: read
 
 jobs:
   release_purge:
-    if: ${{ github.event_name != 'push' || startsWith(github.ref, 'refs/heads/') }}
+    if: ${{ github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     
@@ -37,21 +36,23 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v5
         with:
-          fetch-depth: 2 # 需要 diff，所以深度至少为 2
+          fetch-depth: 0 # push 可能包含多个提交，比较整个推送范围
 
       - name: Detect referenced targets
         id: detect
         shell: bash
         env:
+          BEFORE_SHA: ${{ github.event.before }}
           FORCE_PURGE: ${{ github.event_name == 'workflow_dispatch' && inputs.force_purge || 'false' }}
         run: |
           set -euo pipefail
           # --- 保持原有检测逻辑不变 ---
+          shopt -s nullglob
           CONFIGS=(config/*.yml config/*.yaml)
           : > referenced.targets.txt
 
           if [[ "${FORCE_PURGE}" == "true" ]]; then
-            # ... 强制模式逻辑 (保持原样) ...
+            : > all.txt
             if [ -d icons ]; then find icons -type f -print | sort -u >> all.txt; fi
             for d in rules/ip rules/non_ip rules/domainset rules/yaml; do [ -d "$d" ] && find "$d" -type f -print; done | sort -u >> all.txt || true
             while read -r P; do
@@ -60,7 +61,11 @@ jobs:
             done < all.txt
           else
             # ... Diff 模式逻辑 (保持原样) ...
-            git diff --name-only HEAD~1 HEAD | sort -u > changed.all.txt
+            if [[ -n "$BEFORE_SHA" && "$BEFORE_SHA" != "0000000000000000000000000000000000000000" ]] && git cat-file -e "$BEFORE_SHA^{commit}" 2>/dev/null; then
+              git diff --name-only "$BEFORE_SHA" HEAD | sort -u > changed.all.txt
+            else
+              git ls-files | sort -u > changed.all.txt
+            fi
             grep -E '^(icons|rules/(ip|non_ip|domainset|yaml))/' changed.all.txt > changed.targets.txt || true
             if [ -s changed.targets.txt ]; then
               while read -r P; do
@@ -96,5 +101,6 @@ jobs:
               echo "✅ Purged: $url"
             else
               echo "❌ Failed: $url"
+              exit 1
             fi
           '

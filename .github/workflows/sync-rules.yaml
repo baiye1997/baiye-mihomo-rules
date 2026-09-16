@@ -27,6 +27,20 @@ jobs:
       - name: Update rule files
         run: bash scripts/update_rules.sh
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 20
+
+      - name: Install validation dependencies
+        run: npm ci --ignore-scripts
+
+      - name: Prepare pinned Mihomo and Geo data
+        run: bash .github/scripts/prepare-mihomo.sh
+
+      - name: Validate downloaded rules before committing
+        run: npm test
+
       - name: Detect changes
         id: diff
         shell: bash
@@ -48,7 +62,7 @@ jobs:
           git config user.name  "baiye-bot"
           git config user.email "baiye-bot@users.noreply.github.com"
           
-          git add -A
+          git add rules/
           git commit -m "chore(sync): update external rules from upstream"
           
           # 优化：更安全的 Push 方式

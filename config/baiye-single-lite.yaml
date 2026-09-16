@@ -14,6 +14,8 @@ proxy-providers:
     <<: *prov
     url: "替换订阅链接1"
     path: "./proxy_provider/providers.yaml"
+    override:
+      additional-prefix: "[显示名称1]"
     filter: *blk
 
 # ======================= 基础配置 =======================
@@ -115,8 +117,8 @@ geox-url:
   geosite: "https://cdn.jsdelivr.net/gh/Loyalsoldier/v2ray-rules-dat@release/geosite.dat"
 
 # ======================= 策略组锚点 =======================
-tmpl: &tmpl {url: *url, interval: 300, lazy: true, timeout: 5000, disable-udp: false, max-failed-times: 3, hidden: true, include-all-providers: true, exclude-filter: "(?i)(DIRECT|直接连接|官网|订阅|流量|到期|套餐|客服|群|邀请|网址|剩余|过期|LAN|(?:^|[^0-9.])0?\\.[0-9]+\\s*(?:x|×|倍(?:率)?)(?:$|[^0-9A-Za-z])|(?:^|[^0-9.])5x(?:$|[^0-9]))"}
-sel:  &sel  {type: select, url: *url, disable-udp: false, hidden: false, include-all-providers: true, exclude-filter: "(?i)(DIRECT|直接连接|官网|订阅|流量|到期|套餐|客服|群|邀请|网址|剩余|过期|LAN)"}
+tmpl: &tmpl {url: *url, interval: 300, lazy: true, timeout: 5000, disable-udp: false, max-failed-times: 3, hidden: true, include-all-providers: true, empty-fallback: REJECT, exclude-filter: "(?i)(DIRECT|直接连接|官网|订阅|流量|到期|套餐|客服|群|邀请|网址|剩余|过期|(?:^|[^A-Za-z])LAN(?:$|[^A-Za-z])|(?:^|[^0-9.])0?\\.[0-9]+\\s*(?:x|×|倍(?:率)?)(?:$|[^0-9A-Za-z])|(?:^|[^0-9.])5x(?:$|[^0-9])|x15(?:$|[^0-9.]))"}
+sel:  &sel  {type: select, url: *url, disable-udp: false, hidden: false, include-all-providers: true, empty-fallback: REJECT, exclude-filter: "(?i)(DIRECT|直接连接|官网|订阅|流量|到期|套餐|客服|群|邀请|网址|剩余|过期|(?:^|[^A-Za-z])LAN(?:$|[^A-Za-z]))"}
 test: &test {type: url-test, <<: *tmpl, tolerance: 50}
 fall: &fall {type: fallback, <<: *tmpl}
 
@@ -127,13 +129,14 @@ drc:  &drc  {type: select, proxies: ["DIRECT","♻️ 智能选择","👆 手动
 strm: &strm {type: select, proxies: ["♻️ 智能选择","👆 手动选择","DIRECT","🇭🇰 - 择优节点","🇨🇳 - 择优节点","🇯🇵 - 择优节点","🇰🇷 - 择优节点","🇸🇬 - 择优节点","🇺🇸 - 择优节点","🇭🇰 - 自动回退","🇨🇳 - 自动回退","🇯🇵 - 自动回退","🇸🇬 - 自动回退","🇺🇸 - 自动回退"]}
 tg:   &tg   {type: select, proxies: ["♻️ 智能选择","👆 手动选择","DIRECT","🇸🇬 - 择优节点","🇭🇰 - 择优节点","🇯🇵 - 择优节点","🇺🇸 - 择优节点"]}
 
-hk: &hk '^(?=.*(?i)(港|🇭🇰|Hong|(?:^|[^A-Za-z])(?:HK|HKG)(?:$|[^A-Za-z])))(?!.*(?i)(?:^|[^0-9.])5x(?:$|[^0-9])).*$'
-tw: &tw '^(?=.*(?i)(台|台湾|臺|🇹🇼|Taiwan|Taipei|(?:^|[^A-Za-z])(?:TW|TPE|TSA|KHH)(?:$|[^A-Za-z])))(?!.*(?i)(?:^|[^0-9.])5x(?:$|[^0-9])).*$'
-jp: &jp '^(?=.*(?i)(日|🇯🇵|Japan|(?:^|[^A-Za-z])(?:JP|NRT|HND|KIX|CTS|FUK)(?:$|[^A-Za-z])))(?!.*(?i)(尼日利亚|(?:^|[^0-9.])5x(?:$|[^0-9]))).*$'
-kr: &kr '^(?=.*(?i)(韩|🇰🇷|韓|首尔|南朝鲜|Korea|South Korea|(?:^|[^A-Za-z])(?:KR|KOR)(?:$|[^A-Za-z])))(?!.*(?i)(?:^|[^0-9.])5x(?:$|[^0-9])).*$'
-sg: &sg '^(?=.*(?i)(坡|🇸🇬|Sing|(?:^|[^A-Za-z])(?:SG|SIN|XSP)(?:$|[^A-Za-z])))(?!.*(?i)(?:^|[^0-9.])5x(?:$|[^0-9])).*$'
-us: &us '^(?=.*(?i)(美|🇺🇸|硅谷|Silicon|United States|(?:^|[^A-Za-z])(?:US|USA|JFK|SJC|LAX|ORD|ATL|DFW|SFO|MIA|SEA|IAD)(?:$|[^A-Za-z])))(?!.*(?i)(?:^|[^0-9.])5x(?:$|[^0-9])).*$'
-ai: &ai '(?i)(AI专用|AI解锁)'
+hk: &hk '^(?=.*(?i)(港|🇭🇰|Hong|(?:^|[^A-Za-z])(?:HK|HKG)(?:$|[^A-Za-z]))).*$'
+tw: &tw '^(?=.*(?i)(台|台湾|臺|🇹🇼|Taiwan|Taipei|(?:^|[^A-Za-z])(?:TW|TPE|TSA|KHH)(?:$|[^A-Za-z]))).*$'
+jp: &jp '^(?=.*(?i)(日|🇯🇵|Japan|(?:^|[^A-Za-z])(?:JP|NRT|HND|KIX|CTS|FUK)(?:$|[^A-Za-z])))(?!.*尼日利亚).*$'
+kr: &kr '^(?=.*(?i)(韩|🇰🇷|韓|首尔|南朝鲜|Korea|South Korea|(?:^|[^A-Za-z])(?:KR|KOR)(?:$|[^A-Za-z]))).*$'
+sg: &sg '^(?=.*(?i)(坡|🇸🇬|Sing|(?:^|[^A-Za-z])(?:SG|SIN|XSP)(?:$|[^A-Za-z]))).*$'
+us: &us '^(?=.*(?i)(美|🇺🇸|硅谷|Silicon|United States|(?:^|[^A-Za-z])(?:US|USA|JFK|SJC|LAX|ORD|ATL|DFW|SFO|MIA|SEA|IAD)(?:$|[^A-Za-z]))).*$'
+# AI 候选：AI 标签或美国 / 新加坡 / 日本 / 台湾，排除韩国；名称筛选不代表已验证解锁。
+ai: &ai '(?i)^(?!.*(?:韩国|韓國|韩国家宽|韓国|🇰🇷|首尔|首爾|Korea|(?:^|[^A-Za-z])(?:KR|KOR)(?:$|[^A-Za-z]))).*(?:美国|美國|🇺🇸|硅谷|Silicon|United States|日本|🇯🇵|Japan|新加坡|🇸🇬|Singapore|台湾|臺灣|台北|臺北|🇹🇼|Taiwan|Taipei|(?:^|[^A-Za-z])(?:AI|US|USA|JFK|SJC|LAX|ORD|ATL|DFW|SFO|MIA|SEA|IAD|JP|NRT|HND|KIX|CTS|FUK|SG|SIN|XSP|TW|TPE|TSA|KHH)(?:$|[^A-Za-z]))'
 
 # ======================= 策略组 =======================
 proxy-groups:
@@ -170,6 +173,7 @@ cls: &cls {type: http, behavior: classical, interval: 43200, format: text, proxy
 dom: &dom {type: http, behavior: domain, interval: 43200, format: text, proxy: "🚀 节点选择"}
 
 rule-providers:
+  apple_intelligence: {<<: *cls, url: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/non_ip/apple_intelligence.txt", path: ./rules/non_ip/apple_intelligence.txt}
   game_non_ip:     {<<: *cls, url: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/non_ip/game.txt", path: ./rules/non_ip/game.txt}
   game_ip:         {<<: *cls, url: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/ip/game.txt", path: ./rules/ip/game.txt}
   sniff-skip:      {<<: *dom, url: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/domainset/sniff-skip.list", path: ./rules/domainset/sniff-skip.list}
@@ -190,6 +194,7 @@ rule-providers:
 # ======================= 分流规则 =======================
 rules:
   # 1. 私有 / 局域网 / 设备互联
+  - DOMAIN-SUFFIX,push.apple.com,DIRECT
   - GEOSITE,private,DIRECT
   - DOMAIN-SUFFIX,miwifi.com,DIRECT
   - DOMAIN-SUFFIX,mijia.tech,DIRECT
@@ -213,11 +218,13 @@ rules:
   - GEOSITE,spotify,🎵 Spotify
   - RULE-SET,stream_non_ip,📺 视频媒体
   - RULE-SET,ai_non_ip,🤖 AI 平台
+  - RULE-SET,apple_intelligence,🤖 AI 平台
   - RULE-SET,telegram_non_ip,✈️ Telegram
   - RULE-SET,neteasemusic_non_ip,DIRECT
   - RULE-SET,lan_non_ip,DIRECT
 
   # 5. 自定义服务规则
+  - GEOSITE,category-games@cn,DIRECT
   - RULE-SET,game_non_ip,🎮 游戏平台
 
   # 6. 服务类 GEOSITE
@@ -231,7 +238,6 @@ rules:
   - RULE-SET,direct_non_ip,DIRECT
   - GEOSITE,category-ai-cn,DIRECT
   - GEOSITE,google-cn,DIRECT
-  - GEOSITE,category-games@cn,DIRECT
   - GEOSITE,category-media-cn,DIRECT
   - GEOSITE,cn,DIRECT
 
