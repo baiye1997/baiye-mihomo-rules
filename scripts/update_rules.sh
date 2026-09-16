@@ -112,7 +112,8 @@ while IFS= read -r line; do
           echo "  ✅ 已更新：$dest"
         fi
       else
-        echo "  ⚠️ $url 返回空内容，跳过。"
+        echo "  ❌ $url 返回空内容。"
+        status=1
       fi
     else
       echo "  ❌ 下载失败：$url"

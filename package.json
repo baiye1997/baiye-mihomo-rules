@@ -1,0 +1,6 @@
+{
+  "name": "baiye-mihomo-rules",
+  "private": true,
+  "scripts": { "test": "node --test scripts/*.test.js" },
+  "dependencies": { "yaml": "2.9.1" }
+}

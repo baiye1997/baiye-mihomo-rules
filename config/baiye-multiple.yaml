@@ -122,8 +122,8 @@ geox-url:
   geosite: "https://cdn.jsdelivr.net/gh/Loyalsoldier/v2ray-rules-dat@release/geosite.dat"
 
 # ======================= 策略组锚点 =======================
-tmpl: &tmpl {url: *url, interval: 300, lazy: true, timeout: 5000, disable-udp: false, max-failed-times: 3, hidden: true, include-all-providers: true, exclude-filter: "(?i)(DIRECT|直接连接|官网|订阅|流量|到期|套餐|客服|群|邀请|网址|剩余|过期|LAN|(?:^|[^0-9.])0?\\.[0-9]+\\s*(?:x|×|倍(?:率)?)(?:$|[^0-9A-Za-z])|(?:^|[^0-9.])5x(?:$|[^0-9]))"}
-sel:  &sel  {type: select, url: *url, disable-udp: false, hidden: false, include-all-providers: true, exclude-filter: "(?i)(DIRECT|直接连接|官网|订阅|流量|到期|套餐|客服|群|邀请|网址|剩余|过期|LAN)"}
+tmpl: &tmpl {url: *url, interval: 300, lazy: true, timeout: 5000, disable-udp: false, max-failed-times: 3, hidden: true, include-all-providers: true, empty-fallback: REJECT, exclude-filter: "(?i)(DIRECT|直接连接|官网|订阅|流量|到期|套餐|客服|群|邀请|网址|剩余|过期|(?:^|[^A-Za-z])LAN(?:$|[^A-Za-z])|(?:^|[^0-9.])0?\\.[0-9]+\\s*(?:x|×|倍(?:率)?)(?:$|[^0-9A-Za-z])|(?:^|[^0-9.])5x(?:$|[^0-9])|x15(?:$|[^0-9.]))"}
+sel:  &sel  {type: select, url: *url, disable-udp: false, hidden: false, include-all-providers: true, empty-fallback: REJECT, exclude-filter: "(?i)(DIRECT|直接连接|官网|订阅|流量|到期|套餐|客服|群|邀请|网址|剩余|过期|(?:^|[^A-Za-z])LAN(?:$|[^A-Za-z]))"}
 test: &test {type: url-test, <<: *tmpl, tolerance: 50}
 fall: &fall {type: fallback, <<: *tmpl}
 
@@ -134,13 +134,14 @@ drc:  &drc  {type: select, proxies: ["DIRECT","♻️ 智能选择","👆 手动
 strm: &strm {type: select, proxies: ["♻️ 智能选择","👆 手动选择","DIRECT","🇭🇰 - 择优节点","🇨🇳 - 择优节点","🇯🇵 - 择优节点","🇰🇷 - 择优节点","🇸🇬 - 择优节点","🇺🇸 - 择优节点","🇭🇰 - 自动回退","🇨🇳 - 自动回退","🇯🇵 - 自动回退","🇸🇬 - 自动回退","🇺🇸 - 自动回退"]}
 tg:   &tg   {type: select, proxies: ["♻️ 智能选择","👆 手动选择","DIRECT","🇸🇬 - 择优节点","🇭🇰 - 择优节点","🇯🇵 - 择优节点","🇺🇸 - 择优节点"]}
 
-hk: &hk '^(?=.*(?i)(港|🇭🇰|Hong|(?:^|[^A-Za-z])(?:HK|HKG)(?:$|[^A-Za-z])))(?!.*(?i)(?:^|[^0-9.])5x(?:$|[^0-9])).*$'
-tw: &tw '^(?=.*(?i)(台|台湾|臺|🇹🇼|Taiwan|Taipei|(?:^|[^A-Za-z])(?:TW|TPE|TSA|KHH)(?:$|[^A-Za-z])))(?!.*(?i)(?:^|[^0-9.])5x(?:$|[^0-9])).*$'
-jp: &jp '^(?=.*(?i)(日|🇯🇵|Japan|(?:^|[^A-Za-z])(?:JP|NRT|HND|KIX|CTS|FUK)(?:$|[^A-Za-z])))(?!.*(?i)(尼日利亚|(?:^|[^0-9.])5x(?:$|[^0-9]))).*$'
-kr: &kr '^(?=.*(?i)(韩|🇰🇷|韓|首尔|南朝鲜|Korea|South Korea|(?:^|[^A-Za-z])(?:KR|KOR)(?:$|[^A-Za-z])))(?!.*(?i)(?:^|[^0-9.])5x(?:$|[^0-9])).*$'
-sg: &sg '^(?=.*(?i)(坡|🇸🇬|Sing|(?:^|[^A-Za-z])(?:SG|SIN|XSP)(?:$|[^A-Za-z])))(?!.*(?i)(?:^|[^0-9.])5x(?:$|[^0-9])).*$'
-us: &us '^(?=.*(?i)(美|🇺🇸|硅谷|Silicon|United States|(?:^|[^A-Za-z])(?:US|USA|JFK|SJC|LAX|ORD|ATL|DFW|SFO|MIA|SEA|IAD)(?:$|[^A-Za-z])))(?!.*(?i)(?:^|[^0-9.])5x(?:$|[^0-9])).*$'
-ai: &ai '(?i)(AI专用|AI解锁)'
+hk: &hk '^(?=.*(?i)(港|🇭🇰|Hong|(?:^|[^A-Za-z])(?:HK|HKG)(?:$|[^A-Za-z]))).*$'
+tw: &tw '^(?=.*(?i)(台|台湾|臺|🇹🇼|Taiwan|Taipei|(?:^|[^A-Za-z])(?:TW|TPE|TSA|KHH)(?:$|[^A-Za-z]))).*$'
+jp: &jp '^(?=.*(?i)(日|🇯🇵|Japan|(?:^|[^A-Za-z])(?:JP|NRT|HND|KIX|CTS|FUK)(?:$|[^A-Za-z])))(?!.*尼日利亚).*$'
+kr: &kr '^(?=.*(?i)(韩|🇰🇷|韓|首尔|南朝鲜|Korea|South Korea|(?:^|[^A-Za-z])(?:KR|KOR)(?:$|[^A-Za-z]))).*$'
+sg: &sg '^(?=.*(?i)(坡|🇸🇬|Sing|(?:^|[^A-Za-z])(?:SG|SIN|XSP)(?:$|[^A-Za-z]))).*$'
+us: &us '^(?=.*(?i)(美|🇺🇸|硅谷|Silicon|United States|(?:^|[^A-Za-z])(?:US|USA|JFK|SJC|LAX|ORD|ATL|DFW|SFO|MIA|SEA|IAD)(?:$|[^A-Za-z]))).*$'
+# AI 候选：AI 标签或美国 / 新加坡 / 日本 / 台湾，排除韩国；名称筛选不代表已验证解锁。
+ai: &ai '(?i)^(?!.*(?:韩国|韓國|韩国家宽|韓国|🇰🇷|首尔|首爾|Korea|(?:^|[^A-Za-z])(?:KR|KOR)(?:$|[^A-Za-z]))).*(?:美国|美國|🇺🇸|硅谷|Silicon|United States|日本|🇯🇵|Japan|新加坡|🇸🇬|Singapore|台湾|臺灣|台北|臺北|🇹🇼|Taiwan|Taipei|(?:^|[^A-Za-z])(?:AI|US|USA|JFK|SJC|LAX|ORD|ATL|DFW|SFO|MIA|SEA|IAD|JP|NRT|HND|KIX|CTS|FUK|SG|SIN|XSP|TW|TPE|TSA|KHH)(?:$|[^A-Za-z]))'
 low: &low '(?i)(?:^|[^0-9.])0?\.[0-9]+\s*(?:x|×|倍(?:率)?)(?:$|[^0-9A-Za-z])'
 
 # ======================= 策略组 =======================
@@ -157,11 +158,13 @@ proxy-groups:
   - {name: "Ⓜ️ 微软服务", <<: *app, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/microsoft.png"}
   - {name: "🍎 苹果服务", <<: *app, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/apple.png"}
   - {name: "🎮 游戏平台", <<: *app, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/game.png"}
-  - {name: "📦 CDN 低倍率", type: select, proxies: ["♻️ 低倍率自动","🚀 节点选择","👆 手动选择","DIRECT"], include-all-providers: true, url: *url, disable-udp: false, hidden: false, filter: *low, exclude-filter: "(?i)(DIRECT|直接连接|官网|订阅|流量|到期|套餐|客服|群|邀请|网址|剩余|过期|LAN)", icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/low.png"}
+  - {name: "📦 CDN 低倍率", type: select, proxies: ["♻️ 低倍率自动","🚀 节点选择","👆 手动选择","DIRECT"], include-all-providers: true, url: *url, disable-udp: false, hidden: false, filter: *low, exclude-filter: "(?i)(DIRECT|直接连接|官网|订阅|流量|到期|套餐|客服|群|邀请|网址|剩余|过期|(?:^|[^A-Za-z])LAN(?:$|[^A-Za-z]))", icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/low.png"}
   - {name: "🎵 Spotify", <<: *strm, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/spotify.png"}
   - {name: "📺 视频媒体", <<: *strm, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/netflix.png"}
 
-  - {name: "♻️ 低倍率自动", type: url-test, include-all-providers: true, url: *url, interval: 300, lazy: true, timeout: 5000, tolerance: 50, disable-udp: false, hidden: true, filter: *low, exclude-filter: "(?i)(DIRECT|直接连接|官网|订阅|流量|到期|套餐|客服|群|邀请|网址|剩余|过期|LAN)"}
+  # 优先低倍率池，空池或不可用时回退普通自动池；空池本身拒绝连接。
+  - {name: "♻️ 低倍率自动", type: fallback, proxies: ["♻️ 低倍率测速","♻️ 智能选择"], url: *url, interval: 300, lazy: false, timeout: 5000, hidden: true, empty-fallback: REJECT}
+  - {name: "♻️ 低倍率测速", type: url-test, include-all-providers: true, url: *url, interval: 300, lazy: true, timeout: 5000, tolerance: 50, disable-udp: false, hidden: true, filter: *low, empty-fallback: REJECT, exclude-filter: "(?i)(DIRECT|直接连接|官网|订阅|流量|到期|套餐|客服|群|邀请|网址|剩余|过期|(?:^|[^A-Za-z])LAN(?:$|[^A-Za-z]))"}
 
   - {name: "🇭🇰 - 择优节点", <<: *test, filter: *hk}
   - {name: "🇨🇳 - 择优节点", <<: *test, filter: *tw}

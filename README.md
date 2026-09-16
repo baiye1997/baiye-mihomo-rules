@@ -1,7 +1,7 @@
 # Baiye Mihomo Rules
 
 集中维护和同步个人使用的 **Clash / Mihomo** 规则与配置。  
-每日 **北京时间 06:00** 自动从上游同步，保证规则持续可用。
+每日 **北京时间 06:00** 自动从上游同步，通过规则与内核检查后提交更新。
 
 ---
 
@@ -56,9 +56,38 @@ geodata-loader: memconservative
 
 ---
 
+## NOW / 极速 cloud 订阅
+
+- 两家一起使用选 `baiye-multiple.yaml` 或 `baiye-multiple-lite.yaml`；订阅 1 对应 NOW，订阅 2 对应极速 cloud。
+- 手动导入时填写订阅链接和显示名称；通过 Gist 发布时，更新 GitHub Secrets `SUB_URL_1` / `SUB_URL_2`，保留自定义显示前缀 `[天照]` / `[月读]`。单订阅输出使用订阅 1。
+- `🧠 AI 专用节点` 保留原组名与手动选择方式，候选扩大为带独立 AI 标签、美国、新加坡、日本、台湾节点，排除韩国；按名称筛选不保证实际 AI 解锁。
+- 极速 cloud 默认按 10X 扣量（1000G 额度可用约 100G 实际流量）；`x15` 相对其默认节点为 1.5 倍消耗，因消耗较高而排除自动择优 / 回退，手动仍可选，符合地区条件的节点也保留在手动 AI 候选中。不能直接与 NOW 的倍率数字比较。NOW 的 `0.5X` 节点继续进入标准版 CDN 低倍率组；Lite 版没有该组。
+- AI / 地区 / 手动节点组为空时明确拒绝连接，避免隐式直连；标准版 CDN 自动组优先低倍率池，不可用时回退普通智能节点池。
+- Apple Intelligence 在所有版本中进入 AI 组；这只配置网络分流，不改变设备、账号或地区的功能限制。
+
+---
+
 ## 🧩 Lite 版说明（GEO 上游）
 
-Lite 版将主要规则统一为 GEO 系列，规则效果保持一致，不影响使用。
+Lite 版主要使用 GEO 分类，保留 AI、Apple Intelligence、苹果推送直连及国内游戏直连。它不含标准版的 CDN 低倍率组，部分国内服务直接使用 DIRECT，而标准版提供“全球直连”策略选择，两版并非所有规则完全相同。
+
+标准版保留 Sukka README 的 Apple CDN → Apple Service → Apple CN 顺序；Lite 使用自己的 GEO 分类，不能据此假定两版每个苹果域名出口相同。默认 `find-process-mode: off`，上游中的进程名规则不会参与匹配；当前配置主要依靠域名与 IP 分流。
+
+当前已按要求加入 Apple Intelligence 独立规则；其中的定位相关域名也可能影响地图、天气等服务，不能将它理解为只包含 AI 请求。规则来源与顺序以 [Sukka 上游说明](https://github.com/SukkaW/Surge/blob/master/README.md) 为依据，本地例外单独维护。
+
+---
+
+## 本地验证与发布校验
+
+先运行 `npm ci --ignore-scripts`，然后 `npm test`。未设置内核环境变量时，仅运行生成器检查，内核运行测试会明确跳过。
+
+完整校验需要指定 Mihomo 可执行文件和 Geo 数据目录（包含 `geoip.dat`、`geosite.dat`）：
+
+```sh
+MIHOMO_BIN=/path/to/mihomo MIHOMO_GEODATA_DIR=/path/to/geodata npm test
+```
+
+GitHub 发布流程固定使用 Mihomo v1.19.29，验证四份配置及两个 mini 输出后才更新 Gist。PR 使用虚构订阅链接，不需要真实订阅或发布 token；正式发布遇到缺失订阅、无效 YAML、错误引用或内核校验失败会中止。
 
 ---
 
