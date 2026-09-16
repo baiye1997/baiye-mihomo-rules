@@ -3,6 +3,7 @@
 
 const fs = require("fs");
 const https = require("https");
+const http = require("http");
 const path = require("path");
 const YAML = require("yaml");
 const { validateConfig, validateWithCore } = require("./validate-config.js");
@@ -113,7 +114,7 @@ function extractServerDomainFilters(text = "") {
 
 function httpsText(url, redirects = 3) {
   return new Promise((resolve, reject) => {
-    const req = https.get(url, {
+    const req = (new URL(url).protocol === "http:" ? http : https).get(url, {
       headers: { "User-Agent": "github-actions" },
       timeout: 20000,
     }, res => {
@@ -138,23 +139,25 @@ function httpsText(url, redirects = 3) {
   });
 }
 
-async function collectServerDomainFilters() {
+async function collectSubscriptions() {
   const filters = new Set(manualServerDomains);
-
-  await Promise.all(subUrls.map(async (url, i) => {
-    if (!url) return;
+  const snapshots = await Promise.all(subUrls.map(async (url, i) => {
+    if (!url) return null;
     try {
       const text = await httpsText(url);
+      const data = YAML.parse(text, { merge: true, maxAliasCount: 10000 });
+      if (!Array.isArray(data?.proxies) || !data.proxies.length) throw new Error("empty snapshot");
       extractServerDomainFilters(text).forEach(d => filters.add(d));
+      return data.proxies;
     } catch (e) {
-      console.warn(`WARN: 订阅 ${i + 1} server 域名提取失败，保留已有 DNS 配置。`);
+      // Never publish a configuration that needs unavailable nodes to fetch its own nodes.
+      throw new Error(`订阅 ${i + 1} 节点快照获取失败，停止发布`);
     }
   }));
-
-  return [...filters].sort((a, b) => a.localeCompare(b));
+  return { filters: [...filters].sort((a, b) => a.localeCompare(b)), snapshots };
 }
 
-function applySubscriptions(template, serverDomainFilters = [], urls = subUrls, names = subNames) {
+function applySubscriptions(template, serverDomainFilters = [], urls = subUrls, names = subNames, snapshots) {
   const doc = YAML.parseDocument(bumpIconsV(template), { merge: true });
   if (doc.errors.length) throw new Error("配置模板不是有效 YAML");
   const config = doc.toJS({ maxAliasCount: 10000 });
@@ -170,6 +173,11 @@ function applySubscriptions(template, serverDomainFilters = [], urls = subUrls, 
     }
     doc.setIn(["proxy-providers", key, "url"], url);
     doc.setIn(["proxy-providers", key, "override", "additional-prefix"], names[index] || `[Sub${index + 1}]`);
+    if (snapshots) {
+      if (!Array.isArray(snapshots[index]) || !snapshots[index].length) throw new Error(`订阅 ${index + 1} 缺少启动节点快照`);
+      doc.setIn(["proxy-providers", key, "payload"], snapshots[index]);
+      doc.setIn(["proxy-providers", key, "proxy"], "🚀 节点选择");
+    }
   }
   if (serverDomainFilters.length) {
     const existing = config.dns?.["fake-ip-filter"] || [];
@@ -233,7 +241,10 @@ async function main() {
     for (const file of [CONFIG_MULTIPLE_STD, CONFIG_SINGLE_STD, CONFIG_MULTIPLE_LITE, CONFIG_SINGLE_LITE]) {
       if (file) applySubscriptions(readIfExists(file));
     }
-    const serverDomainFilters = DRY_RUN === "true" ? manualServerDomains : await collectServerDomainFilters();
+    const { filters: serverDomainFilters, snapshots } = DRY_RUN === "true"
+      ? { filters: manualServerDomains, snapshots: subUrls.map(() => [{ name: "美国 AI 启动校验", type: "socks5", server: "127.0.0.1", port: 9 }]) }
+      : await collectSubscriptions();
+    const generate = template => applySubscriptions(template, serverDomainFilters, subUrls, subNames, snapshots);
     if (serverDomainFilters.length) {
       log(`已为 Gist 配置注入 ${serverDomainFilters.length} 个代理服务器 fake-ip-filter 域名`);
     }
@@ -241,26 +252,26 @@ async function main() {
     // --- 读取逻辑保持不变 ---
     const multiStd = readIfExists(CONFIG_MULTIPLE_STD);
     if (multiStd) {
-      const s = applySubscriptions(multiStd, serverDomainFilters);
+      const s = generate(multiStd);
       outputs.standard[GIST_FILE_MULTIPLE_STD] = { content: s };
       outputs.standard[GIST_FILE_MINI_STD] = { content: deriveMini(s) };
     }
 
     const singleStd = readIfExists(CONFIG_SINGLE_STD);
     if (singleStd) {
-      outputs.standard[GIST_FILE_SINGLE_STD] = { content: applySubscriptions(singleStd, serverDomainFilters) };
+      outputs.standard[GIST_FILE_SINGLE_STD] = { content: generate(singleStd) };
     }
 
     const multiLite = readIfExists(CONFIG_MULTIPLE_LITE);
     if (multiLite) {
-      const s = applySubscriptions(multiLite, serverDomainFilters);
+      const s = generate(multiLite);
       outputs.lite[GIST_FILE_MULTIPLE_LITE] = { content: s };
       outputs.lite[GIST_FILE_MINI_LITE] = { content: deriveMini(s) };
     }
 
     const singleLite = readIfExists(CONFIG_SINGLE_LITE);
     if (singleLite) {
-      outputs.lite[GIST_FILE_SINGLE_LITE] = { content: applySubscriptions(singleLite, serverDomainFilters) };
+      outputs.lite[GIST_FILE_SINGLE_LITE] = { content: generate(singleLite) };
     }
 
     log(`处理完成，Standard Gist 文件数: ${Object.keys(outputs.standard).length}, Lite/GEO Gist 文件数: ${Object.keys(outputs.lite).length}`);

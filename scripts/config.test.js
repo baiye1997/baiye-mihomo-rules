@@ -34,6 +34,25 @@ test('both YAML styles produce exact hosts without broad shared-domain exception
   assert.ok(!c.dns['fake-ip-filter'].includes('+.workers.dev'));
 });
 
+test('published providers keep their URLs and prefixes with independent startup snapshots', () => {
+  const snapshots = [
+    [{ name: '美国启动', type: 'socks5', server: '127.0.0.1', port: 9 }],
+    [{ name: '日本启动', type: 'socks5', server: '127.0.0.1', port: 10 }],
+  ];
+  for (const name of fs.readdirSync('config').filter(n => n.endsWith('.yaml'))) {
+    const text = applySubscriptions(fs.readFileSync(path.join('config', name), 'utf8'), [], urls, names, snapshots);
+    const c = validateConfig(text);
+    Object.values(c['proxy-providers']).forEach((p, index) => {
+      assert.deepEqual(p.payload, snapshots[index]);
+      assert.equal(p.url, urls[index]);
+      assert.equal(p.proxy, '🚀 节点选择');
+      assert.equal(p.override['additional-prefix'], names[index]);
+    });
+    if (process.env.MIHOMO_BIN) validateWithCore(text, name);
+  }
+  assert.throws(() => applySubscriptions(template, [], urls, names, [snapshots[0], []]), /订阅 2 缺少启动/);
+});
+
 test('rule download URLs and outbound references are validated before isolation', () => {
   const c = validateConfig(applySubscriptions(template, [], urls, names));
   const p = c['rule-providers'].apple_intelligence;
@@ -56,6 +75,26 @@ test('publication requires a destination for each generated family before networ
     assert.equal(result.status, 1);
     assert.ok(result.stderr.includes(`Missing GIST_ID_${family}`));
   }
+});
+
+test('failed snapshot download stops publication without exposing the subscription URL', async () => {
+  const http = require('node:http');
+  const { once } = require('node:events');
+  const { promisify } = require('node:util');
+  const execFile = promisify(require('node:child_process').execFile);
+  const server = http.createServer((req, res) => { res.writeHead(503); res.end(); });
+  server.listen(0, '127.0.0.1'); await once(server, 'listening');
+  try {
+    const env = { ...process.env, DRY_RUN: 'false', GIST_TOKEN: 'test-only', GIST_ID_STANDARD: 'test-only', STATUS_FILE: '',
+      CONFIG_MULTIPLE_STD: '', CONFIG_SINGLE_STD: 'config/baiye-single.yaml', CONFIG_MULTIPLE_LITE: '', CONFIG_SINGLE_LITE: '',
+      SUB_URLS: `http://127.0.0.1:${server.address().port}/secret-subscription-token` };
+    await assert.rejects(execFile(process.execPath, ['.github/scripts/build-and-publish.js'], { env, timeout: 5000 }), error => {
+      assert.equal(error.code, 1);
+      assert.match(error.stderr, /节点快照获取失败/);
+      assert.ok(!error.stderr.includes('secret-subscription-token'));
+      return true;
+    });
+  } finally { server.closeAllConnections(); await new Promise(resolve => server.close(resolve)); }
 });
 
 for (const name of fs.readdirSync('config').filter(n => n.endsWith('.yaml'))) {

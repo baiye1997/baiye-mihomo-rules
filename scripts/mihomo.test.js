@@ -18,9 +18,17 @@ async function freePort() {
   const port = server.address().port; await new Promise(resolve => server.close(resolve)); return port;
 }
 
-async function runConfig(name, nodes, check, mini = false) {
+async function runConfig(name, nodes, check, mini = false, cold = false) {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'mihomo-regression-'));
-  const health = http.createServer((req, res) => { res.writeHead(204); res.end(); });
+  let ruleDownloads = 0;
+  const health = http.createServer((req, res) => {
+    if (cold && req.url === '/subscription') { res.writeHead(503); res.end(); return; }
+    if (cold && req.url.startsWith('/rules/') && !req.url.includes('..')) {
+      ruleDownloads++;
+      res.writeHead(200); res.end(fs.readFileSync(path.join(process.cwd(), req.url))); return;
+    }
+    res.writeHead(204); res.end();
+  });
   health.listen(0, '127.0.0.1'); await once(health, 'listening');
   let proc;
   try {
@@ -32,6 +40,15 @@ async function runConfig(name, nodes, check, mini = false) {
     const probe = `http://127.0.0.1:${health.address().port}/`;
     c['external-controller'] = `127.0.0.1:${api}`; c['mixed-port'] = mixed;
     c.dns.enable = false; c.tun.enable = false; c.sniffer.enable = false; c['log-level'] = 'info';
+    if (cold) {
+      // Exercise real HTTP providers and an empty rules cache, not inline/file replacements.
+      c.dns.enable = original.dns.enable; c.dns.listen = '127.0.0.1:0';
+      fs.rmSync(path.join(dir, 'rules'), { recursive: true, force: true });
+      c['proxy-providers'] = original['proxy-providers'];
+      c['rule-providers'] = original['rule-providers'];
+      for (const p of Object.values(c['proxy-providers'])) { p.url = probe + 'subscription'; p.proxy = '🚀 节点选择'; }
+      for (const p of Object.values(c['rule-providers'])) p.url = probe + p.path.replace(/^\.\//, '');
+    }
     for (const [key, p] of Object.entries(c['proxy-providers'])) {
       // Named DIRECT fixtures exercise selection without real subscription traffic.
       p.payload = nodes.map(node => typeof node === 'string' ? { name: node, type: 'direct' } : node);
@@ -67,7 +84,7 @@ async function runConfig(name, nodes, check, mini = false) {
         assert.ok(logs.includes(`--> ${domain}:`), `No routing result for ${domain}\n${logs}`);
       } finally { socket.destroy(); }
     }
-    await check({ get, connect, logs: () => logs });
+    await check({ get, connect, logs: () => logs, ruleDownloads: () => ruleDownloads });
   } finally {
     if (proc && proc.exitCode === null) { proc.kill(); await once(proc, 'exit'); }
     health.closeAllConnections(); await new Promise(resolve => health.close(resolve));
@@ -126,4 +143,17 @@ test('unreachable low-rate pool falls back while keeping ordinary nodes availabl
     assert.equal(p['♻️ 低倍率自动'].now, '♻️ 智能选择');
     assert.ok(p['♻️ 智能选择'].now.includes('美国正常'));
   });
+});
+
+test('cold start downloads all HTTP rule sets through payload nodes when both subscriptions return 503', { skip: !enabled, timeout: 30000 }, async () => {
+  await runConfig('baiye-multiple.yaml', ['美国启动节点'], async ({ get, connect, logs, ruleDownloads }) => {
+    const p = (await get('proxies')).proxies;
+    assert.ok(p['🧠 AI 专用节点'].all.some(n => n.startsWith('[天照]')));
+    assert.ok(p['🧠 AI 专用节点'].all.some(n => n.startsWith('[月读]')));
+    const rules = (await get('providers/rules')).providers;
+    assert.equal(ruleDownloads(), Object.keys(rules).length);
+    assert.ok(Object.values(rules).every(r => r.ruleCount > 0));
+    await connect('chatgpt.com');
+    assert.ok(logs().split('\n').some(l => l.includes('--> chatgpt.com:') && l.includes('🤖 AI 平台')));
+  }, false, true);
 });

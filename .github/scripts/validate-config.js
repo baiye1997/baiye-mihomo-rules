@@ -46,7 +46,7 @@ function isolatedConfig(text, dir) {
     delete provider.url;
     delete provider.path;
     provider.type = "inline";
-    provider.payload = [{ name: "美国 AI 校验节点 0.5X", type: "socks5", server: "127.0.0.1", port: 9 }];
+    provider.payload ||= [{ name: "美国 AI 校验节点 0.5X", type: "socks5", server: "127.0.0.1", port: 9 }];
     provider["health-check"] = { enable: false };
   }
   for (const provider of Object.values(config["rule-providers"] || {})) {
@@ -72,7 +72,8 @@ function validateWithCore(text, name) {
     fs.writeFileSync(file, JSON.stringify(config));
     const result = spawnSync(process.env.MIHOMO_BIN || "mihomo", ["-t", "-d", dir, "-f", file], { encoding: "utf8", timeout: 60000 });
     if (result.error) throw new Error(`Mihomo 校验无法执行: ${result.error.code || "error"}`);
-    if (result.status !== 0) throw new Error(`Mihomo 校验失败: ${name}\n${result.stdout}\n${result.stderr}`);
+    // Generated payloads contain subscription credentials; do not echo parser output in CI.
+    if (result.status !== 0) throw new Error(`Mihomo 校验失败: ${name} (exit ${result.status})`);
   } finally { fs.rmSync(dir, { recursive: true, force: true }); }
 }
 
