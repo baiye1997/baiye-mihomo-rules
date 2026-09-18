@@ -115,7 +115,7 @@ function extractServerDomainFilters(text = "") {
 function httpsText(url, redirects = 3) {
   return new Promise((resolve, reject) => {
     const req = (new URL(url).protocol === "http:" ? http : https).get(url, {
-      headers: { "User-Agent": "github-actions" },
+      headers: { "User-Agent": "clash.meta" },
       timeout: 20000,
     }, res => {
       if ([301, 302, 303, 307, 308].includes(res.statusCode) && res.headers.location && redirects > 0) {

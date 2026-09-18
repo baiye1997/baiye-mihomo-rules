@@ -82,7 +82,13 @@ test('failed snapshot download stops publication without exposing the subscripti
   const { once } = require('node:events');
   const { promisify } = require('node:util');
   const execFile = promisify(require('node:child_process').execFile);
-  const server = http.createServer((req, res) => { res.writeHead(503); res.end(); });
+  const agents = [];
+  const server = http.createServer((req, res) => {
+    agents.push(req.headers['user-agent']);
+    if (req.url === '/secret-subscription-token') res.writeHead(302, { Location: '/redirected-subscription' });
+    else res.writeHead(503);
+    res.end();
+  });
   server.listen(0, '127.0.0.1'); await once(server, 'listening');
   try {
     const env = { ...process.env, DRY_RUN: 'false', GIST_TOKEN: 'test-only', GIST_ID_STANDARD: 'test-only', STATUS_FILE: '',
@@ -94,6 +100,7 @@ test('failed snapshot download stops publication without exposing the subscripti
       assert.ok(!error.stderr.includes('secret-subscription-token'));
       return true;
     });
+    assert.deepEqual(agents, ['clash.meta', 'clash.meta']);
   } finally { server.closeAllConnections(); await new Promise(resolve => server.close(resolve)); }
 });
 

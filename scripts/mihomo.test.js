@@ -66,29 +66,34 @@ async function runConfig(name, nodes, check, mini = false, cold = false) {
       const res = await fetch(`http://127.0.0.1:${api}/${resource}`, { signal: AbortSignal.timeout(1000) });
       assert.ok(res.ok); return res.json();
     }
-    let ready = false;
-    for (let i = 0; i < 100; i++) {
-      try {
-        const data = await get('providers/rules');
-        if (Object.values(data.providers).every(p => p.ruleCount > 0)) { ready = true; break; }
-      } catch { /* server starting */ }
-      await pause(50);
-    }
-    assert.ok(ready, logs);
-    async function connect(domain) {
-      // Complete a real request to the local fixture; an idle CONNECT tunnel
-      // can wait for application bytes instead of producing a routing result.
+    async function request(domain) {
       await new Promise((resolve, reject) => {
         const req = http.get({ hostname: '127.0.0.1', port: mixed,
           path: `http://${domain}:${health.address().port}/route-probe`, agent: false,
           headers: { Host: `${domain}:${health.address().port}` }, timeout: 2000 }, res => {
           res.resume();
-          res.on('end', () => res.statusCode === 204 ? resolve() : reject(new Error(`Probe ${domain}: HTTP ${res.statusCode}`)));
+          res.on('end', () => res.statusCode === 204 ? resolve() : reject(new Error(`Probe ${domain}: HTTP ${res.statusCode}\n${logs}`)));
           res.on('error', reject);
         });
         req.on('timeout', () => req.destroy(new Error(`Probe ${domain} timed out`)));
         req.on('error', reject);
       });
+    }
+    let ready = false;
+    for (let i = 0; i < 100; i++) {
+      try {
+        const data = await get('providers/rules');
+        if (Object.values(data.providers).every(p => p.ruleCount > 0)) {
+          // Rule counts become visible before Mihomo marks the tunnel Running.
+          await request('127.0.0.1');
+          ready = true; break;
+        }
+      } catch { /* server starting */ }
+      await pause(50);
+    }
+    assert.ok(ready, logs);
+    async function connect(domain) {
+      await request(domain);
       for (let i = 0; i < 100 && !logs.includes(`--> ${domain}:`); i++) await pause(20);
       assert.ok(logs.includes(`--> ${domain}:`), `No routing result for ${domain}\n${logs}`);
     }
