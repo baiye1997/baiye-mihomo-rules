@@ -76,13 +76,21 @@ async function runConfig(name, nodes, check, mini = false, cold = false) {
     }
     assert.ok(ready, logs);
     async function connect(domain) {
-      const socket = net.connect(mixed, '127.0.0.1'); socket.on('error', () => {});
-      await once(socket, 'connect');
-      socket.write(`CONNECT ${domain}:${health.address().port} HTTP/1.1\r\nHost: ${domain}:${health.address().port}\r\n\r\n`);
-      try {
-        for (let i = 0; i < 100 && !logs.includes(`--> ${domain}:`); i++) await pause(20);
-        assert.ok(logs.includes(`--> ${domain}:`), `No routing result for ${domain}\n${logs}`);
-      } finally { socket.destroy(); }
+      // Complete a real request to the local fixture; an idle CONNECT tunnel
+      // can wait for application bytes instead of producing a routing result.
+      await new Promise((resolve, reject) => {
+        const req = http.get({ hostname: '127.0.0.1', port: mixed,
+          path: `http://${domain}:${health.address().port}/route-probe`, agent: false,
+          headers: { Host: `${domain}:${health.address().port}` }, timeout: 2000 }, res => {
+          res.resume();
+          res.on('end', () => res.statusCode === 204 ? resolve() : reject(new Error(`Probe ${domain}: HTTP ${res.statusCode}`)));
+          res.on('error', reject);
+        });
+        req.on('timeout', () => req.destroy(new Error(`Probe ${domain} timed out`)));
+        req.on('error', reject);
+      });
+      for (let i = 0; i < 100 && !logs.includes(`--> ${domain}:`); i++) await pause(20);
+      assert.ok(logs.includes(`--> ${domain}:`), `No routing result for ${domain}\n${logs}`);
     }
     await check({ get, connect, logs: () => logs, ruleDownloads: () => ruleDownloads });
   } finally {
