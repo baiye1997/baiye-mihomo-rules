@@ -1,14 +1,14 @@
 #########################################
 # Sukka's Ruleset - CDN Domains
-# Last Updated: 2026-09-13T08:44:07.146Z
-# Size: 4662
+# Last Updated: 2026-09-18T14:58:18.360Z
+# Size: 4665
 # License: AGPL 3.0
 # Homepage: https://ruleset.skk.moe
 # GitHub: https://github.com/SukkaW/Surge
 #
 # This file contains object storage and static assets CDN domains.
 #
-# $content-hash-v1$:0REgA04OT3rxT4nEnw4jKXuYvLCgnj2q-fmOMFVDeTs$
+# $content-hash-v1$:t3mWXAfJpyKYfvj-HPN-mDniE6r8C06q-ula-zL38dI$
 #########################################
 7h15.ru1353t.1s.m4d3.by.5ukk4w.skk.moe
 0x0.st
@@ -356,6 +356,7 @@ s4.itho.me
 +.sc-cdn.com
 +.scene7.com
 +.seecdn.com
++.seecdn.net
 +.sftcdn.net
 +.shgcdn.com
 +.shields.io
@@ -573,7 +574,6 @@ th.bing.com
 tile.osm.be
 +.tile.osm.ch
 tn.vjav.com
-+.tripcdn.com
 +.ttcache.com
 turbo.build
 +.tutu1.space
@@ -1373,6 +1373,7 @@ static.fc2.com
 static.itch.io
 static.j51.net
 static.lwn.net
+static.okou.io
 static.okx.cab
 static.okx.com
 static.reo.dev
@@ -1820,6 +1821,7 @@ cdn.dribbble.com
 +.cdn.easyling.com
 cdn.ecomm.ui.com
 cdn.equalweb.com
+cdn.eye-able.com
 cdn.firebase.com
 cdn.foxycart.com
 cdn.getkoala.com
@@ -3719,6 +3721,7 @@ images-assets.nasa.gov
 images.contentstack.io
 images.hothardware.com
 images.newrepublic.com
+images.radio-canada.ca
 images.socialblade.com
 images.wsjcommerce.net
 images.wurstclient.net
