@@ -1,14 +1,14 @@
 #########################################
 # Sukka's Ruleset - CDN Domains
-# Last Updated: 2026-09-19T11:28:21.839Z
-# Size: 4666
+# Last Updated: 2026-09-20T10:42:46.671Z
+# Size: 4672
 # License: AGPL 3.0
 # Homepage: https://ruleset.skk.moe
 # GitHub: https://github.com/SukkaW/Surge
 #
 # This file contains object storage and static assets CDN domains.
 #
-# $content-hash-v1$:CkULHB6N36u_3_6uTYNDVbxZxiKUtz0l-COaZnkSJe0$
+# $content-hash-v1$:dt_p7iubm91owt5XyO5CH8zkJThxtEOYhKd72AlYLIE$
 #########################################
 7h15.ru1353t.1s.m4d3.by.5ukk4w.skk.moe
 0x0.st
@@ -2198,6 +2198,7 @@ cdn.freshdesk.com
 cdn.growthbook.io
 cdn.headwayapp.co
 cdn.himetrica.com
+cdn.infrawire.net
 cdn.ipregistry.co
 cdn.jetphotos.com
 cdn.joinhoney.com
@@ -2610,6 +2611,7 @@ home.integrate.com
 icons.ferndocs.com
 icons.veryicon.com
 iframe.nbcnews.com
+image-tc.galaxy.tf
 image.jnislniv.xyz
 image.yuntu.com.tw
 image.yymanhua.com
@@ -3090,6 +3092,7 @@ thumbs.onlyfans.com
 thumbs2.sendvid.com
 tile2.intervals.icu
 tiles.mapillary.com
+tileserver.b10s.net
 time.cloudflare.com
 tuf-repo.github.com
 ui.contentstack.com
@@ -3610,6 +3613,7 @@ staticctf.ubisoft.com
 themes.fourthwall.com
 +.tile.openstreetmap.de
 +.tile.openstreetmap.fr
+tiles.flightaware.com
 tiles.openfreemap.org
 uploads.bikeindex.org
 uploads.sitepoint.com
@@ -3758,6 +3762,7 @@ nodeassets.nbcnews.com
 +.packd.liuxingbaoyu.xyz
 parts.blog.livedoor.jp
 +.patreonusercontent.com
+photos.flightaware.com
 pic.onlinewebfonts.com
 pkg-cdn.jetbrains.team
 platform.instagram.com
@@ -3895,6 +3900,7 @@ cdn.prod.www.spiegel.de
 cdn.ready-market.com.tw
 +.cdn.survey.medallia.com
 cdn.worldvectorlogo.com
+cdn1.singteldigital.com
 cdnstatic.porno-cum.com
 cdnstatic.tencentcs.com
 cms.worldpokerdeals.com
