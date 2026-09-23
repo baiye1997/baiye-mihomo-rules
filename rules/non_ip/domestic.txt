@@ -1,14 +1,14 @@
 #########################################
 # Sukka's Ruleset - Domestic Domains
-# Last Updated: 2026-09-18T13:04:49.628Z
-# Size: 867
+# Last Updated: 2026-09-22T18:44:23.938Z
+# Size: 868
 # License: AGPL 3.0
 # Homepage: https://ruleset.skk.moe
 # GitHub: https://github.com/SukkaW/Surge
 #
 # This file contains known addresses that are avaliable in the Mainland China.
 #
-# $content-hash-v1$:rW75segT1wNnAHK1jmQij9i9zPDCQsEXUXA9n5qKDKk$
+# $content-hash-v1$:b7tRTZxwwrmQIpaTh4Ulmoiu2634kFWzmblRLm3IIs8$
 #########################################
 DOMAIN,7h15.ru1353t.1s.m4d3.by.5ukk4w.skk.moe
 DOMAIN-SUFFIX,3.cn
@@ -289,6 +289,7 @@ DOMAIN-SUFFIX,qhres.com
 DOMAIN-SUFFIX,qiniu.com
 DOMAIN-SUFFIX,qixin.com
 DOMAIN-SUFFIX,qzone.com
+DOMAIN-SUFFIX,rnote.com
 DOMAIN-SUFFIX,roblox.cn
 DOMAIN-SUFFIX,sifou.com
 DOMAIN-SUFFIX,sinajs.cn
@@ -876,5 +877,5 @@ DOMAIN,media.cdn.queniuqe.com
 DOMAIN,cdnstatic.tencentcs.com
 DOMAIN-SUFFIX,kingsoft-office-service.com
 DOMAIN-SUFFIX,dl.delivery.mp.microsoft.com
-DOMAIN-WILDCARD,*.qhimgs?.com
+DOMAIN-WILDCARD,qhimgs?.com
 ################## EOF ##################
