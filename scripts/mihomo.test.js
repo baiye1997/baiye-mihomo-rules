@@ -105,7 +105,7 @@ async function runConfig(name, nodes, check, mini = false, cold = false) {
   }
 }
 
-const normal = ['美国正常', '美国低倍率 0.5X', '日本原生x15', '韩国 AI专用', '台湾正常', '🇺🇸 Ashland AI', '🇳🇱 Netherlands 01', 'LAN', '香港普通'];
+const normal = ['美国正常', '美国低倍率 0.5X', '日本原生x15', '韩国 AI专用', '台湾正常', '🇺🇸 Ashland AI', '🇳🇱 Netherlands 01', 'LAN', '香港普通', '🇭🇰 下载专用01x3', '🇺🇸 下载专用USx3', '🇯🇵 下载专用03x3', '🇭🇰 下载专用04x3', '美国 3X', '美国x30', '美国13x'];
 for (const name of fs.readdirSync('config').filter(n => n.endsWith('.yaml'))) {
   test(`${name}: core routing, name filters and low-rate preference`, { skip: !enabled, timeout: 30000 }, async () => {
     await runConfig(name, normal, async ({ get, connect, logs }) => {
@@ -119,6 +119,20 @@ for (const name of fs.readdirSync('config').filter(n => n.endsWith('.yaml'))) {
       assert.ok(!groups['👆 手动选择'].all.some(n => n.endsWith(']LAN')));
       assert.ok(!groups['♻️ 智能选择'].all.some(n => /x15|0\.5X/.test(n)));
       if (groups['♻️ 低倍率自动']) assert.equal(groups['♻️ 低倍率自动'].now, '♻️ 低倍率测速');
+      const cloudLow = normal.filter(n => /x3$| 3X$/.test(n)).map(n => '[月读]' + n);
+      for (const name of cloudLow) {
+        assert.ok(!groups['♻️ 智能选择'].all.includes(name));
+        if (groups['♻️ 低倍率测速'] && groups['👆 手动选择'].all.includes(name)) {
+          assert.ok(groups['♻️ 低倍率测速'].all.includes(name), name);
+          assert.ok(groups['📦 CDN 低倍率'].all.includes(name), name);
+        }
+      }
+      assert.ok(groups['♻️ 智能选择'].all.includes('[天照]美国 3X'));
+      if (groups['♻️ 低倍率测速']) {
+        assert.ok(!groups['♻️ 低倍率测速'].all.includes('[天照]美国 3X'));
+        assert.ok(!groups['♻️ 低倍率测速'].all.some(n => /x30|13x|x15/.test(n)));
+      }
+
       for (const domain of ['chatgpt.com','api.anthropic.com','gemini.google.com','apple-relay.apple.com','apple-relay.cloudflare.com','push.apple.com','dl.steam.clngaa.com','steamchina.com','cn.apple.com','gs-loc-cn.apple.com']) await connect(domain);
       const output = logs();
       // Preserve the upstream Apple Service -> Apple CN order; routing is a policy choice.
