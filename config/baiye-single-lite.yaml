@@ -117,7 +117,7 @@ geox-url:
   geosite: "https://cdn.jsdelivr.net/gh/Loyalsoldier/v2ray-rules-dat@release/geosite.dat"
 
 # ======================= 策略组锚点 =======================
-tmpl: &tmpl {url: *url, interval: 300, lazy: true, timeout: 5000, disable-udp: false, max-failed-times: 3, hidden: true, include-all-providers: true, empty-fallback: REJECT, exclude-filter: "(?i)(DIRECT|直接连接|官网|订阅|流量|到期|套餐|客服|群|邀请|网址|剩余|过期|(?:^|[^A-Za-z])LAN(?:$|[^A-Za-z])|(?:^|[^0-9.])0?\\.[0-9]+\\s*(?:x|×|倍(?:率)?)(?:$|[^0-9A-Za-z])|(?:^|[^0-9.])5x(?:$|[^0-9])|x15(?:$|[^0-9.]))"}
+tmpl: &tmpl {url: *url, interval: 300, lazy: true, timeout: 5000, disable-udp: false, max-failed-times: 3, hidden: true, include-all-providers: true, empty-fallback: REJECT, exclude-filter: "(?i)(DIRECT|直接连接|官网|订阅|流量|到期|套餐|客服|群|邀请|网址|剩余|过期|(?:^|[^A-Za-z])LAN(?:$|[^A-Za-z])|(?:^|[^0-9.])0?\\.[0-9]+\\s*(?:x|×|倍(?:率)?)(?:$|[^0-9A-Za-z])|(?:^|[^0-9.])5x(?:$|[^0-9])|x15(?:$|[^0-9.])|^\\[月读\\].*(?:x3|(?:^|[^0-9.])3x)(?:$|[^0-9.A-Za-z]))"}
 sel:  &sel  {type: select, url: *url, disable-udp: false, hidden: false, include-all-providers: true, empty-fallback: REJECT, exclude-filter: "(?i)(DIRECT|直接连接|官网|订阅|流量|到期|套餐|客服|群|邀请|网址|剩余|过期|(?:^|[^A-Za-z])LAN(?:$|[^A-Za-z]))"}
 test: &test {type: url-test, <<: *tmpl, tolerance: 50}
 fall: &fall {type: fallback, <<: *tmpl}

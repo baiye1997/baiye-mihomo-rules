@@ -114,7 +114,7 @@ geox-url:
   geosite: "https://cdn.jsdelivr.net/gh/Loyalsoldier/v2ray-rules-dat@release/geosite.dat"
 
 # ======================= 策略组锚点 =======================
-tmpl: &tmpl {url: *url, interval: 300, lazy: true, timeout: 5000, disable-udp: false, max-failed-times: 3, hidden: true, include-all-providers: true, empty-fallback: REJECT, exclude-filter: "(?i)(DIRECT|直接连接|官网|订阅|流量|到期|套餐|客服|群|邀请|网址|剩余|过期|(?:^|[^A-Za-z])LAN(?:$|[^A-Za-z])|(?:^|[^0-9.])0?\\.[0-9]+\\s*(?:x|×|倍(?:率)?)(?:$|[^0-9A-Za-z])|(?:^|[^0-9.])5x(?:$|[^0-9])|x15(?:$|[^0-9.]))"}
+tmpl: &tmpl {url: *url, interval: 300, lazy: true, timeout: 5000, disable-udp: false, max-failed-times: 3, hidden: true, include-all-providers: true, empty-fallback: REJECT, exclude-filter: "(?i)(DIRECT|直接连接|官网|订阅|流量|到期|套餐|客服|群|邀请|网址|剩余|过期|(?:^|[^A-Za-z])LAN(?:$|[^A-Za-z])|(?:^|[^0-9.])0?\\.[0-9]+\\s*(?:x|×|倍(?:率)?)(?:$|[^0-9A-Za-z])|(?:^|[^0-9.])5x(?:$|[^0-9])|x15(?:$|[^0-9.])|^\\[月读\\].*(?:x3|(?:^|[^0-9.])3x)(?:$|[^0-9.A-Za-z]))"}
 sel:  &sel  {type: select, url: *url, disable-udp: false, hidden: false, include-all-providers: true, empty-fallback: REJECT, exclude-filter: "(?i)(DIRECT|直接连接|官网|订阅|流量|到期|套餐|客服|群|邀请|网址|剩余|过期|(?:^|[^A-Za-z])LAN(?:$|[^A-Za-z]))"}
 test: &test {type: url-test, <<: *tmpl, tolerance: 50}
 fall: &fall {type: fallback, <<: *tmpl}
@@ -134,7 +134,7 @@ sg: &sg '^(?=.*(?i)(坡|🇸🇬|Sing|(?:^|[^A-Za-z])(?:SG|SIN|XSP)(?:$|[^A-Za-z
 us: &us '^(?=.*(?i)(美|🇺🇸|硅谷|Silicon|United States|(?:^|[^A-Za-z])(?:US|USA|JFK|SJC|LAX|ORD|ATL|DFW|SFO|MIA|SEA|IAD)(?:$|[^A-Za-z]))).*$'
 # AI 候选：AI 标签或美国 / 新加坡 / 日本 / 台湾，排除韩国；名称筛选不代表已验证解锁。
 ai: &ai '(?i)^(?!.*(?:韩国|韓國|韩国家宽|韓国|🇰🇷|首尔|首爾|Korea|(?:^|[^A-Za-z])(?:KR|KOR)(?:$|[^A-Za-z]))).*(?:美国|美國|🇺🇸|硅谷|Silicon|United States|日本|🇯🇵|Japan|新加坡|🇸🇬|Singapore|台湾|臺灣|台北|臺北|🇹🇼|Taiwan|Taipei|(?:^|[^A-Za-z])(?:AI|US|USA|JFK|SJC|LAX|ORD|ATL|DFW|SFO|MIA|SEA|IAD|JP|NRT|HND|KIX|CTS|FUK|SG|SIN|XSP|TW|TPE|TSA|KHH)(?:$|[^A-Za-z]))'
-low: &low '(?i)(?:^|[^0-9.])0?\.[0-9]+\s*(?:x|×|倍(?:率)?)(?:$|[^0-9A-Za-z])'
+low: &low '(?i)(?:^|[^0-9.])0?\.[0-9]+\s*(?:x|×|倍(?:率)?)(?:$|[^0-9A-Za-z])|^\[月读\].*(?:x3|(?:^|[^0-9.])3x)(?:$|[^0-9.A-Za-z])'
 
 # ======================= 策略组 =======================
 proxy-groups:
