@@ -1,14 +1,14 @@
 #########################################
 # Sukka's Ruleset - CDN Domains
-# Last Updated: 2026-09-30T06:20:11.061Z
-# Size: 4679
+# Last Updated: 2026-10-01T14:48:46.522Z
+# Size: 4681
 # License: AGPL 3.0
 # Homepage: https://ruleset.skk.moe
 # GitHub: https://github.com/SukkaW/Surge
 #
 # This file contains object storage and static assets CDN domains.
 #
-# $content-hash-v1$:mw-n6YDn-lehHDVXZIwUOLHyDgyztcRJon6zrxsmFlY$
+# $content-hash-v1$:3KDAmIXIptWVb3BQKZQXD3nTYSbk4Ikr5Bxkln7HLqE$
 #########################################
 7h15.ru1353t.1s.m4d3.by.5ukk4w.skk.moe
 0x0.st
@@ -129,6 +129,7 @@ cdn.sc.gl
 +.erocdn.co
 +.eth.sucks
 +.f-cdn.com
++.fal.media
 +.fbcdn.com
 +.fbcdn.net
 +.fbsbx.com
@@ -3875,6 +3876,7 @@ assets.clickfunnels.com
 assets.lemonsqueezy.com
 assets.mcp.corespeed.io
 assets.science.nasa.gov
+assets.singaporeair.com
 assets.streamlinehq.com
 assets.xboxservices.com
 assets1.lottiefiles.com
