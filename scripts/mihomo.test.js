@@ -118,19 +118,27 @@ for (const name of fs.readdirSync('config').filter(n => n.endsWith('.yaml'))) {
       assert.ok(groups['👆 手动选择'].all.some(n => n.includes('Netherlands')));
       assert.ok(!groups['👆 手动选择'].all.some(n => n.endsWith(']LAN')));
       assert.ok(!groups['♻️ 智能选择'].all.some(n => /x15|0\.5X/.test(n)));
-      if (groups['♻️ 低倍率自动']) assert.equal(groups['♻️ 低倍率自动'].now, '♻️ 低倍率测速');
+      if (groups['♻️ 低倍率自动']) {
+        assert.equal(groups['📦 CDN 低倍率'].type, 'Selector');
+        assert.equal(groups['♻️ 低倍率自动'].type, 'URLTest');
+        assert.ok(groups['♻️ 低倍率自动'].now.includes('0.5X') || /x3|3X/i.test(groups['♻️ 低倍率自动'].now));
+        assert.equal(groups['📦 CDN 低倍率'].now, '♻️ 低倍率自动');
+        assert.ok(groups['📦 CDN 低倍率'].all.includes('🚀 节点选择'));
+        assert.ok(groups['📦 CDN 低倍率'].all.includes('👆 手动选择'));
+        // Mihomo omits explicit DIRECT from a selector's runtime `all` list.
+        assert.ok(!groups['♻️ 低倍率测速']);
+      }
       const cloudLow = normal.filter(n => /x3$| 3X$/.test(n)).map(n => '[月读]' + n);
       for (const name of cloudLow) {
         assert.ok(!groups['♻️ 智能选择'].all.includes(name));
-        if (groups['♻️ 低倍率测速'] && groups['👆 手动选择'].all.includes(name)) {
-          assert.ok(groups['♻️ 低倍率测速'].all.includes(name), name);
+        if (groups['📦 CDN 低倍率'] && groups['👆 手动选择'].all.includes(name)) {
           assert.ok(groups['📦 CDN 低倍率'].all.includes(name), name);
         }
       }
       assert.ok(groups['♻️ 智能选择'].all.includes('[天照]美国 3X'));
-      if (groups['♻️ 低倍率测速']) {
-        assert.ok(!groups['♻️ 低倍率测速'].all.includes('[天照]美国 3X'));
-        assert.ok(!groups['♻️ 低倍率测速'].all.some(n => /x30|13x|x15/.test(n)));
+      if (groups['📦 CDN 低倍率']) {
+        assert.ok(!groups['📦 CDN 低倍率'].all.includes('[天照]美国 3X'));
+        assert.ok(!groups['📦 CDN 低倍率'].all.some(n => /x30|13x|x15/.test(n)));
       }
 
       for (const domain of ['chatgpt.com','api.anthropic.com','gemini.google.com','apple-relay.apple.com','apple-relay.cloudflare.com','push.apple.com','dl.steam.clngaa.com','steamchina.com','cn.apple.com','gs-loc-cn.apple.com']) await connect(domain);
@@ -144,12 +152,12 @@ for (const name of fs.readdirSync('config').filter(n => n.endsWith('.yaml'))) {
   });
 }
 
-test('no low-rate nodes: CDN automatically uses regular proxy pool', { skip: !enabled, timeout: 30000 }, async () => {
+test('no low-rate nodes: visible CDN selector keeps manual fallback', { skip: !enabled, timeout: 30000 }, async () => {
   await runConfig('baiye-single.yaml', ['美国正常','韩国原生x15'], async ({ get }) => {
-    let p;
-    for (let i=0;i<60;i++) { p=(await get('proxies')).proxies; if(p['♻️ 低倍率自动'].now==='♻️ 智能选择') break; await pause(100); }
-    assert.equal(p['♻️ 低倍率测速'].now, 'REJECT');
-    assert.equal(p['♻️ 低倍率自动'].now, '♻️ 智能选择');
+    const p=(await get('proxies')).proxies;
+    assert.equal(p['📦 CDN 低倍率'].now, '♻️ 低倍率自动');
+    assert.equal(p['♻️ 低倍率自动'].now, 'REJECT');
+    assert.ok(p['📦 CDN 低倍率'].all.includes('🚀 节点选择'));
     assert.equal(p['🇰🇷 - 择优节点'].now, 'REJECT');
   });
 });
@@ -163,11 +171,13 @@ test('mini without eligible AI nodes rejects instead of selecting COMPATIBLE', {
 });
 
 
-test('unreachable low-rate pool falls back while keeping ordinary nodes available', { skip: !enabled, timeout: 30000 }, async () => {
+test('low-rate pool keeps its selected node without hiding ordinary nodes', { skip: !enabled, timeout: 30000 }, async () => {
   await runConfig('baiye-single.yaml', ['美国正常', { name: '美国低倍率 0.5X', type: 'socks5', server: '127.0.0.1', port: 9 }], async ({ get }) => {
     let p;
-    for (let i=0;i<60;i++) { p=(await get('proxies')).proxies; if(p['♻️ 低倍率自动'].now==='♻️ 智能选择') break; await pause(100); }
-    assert.equal(p['♻️ 低倍率自动'].now, '♻️ 智能选择');
+    for (let i=0;i<60;i++) { p=(await get('proxies')).proxies; if(p['♻️ 低倍率自动'].now.includes('美国低倍率')) break; await pause(100); }
+    assert.ok(p['♻️ 低倍率自动'].now.includes('美国低倍率'));
+    assert.equal(p['📦 CDN 低倍率'].now, '♻️ 低倍率自动');
+    assert.ok(p['📦 CDN 低倍率'].all.includes('🚀 节点选择'));
     assert.ok(p['♻️ 智能选择'].now.includes('美国正常'));
   });
 });

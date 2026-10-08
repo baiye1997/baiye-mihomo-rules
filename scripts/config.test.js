@@ -113,6 +113,18 @@ for (const name of fs.readdirSync('config').filter(n => n.endsWith('.yaml'))) {
     assert.ok(c.rules.includes('DOMAIN-SUFFIX,push.apple.com,DIRECT'));
     assert.ok(c.rules.findIndex(r => r.startsWith('GEOSITE,category-games@cn,')) < c.rules.indexOf('RULE-SET,game_non_ip,🎮 游戏平台'));
     for (const g of c['proxy-groups'].filter(g => g['include-all-providers'] && !g.proxies?.length)) assert.equal(g['empty-fallback'], 'REJECT');
+    if (c['proxy-groups'].some(g => g.name === '📦 CDN 低倍率')) {
+      const low = c['proxy-groups'].find(g => g.name === '📦 CDN 低倍率');
+      const auto = c['proxy-groups'].find(g => g.name === '♻️ 低倍率自动');
+      assert.ok(c.rules.includes('RULE-SET,cdn_domainset,📦 CDN 低倍率'));
+      assert.ok(c.rules.includes('RULE-SET,cdn_non_ip,📦 CDN 低倍率'));
+      assert.equal(low.type, 'select');
+      assert.deepEqual(low.proxies.slice(0, 4), ['♻️ 低倍率自动', '🚀 节点选择', '👆 手动选择', 'DIRECT']);
+      assert.equal(low.hidden, false);
+      assert.equal(auto.type, 'url-test');
+      assert.equal(auto.hidden, true);
+      assert.ok(!c['proxy-groups'].some(g => g.name === '♻️ 低倍率测速'));
+    }
     if (process.env.MIHOMO_BIN) validateWithCore(output, name);
     if (name.includes('multiple')) {
       const mini = deriveMini(output);
