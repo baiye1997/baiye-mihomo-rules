@@ -150,12 +150,12 @@ proxy-groups:
   - {name: "Ⓜ️ 微软服务", <<: *app, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/microsoft.png"}
   - {name: "🍎 苹果服务", <<: *app, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/apple.png"}
   - {name: "🎮 游戏平台", <<: *app, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/game.png"}
-  - {name: "📦 CDN 低倍率", type: url-test, include-all-providers: true, url: *url, interval: 300, lazy: true, timeout: 5000, tolerance: 50, disable-udp: false, hidden: false, filter: *low, empty-fallback: REJECT, exclude-filter: "(?i)(DIRECT|直接连接|官网|订阅|流量|到期|套餐|客服|群|邀请|网址|剩余|过期|(?:^|[^A-Za-z])LAN(?:$|[^A-Za-z]))", icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/low.png"}
+  - {name: "📦 CDN 低倍率", type: select, proxies: ["♻️ 低倍率自动","🚀 节点选择","👆 手动选择","DIRECT"], include-all-providers: true, url: *url, disable-udp: false, hidden: false, filter: *low, exclude-filter: "(?i)(DIRECT|直接连接|官网|订阅|流量|到期|套餐|客服|群|邀请|网址|剩余|过期|(?:^|[^A-Za-z])LAN(?:$|[^A-Za-z]))", icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/low.png"}
   - {name: "🎵 Spotify", <<: *strm, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/spotify.png"}
   - {name: "📺 视频媒体", <<: *strm, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/netflix.png"}
 
-  # 优先低倍率池，空池或不可用时回退普通自动池；空池本身拒绝连接。
-  - {name: "♻️ 低倍率自动", type: fallback, proxies: ["📦 CDN 低倍率","♻️ 智能选择"], url: *url, interval: 300, lazy: false, timeout: 5000, hidden: true, empty-fallback: REJECT}
+  # 隐藏测速组只负责选择低倍率节点；可见选择组保留普通、手动与直连入口。
+  - {name: "♻️ 低倍率自动", type: url-test, include-all-providers: true, url: *url, interval: 300, lazy: true, timeout: 5000, tolerance: 50, disable-udp: false, hidden: true, filter: *low, empty-fallback: REJECT, exclude-filter: "(?i)(DIRECT|直接连接|官网|订阅|流量|到期|套餐|客服|群|邀请|网址|剩余|过期|(?:^|[^A-Za-z])LAN(?:$|[^A-Za-z]))"}
 
   - {name: "🇭🇰 - 择优节点", <<: *test, filter: *hk}
   - {name: "🇨🇳 - 择优节点", <<: *test, filter: *tw}
@@ -231,8 +231,8 @@ rules:
 
   # 4. Sukka domainset / non_ip（保持上游 README 顺序）
   - RULE-SET,speedtest,🚀 节点选择
-  - RULE-SET,cdn_domainset,♻️ 低倍率自动
-  - RULE-SET,cdn_non_ip,♻️ 低倍率自动
+  - RULE-SET,cdn_domainset,📦 CDN 低倍率
+  - RULE-SET,cdn_non_ip,📦 CDN 低倍率
   - GEOSITE,spotify,🎵 Spotify
   - RULE-SET,stream_non_ip,📺 视频媒体
   - RULE-SET,ai_non_ip,🤖 AI 平台
