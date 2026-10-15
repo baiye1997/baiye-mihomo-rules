@@ -8,5 +8,6 @@ gzip -d mihomo.gz
 chmod +x mihomo
 curl -fSL --retry 2 --max-time 120 -o geoip.dat https://cdn.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/geoip-lite.dat
 curl -fSL --retry 2 --max-time 120 -o geosite.dat https://cdn.jsdelivr.net/gh/Loyalsoldier/v2ray-rules-dat@release/geosite.dat
+curl -fSL --retry 2 --max-time 120 -o ASN.mmdb https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/GeoLite2-ASN.mmdb
 echo "MIHOMO_BIN=$RUNNER_TEMP/mihomo-check/mihomo" >> "$GITHUB_ENV"
 echo "MIHOMO_GEODATA_DIR=$RUNNER_TEMP/mihomo-check" >> "$GITHUB_ENV"

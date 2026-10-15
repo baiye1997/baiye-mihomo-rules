@@ -24,6 +24,9 @@ function entries(file, text = fs.readFileSync(file, 'utf8')) {
       const version = kind === 'IP-CIDR' ? 4 : 6;
       assert.ok(net.isIP(ip) === version && /^\d+$/.test(prefix) && Number(prefix) <= (version === 4 ? 32 : 128) && rest.length === 0, `${file}: ${rule}`);
       assert.ok(option === undefined || option === 'no-resolve', `${file}: ${rule}`);
+    } else if (kind === 'IP-ASN') {
+      assert.ok(/^[0-9]+$/.test(value) && Number(value) > 0 && Number(value) <= 4294967295, `${file}: invalid ASN`);
+      assert.ok(option === undefined || option === 'no-resolve', `${file}: unexpected outbound/option`);
     } else {
       // Reject new upstream formats until their parser and routing intent are reviewed.
       assert.ok(['DOMAIN', 'DOMAIN-SUFFIX', 'DOMAIN-KEYWORD', 'DOMAIN-WILDCARD', 'PROCESS-NAME'].includes(kind), `${file}: unsupported ${kind}`);
@@ -53,6 +56,14 @@ test('all rule files have valid content, complete sources and exact game split',
   assert.deepEqual(game.filter(r => r.startsWith('IP-CIDR')), entries('rules/ip/game.txt'));
 });
 
+const asnRules = ['IP-ASN,399358', 'IP-ASN,13335,no-resolve', 'IP-ASN,4294967295'];
+test('ASN validation accepts numeric ASNs and rejects invalid values or outbound injection', () => {
+  assert.deepEqual(entries('rules/ip/asn.txt', asnRules.join('\n')), asnRules);
+  for (const rule of ['IP-ASN,', 'IP-ASN,0', 'IP-ASN,-1', 'IP-ASN,1.5', 'IP-ASN,AS399358', 'IP-ASN,4294967296', 'IP-ASN,1e3', 'IP-ASN,13335,DIRECT', 'IP-ASN,13335,no-resolve,DIRECT']) {
+    assert.throws(() => entries('rules/ip/asn.txt', rule), rule);
+  }
+});
+
 test('download validation rejects HTML, empty content, malformed CIDRs and hidden outbound fields', () => {
   for (const [file, text] of [
     ['rules/domainset/a.txt', '<html>Service unavailable</html>'],
@@ -71,6 +82,10 @@ test('Mihomo parses every classical rule as a top-level rule without silently dr
     parts.splice(2, 0, 'DIRECT');
     return parts.join(',');
   })));
-  c.rules.push('MATCH,DIRECT');
+  c.rules.push(...asnRules.map(rule => {
+    const parts = rule.split(',');
+    parts.splice(2, 0, 'DIRECT');
+    return parts.join(',');
+  }), 'MATCH,DIRECT');
   validateWithCore(YAML.stringify(c), 'all classical rules');
 });
