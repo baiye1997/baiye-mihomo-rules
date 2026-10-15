@@ -1,14 +1,14 @@
 #########################################
 # Sukka's Ruleset - Speedtest Domains
-# Last Updated: 2026-10-02T21:18:48.196Z
-# Size: 3415
+# Last Updated: 2026-10-14T20:40:33.102Z
+# Size: 3431
 # License: AGPL 3.0
 # Homepage: https://ruleset.skk.moe
 # GitHub: https://github.com/SukkaW/Surge
 #
 # This file contains common speedtest endpoints.
 #
-# $content-hash-v1$:mU6xl1BJl220N76-8dkiQjMNAJB6HKP5lOdkuibzuZA$
+# $content-hash-v1$:HEl1BipPdYBcNpI2GfwoxqTyouUkNE6W5PcIKLYCT1Y$
 #########################################
 7h15.ru1353t.1s.m4d3.by.5ukk4w.skk.moe
 +.fast.com
@@ -289,6 +289,7 @@ teste.i9va.net.br
 tnookla.tn.edu.tw
 two.speed.airc.it
 vitesse.cogeco.ca
+wrlcc.synology.me
 www.librespeed.fi
 ch1.chtm.hinet.net
 ds19.vipconnect.mx
@@ -303,6 +304,7 @@ hk.mymonitor.space
 kh1.chtm.hinet.net
 +.measurementlab.net
 one.speed.c4g7.com
+ookla.argsment.com
 ookla.as400442.net
 ookla.bigredne.com
 +.ookla.ddnsgeek.com
@@ -329,6 +331,7 @@ spd53.claro.com.br
 spd60.claro.com.br
 spd76.claro.com.br
 spd79.claro.com.br
+spdt.lanxus.com.br
 speed.as198997.net
 speed.cablelink.at
 speed.clair.global
@@ -522,6 +525,7 @@ speedtest.netcup.at
 speedtest.netone.nl
 speedtest.newsxs.nl
 speedtest.nocix.net
+speedtest.nwlab.org
 +.speedtest.orange.fr
 +.speedtest.orange.pl
 speedtest.osage.net
@@ -781,6 +785,7 @@ speedtest3.lepida.it
 speedtest31.turk.net
 speedtest33.turk.net
 speedtest4.lepida.it
+speedtest5.mywnz.com
 speedtest54.turk.net
 speedtest59.turk.net
 speedtest61.turk.net
@@ -836,6 +841,7 @@ fibertest.soipl.co.in
 guwahati.neconnect.in
 hiztesti.codit.com.tr
 hiztesti.turbo.net.tr
+hoyalclub.synology.me
 ind-nperf.verizon.net
 joplin1.cabospeed.com
 karapinar.flix.net.tr
@@ -1545,6 +1551,7 @@ speedtest2.digimobil.es
 speedtest2.il.mycci.net
 speedtest2.openfiber.it
 speedtest2.pa.mycci.net
+speedtest3nl.quickqc.nl
 speedtest4.digimobil.es
 speedtest5.fybercom.net
 speedtest6.digimobil.es
@@ -1597,6 +1604,7 @@ teste.mwhtelecom.com.br
 teste.oriontelecom.link
 teste.reatelecom.com.br
 teste.speednetpa.net.br
+topnet.brsserver.com.br
 vaspeedtest.rackdog.com
 velocidade.4wnet.com.br
 velocidade.hrcfiber.com
@@ -1694,6 +1702,7 @@ speedtest.cadence.net.uk
 speedtest.chisholmbb.com
 speedtest.citytelecom.ru
 speedtest.connectzone.in
+speedtest.dacomfibra.com
 speedtest.datafex.com.tr
 speedtest.del.excitel.in
 speedtest.deltacable.com
@@ -1860,6 +1869,7 @@ spd-100g-ookla.stelogy.io
 speed-br2.gigacomm.net.au
 speed-mel.gigacomm.net.au
 speed-syd.gigacomm.net.au
+speed.airmaxbroadband.com
 speed.newmarket.telmax.ca
 speed.telecablecartaya.es
 speed.upnetcaucaia.com.br
@@ -2101,6 +2111,7 @@ speedtest-sev.masmovil.com
 speedtest-sg.napinfo.co.id
 speedtest-sin.melbicom.net
 speedtest-sjc.sectrify.com
+speedtest-sjdm.newworld.ph
 speedtest-tek.teksavvy.com
 speedtest-txg.infinirc.net
 speedtest-val.masmovil.com
@@ -2233,6 +2244,7 @@ spttp1_tc.taiwanmobile.com
 srv02-sjdm.imj-wanklik.com
 srvteste.edntelecom.net.br
 st-jamestown.sumofiber.com
+st-ookla.zas.virtualiza.me
 st.racsanntechnologies.com
 stdel.tatatelebusiness.com
 stmum.tatatelebusiness.com
@@ -2454,9 +2466,11 @@ gh-speedtest.homeplus.net.tw
 hk-bgp-speedtest.nearoute.io
 hmc-speedtest.northstate.net
 iad-eqx10-ookla-1.99.network
+imrteixeira.brsserver.com.br
 kl-speedtest.homeplus.net.tw
 koreaspeedtest.cmctelecom.vn
 ks-speedtest.homeplus.net.tw
+kzspeedtest01.aunalytics.com
 ldc01-speedtest.whipcord.com
 lg-speedtest.homeplus.net.tw
 lifitelecom.brsserver.com.br
@@ -2669,6 +2683,7 @@ spd01-monr-ca.gigglefiber.com
 speed-miss.systemlifeline.com
 speed.alliedcorporation.co.in
 speed.bitnettecnologia.com.br
+speed01.mil01.cmp.hb-bkbn.net
 speednet-atn.brsserver.com.br
 speedtest-adl.optusnet.com.au
 speedtest-alm-nl.as215248.net
@@ -3008,6 +3023,7 @@ speedtest.bradfordbroadband.com
 speedtest.deltatelecomam.com.br
 speedtest.euronettelecom.com.br
 speedtest.extremanetwork.com.br
+speedtest.g5nortetelecom.com.br
 speedtest.hkg01.node.as9516.com
 speedtest.isplinkdigital.com.br
 speedtest.japanettelecom.com.br

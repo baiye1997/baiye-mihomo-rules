@@ -1,14 +1,14 @@
 #########################################
 # Sukka's Ruleset - CDN Domains
-# Last Updated: 2026-10-01T14:48:46.522Z
-# Size: 4681
+# Last Updated: 2026-10-15T09:44:19.404Z
+# Size: 4690
 # License: AGPL 3.0
 # Homepage: https://ruleset.skk.moe
 # GitHub: https://github.com/SukkaW/Surge
 #
 # This file contains object storage and static assets CDN domains.
 #
-# $content-hash-v1$:3KDAmIXIptWVb3BQKZQXD3nTYSbk4Ikr5Bxkln7HLqE$
+# $content-hash-v1$:9BKB9IdFajhij-eftppPwrMiGBeRrezV0OMZYAuuZQo$
 #########################################
 7h15.ru1353t.1s.m4d3.by.5ukk4w.skk.moe
 0x0.st
@@ -1504,6 +1504,7 @@ cdn.parsely.com
 cdn.perfops.net
 cdn.pixabay.com
 cdn.plus500.com
+cdn.priv.center
 cdn.privacy.com
 cdn.quadpay.com
 cdn.readmoo.com
@@ -1599,6 +1600,7 @@ icons.llamao.fi
 image.gyutto.jp
 image.status.io
 images.dmca.com
+images.higgs.ai
 images.kick.com
 images.pluto.tv
 images.vudu.com
@@ -1789,6 +1791,7 @@ assets.stash.com
 assets.toot.cafe
 assets.twitch.tv
 assets.upload.io
+assets.vanta.com
 assets.vogue.com
 assets.volvo.com
 assets.xmind.net
@@ -2360,6 +2363,7 @@ media.nownews.com
 +.media.zestyio.com
 +.mediadelivery.net
 +.monitor.azure.com
+n.approveit.today
 netlify.apollo.io
 +.notion-static.com
 ocsp.comodoca.com
@@ -3097,6 +3101,7 @@ thumbs.onlyfans.com
 thumbs2.sendvid.com
 tile2.intervals.icu
 tiles.mapillary.com
+tiles.onemap.gov.sg
 tileserver.b10s.net
 time.cloudflare.com
 tuf-repo.github.com
@@ -3524,6 +3529,7 @@ images.everyplate.com
 images.findagrave.com
 +.images.hentaicity.com
 images.icon-icons.com
+images.macworld.co.uk
 img.foresightnews.pro
 imgs.search.brave.com
 imgs.socialinsider.io
@@ -4400,6 +4406,7 @@ player-frontend.cnevids.com
 prego-cache.prod.sketch.com
 public-pages.cbinsights.com
 resources-live.sketch.cloud
+rum-ingest.us1.signalfx.com
 safebrowsing.googleapis.com
 sessions-bugsnag.docker.com
 +.siteintercept.qualtrics.com
@@ -4409,6 +4416,7 @@ static-homepage-en.pluto.tv
 static-mh.content.disney.io
 static-production.npmjs.com
 static-webfonts.myfonts.com
+static.acm.account.sony.com
 static.captcha-delivery.com
 sts.online.visualstudio.com
 tvdownloaddw-a.akamaihd.net
@@ -4530,6 +4538,7 @@ cdn.designerapp.osi.office.net
 cdn.quickemailverification.com
 cdn.rex.contents.rakuten.co.jp
 config.extension.grammarly.com
+customer-first-focus.b-cdn.net
 dev.visualwebsiteoptimizer.com
 edgeassetservice.azureedge.net
 explorer-api.walletconnect.com
