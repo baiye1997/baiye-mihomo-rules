@@ -39,8 +39,8 @@ function validateConfig(text) {
 function isolatedConfig(text, dir) {
   const config = validateConfig(text);
   const geoDir = process.env.MIHOMO_GEODATA_DIR;
-  if (!geoDir) throw new Error("需要设置 MIHOMO_GEODATA_DIR，指向 geoip.dat / geosite.dat 所在目录");
-  for (const name of ["geoip.dat", "geosite.dat"]) fs.copyFileSync(path.join(geoDir, name), path.join(dir, name));
+  if (!geoDir) throw new Error("需要设置 MIHOMO_GEODATA_DIR，指向 geoip.dat / geosite.dat / ASN.mmdb 所在目录");
+  for (const name of ["geoip.dat", "geosite.dat", "ASN.mmdb"]) fs.copyFileSync(path.join(geoDir, name), path.join(dir, name));
   config["geo-auto-update"] = false;
   for (const provider of Object.values(config["proxy-providers"] || {})) {
     delete provider.url;
