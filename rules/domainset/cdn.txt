@@ -1,14 +1,14 @@
 #########################################
 # Sukka's Ruleset - CDN Domains
-# Last Updated: 2026-10-16T09:01:45.667Z
-# Size: 4692
+# Last Updated: 2026-10-19T06:11:54.136Z
+# Size: 4695
 # License: AGPL 3.0
 # Homepage: https://ruleset.skk.moe
 # GitHub: https://github.com/SukkaW/Surge
 #
 # This file contains object storage and static assets CDN domains.
 #
-# $content-hash-v1$:Fy6YnJZzCizPwsaKGI_q9AivCLcjBPaboTmuFXzCJU8$
+# $content-hash-v1$:hl-tl_C1sOvq9brOFFy52TAx54LGJaIrjLMOzV2JdnY$
 #########################################
 7h15.ru1353t.1s.m4d3.by.5ukk4w.skk.moe
 0x0.st
@@ -2782,6 +2782,7 @@ upload.teftera.com
 uploads.guim.co.uk
 uploads.linear.app
 v2uploads.zopim.io
+vcc-assets.8x8.com
 vector.hereapi.com
 video3.mingpao.com
 videos.elephas.app
@@ -3009,6 +3010,7 @@ media.karousell.com
 media.newyorker.com
 media.shopimind.com
 +.media.strapiapp.com
+media.trekbikes.com
 medium-media.vgm.io
 +.motherlessmedia.com
 +.msftconnecttest.com
@@ -3510,6 +3512,7 @@ files.writefreely.org
 font-public.canva.com
 +.framerusercontent.com
 front-resource.fs.com
+frontend2.locally.com
 +.gateway.serph.network
 +.githubusercontent.com
 gitpkg-fork.vercel.sh
