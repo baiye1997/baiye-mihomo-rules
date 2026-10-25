@@ -1,14 +1,14 @@
 #########################################
 # Sukka's Ruleset - CDN Domains
-# Last Updated: 2026-10-24T15:36:57.910Z
-# Size: 4708
+# Last Updated: 2026-10-25T14:57:54.006Z
+# Size: 4696
 # License: AGPL 3.0
 # Homepage: https://ruleset.skk.moe
 # GitHub: https://github.com/SukkaW/Surge
 #
 # This file contains object storage and static assets CDN domains.
 #
-# $content-hash-v1$:kd_NDpwTuUspJkWAV0vabs7NZjPYvMUodD_1_2HbE78$
+# $content-hash-v1$:dD1P8lpb4CHwvDfLZxLopK27qRtVGGpCsHW-TYR_MvM$
 #########################################
 7h15.ru1353t.1s.m4d3.by.5ukk4w.skk.moe
 0x0.st
@@ -660,7 +660,6 @@ cf.shopee.tw
 +.cloudlin.vip
 +.corsproxy.io
 +.crossbell.io
-css.4jpg.top
 data.peer.as
 david-dm.org
 +.dditsadn.com
@@ -1034,7 +1033,6 @@ pics.vpdmm.cc
 +.picsum.photos
 +.place-hold.it
 pomf2.lain.la
-proxy.cors.sh
 r2.dejavu.moe
 r2cdn.c7d.dev
 +.randomuser.me
@@ -1093,7 +1091,6 @@ waitlisted.co
 +.wixstatic.com
 +.workoscdn.com
 +.wowmodels.com
-www.10086.win
 www.acgpix.de
 +.xdaimages.com
 +.xhpingcdn.com
@@ -1128,7 +1125,6 @@ bst.icons8.com
 c.animaapp.com
 c.marsflag.com
 c.navattic.com
-c1.patreon.com
 c4.patreon.com
 c5.patreon.com
 c6.patreon.com
@@ -1310,7 +1306,6 @@ lc.nssurge.com
 +.live-video.net
 +.media-imdb.com
 +.media.ci-en.jp
-media.evolv.ai
 media.masto.nu
 media.mstdn.io
 media.trakt.tv
@@ -1452,7 +1447,6 @@ assets.time.com
 assets.yande.re
 assets.zpic.biz
 attach.setn.com
-avts.wmlabs.net
 +.bestfreecdn.com
 +.bleepstatic.com
 +.bp.blogspot.com
@@ -1809,7 +1803,6 @@ blob.jortage.com
 +.bugly.qcloud.com
 bundlephobia.com
 cache.ip-api.com
-cache.sgvafs.com
 +.capcutstatic.com
 cdn-1.porn87.com
 cdn-1.strava.com
@@ -1859,7 +1852,6 @@ cdn.playwire.com
 cdn.roboflow.com
 cdn.roseperl.com
 cdn.scaleflex.it
-cdn.seedance2.ai
 +.cdn.signalfx.com
 cdn.simplesat.io
 cdn.skymavis.com
@@ -2428,6 +2420,7 @@ static.anysex.com
 static.bbci.co.uk
 static.beebom.com
 static.buffer.com
+static.capcom.com
 static.carfax.com
 static.chaika.moe
 static.change.org
@@ -2479,7 +2472,6 @@ tools.refokus.com
 uhf.microsoft.com
 v2.listenloop.com
 +.videodelivery.net
-w2.influxdata.com
 wa.arounddeal.com
 wa1.aninoapps.com
 +.walmartimages.com
@@ -2645,7 +2637,6 @@ img.fastcybers.com
 img.hellofresh.com
 img.sparknotes.com
 imgproxy.windy.com
-imgrs.apkcombo.com
 imgs3.hcaptcha.com
 +.intercomassets.com
 +.ipfs-gateway.cloud
@@ -2797,7 +2788,6 @@ videos.elephas.app
 videos.ohentai.org
 videos2.edclub.com
 vids.imagepost.com
-walter-r2.trakt.tv
 +.warnermediacdn.com
 web-cdn.bitrise.io
 webp.frostming.com
@@ -3105,7 +3095,6 @@ static.zerochan.net
 storageapi.fleek.co
 sync.getpublica.com
 tag.unifyintent.com
-tags.nationwide.com
 thumb.wikimedia.org
 thumbnails.padre.gg
 thumbs.onlyfans.com
@@ -3185,9 +3174,9 @@ cdn.boostcommerce.io
 cdn.botframework.com
 cdn.buymeacoffee.com
 cdn.c1.amplience.net
+cdn.capcom-unity.com
 cdn.clever-cloud.com
 cdn.cnx-software.com
-cdn.downdetector.com
 cdn.dynamicyield.com
 cdn.fastcomments.com
 cdn.forms.office.net
@@ -3382,8 +3371,6 @@ statics.simpshub.com
 stats.codesandbox.io
 status.canarymail.io
 +.steamusercontent.com
-storage.synctrack.io
-storageapi.fleek.one
 storageapi2.fleek.co
 +.superfiliate-cdn.com
 +.superhumanstatic.com
@@ -3484,7 +3471,9 @@ cdn11.bigcommerce.com
 cdn2-imgix.macpaw.com
 cdn2.downdetector.com
 cdn2.unrealengine.com
+cdn3.downdetector.com
 cdn3.unrealengine.com
+cdn4.downdetector.com
 cdn77.boyfriendtv.com
 cdna.pcpartpicker.com
 cdne-pics.youjizz.com
@@ -3577,7 +3566,6 @@ oneocsp.microsoft.com
 opensignal.cdnbye.com
 organizer.bizzabo.com
 +.parsecusercontent.com
-participants.evolv.ai
 pictures-cdn.porn.com
 pixel-cdn.default.com
 platform.theverge.com
@@ -3923,6 +3911,7 @@ cdn-static-1.medium.com
 cdn-uicons.flaticon.com
 cdn.northropgrumman.com
 cdn.prod.www.spiegel.de
+cdn.promo.capcomusa.com
 cdn.ready-market.com.tw
 +.cdn.survey.medallia.com
 cdn.worldvectorlogo.com
@@ -4220,6 +4209,7 @@ hub-assets.displaycal.net
 hv-monsterdb-data.skk.moe
 im.np-payment-gateway.com
 image-forwarder.notaku.so
+image.icon-gen.svc.ui.com
 image.p-c2-x.abema-tv.com
 images.microcms-assets.io
 images.opencollective.com
@@ -4229,6 +4219,7 @@ lastfm.freetls.fastly.net
 lift-ai-js.marketlinc.com
 logos.speedtestcustom.com
 lzd-img-global.slatic.net
+manifest.prod.boltdns.net
 marketing.thingiverse.com
 mir-s3-cdn-cf.behance.net
 mixin-images.zeromesh.net
@@ -4274,9 +4265,6 @@ trekcdnprod.azureedge.net
 tuf-repo-cdn.sigstore.dev
 ubistatic2-a.akamaihd.net
 unlimited-cdn.waifu2x.net
-v-tiles1.downdetector.com
-v-tiles2.downdetector.com
-v-tiles3.downdetector.com
 vz-2222604c-50b.b-cdn.net
 vz-c0fe498e-5ab.b-cdn.net
 web-assets.esetstatic.com
