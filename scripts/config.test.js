@@ -53,6 +53,23 @@ test('published providers keep their URLs and prefixes with independent startup 
   assert.throws(() => applySubscriptions(template, [], urls, names, [snapshots[0], []]), /订阅 2 缺少启动/);
 });
 
+test('VLESS null flow is omitted without changing valid flow or the source snapshot', () => {
+  const proxies = [
+    { name: '日本 WS', type: 'vless', server: '127.0.0.1', port: 443, uuid: '00000000-0000-4000-8000-000000000001', network: 'ws', flow: null },
+    { name: '美国 Vision', type: 'vless', server: '127.0.0.1', port: 443, uuid: '00000000-0000-4000-8000-000000000002', tls: true, flow: 'xtls-rprx-vision' },
+  ];
+  const output = applySubscriptions(template, [], urls, names, [proxies, proxies]);
+  const c = validateConfig(output);
+  for (const provider of Object.values(c['proxy-providers'])) {
+    assert.ok(!Object.hasOwn(provider.payload[0], 'flow'));
+    assert.deepEqual(provider.payload[1], proxies[1]);
+    const { flow, ...expected } = proxies[0];
+    assert.deepEqual(provider.payload[0], expected);
+  }
+  assert.equal(proxies[0].flow, null);
+  if (process.env.MIHOMO_BIN) validateWithCore(output, 'VLESS null flow');
+});
+
 test('rule download URLs and outbound references are validated before isolation', () => {
   const c = validateConfig(applySubscriptions(template, [], urls, names));
   const p = c['rule-providers'].apple_intelligence;

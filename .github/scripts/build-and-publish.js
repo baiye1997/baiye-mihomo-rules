@@ -181,7 +181,13 @@ function applySubscriptions(template, serverDomainFilters = [], urls = subUrls, 
     doc.setIn(["proxy-providers", key, "override", "additional-prefix"], names[index] || `[Sub${index + 1}]`);
     if (snapshots) {
       if (!Array.isArray(snapshots[index]) || !snapshots[index].length) throw new Error(`订阅 ${index + 1} 缺少启动节点快照`);
-      doc.setIn(["proxy-providers", key, "payload"], snapshots[index]);
+      doc.setIn(["proxy-providers", key, "payload"], snapshots[index].map(proxy => {
+        // Some VLESS subscriptions emit null for an absent flow; Mihomo requires omission or a string.
+        if (proxy.type !== 'vless' || proxy.flow !== null) return proxy;
+        const normalized = { ...proxy };
+        delete normalized.flow;
+        return normalized;
+      }));
       doc.setIn(["proxy-providers", key, "proxy"], "🚀 节点选择");
     }
   }
