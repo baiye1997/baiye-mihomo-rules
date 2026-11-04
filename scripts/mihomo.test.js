@@ -105,40 +105,31 @@ async function runConfig(name, nodes, check, mini = false, cold = false) {
   }
 }
 
-const normal = ['美国正常', '美国低倍率 0.5X', '日本原生x15', '韩国 AI专用', '台湾正常', '🇺🇸 Ashland AI', '🇳🇱 Netherlands 01', 'LAN', '香港普通', '🇭🇰 下载专用01x3', '🇺🇸 下载专用USx3', '🇯🇵 下载专用03x3', '🇭🇰 下载专用04x3', '美国 3X', '美国x30', '美国13x'];
+const extraAiNames = ['🇻🇳 越南原生', '🇲🇾Malaysia 01', '🇦🇺Australia 01', '🇮🇩 印度尼西亚', '🇮🇳India 01', '🇫🇷 法国原生', '🇬🇧 英国原生', '🇩🇪 德国原生', '🇪🇸 西班牙原生', '🇳🇱 Netherlands 01', '🇹🇷 土耳其原生', '🇨🇦 加拿大', '🇮🇹Italy 01', '🇺🇦 乌克兰', '🇵🇹 葡萄牙', '🇿🇦 南非', '🇲🇽México 01', '🇧🇷Brazil 01', '🇹🇭Thailand 01'];
+const normal = ['美国正常', '美国低倍率 0.5X', '日本原生x15', '韩国 AI专用', '台湾正常', '🇺🇸 Ashland AI', '🇳🇱 Netherlands 01', 'LAN', '香港普通', '🇭🇰 下载专用01x3', '🇺🇸 下载专用USx3', '🇯🇵 下载专用03x3', '🇭🇰 下载专用04x3', '美国 3X', '美国x30', '美国13x', '🇺🇸United States 01', '🇨🇳Taiwan 01', '🇸🇬Singapore 01', '🇯🇵Japan 01', '🇺🇸 美国A1|国际优化', '🇰🇷 韩国原生', '剩余流量：1000 GB', '距离下次重置剩余：30 天', '套餐到期：2026-12-04', '官网：极速云导航.com'];
+normal.push(...extraAiNames.filter(n => !normal.includes(n)), '俄罗斯普通', '未知地区普通', '香港 AI专用', '🇭🇰 ChatGPT', 'Hong Kong Claude', 'HK AI', 'HKG Gemini');
 for (const name of fs.readdirSync('config').filter(n => n.endsWith('.yaml'))) {
-  test(`${name}: core routing, name filters and low-rate preference`, { skip: !enabled, timeout: 30000 }, async () => {
+  test(`${name}: core routing and subscription name filters`, { skip: !enabled, timeout: 30000 }, async () => {
     await runConfig(name, normal, async ({ get, connect, logs }) => {
       const groups = (await get('proxies')).proxies;
       const ai = groups['🧠 AI 专用节点'].all;
       assert.ok(ai.some(n => n.includes('Ashland')));
       assert.ok(ai.some(n => n.includes('台湾')));
+      for (const name of ['🇺🇸United States 01', '🇨🇳Taiwan 01', '🇸🇬Singapore 01', '🇯🇵Japan 01', '🇺🇸 美国A1|国际优化']) {
+        assert.ok(ai.includes('[天照]' + name), name);
+      }
+      assert.ok(!groups['👆 手动选择'].all.some(n => /剩余|到期|官网/.test(n)));
+      assert.ok(ai.some(n => n.includes('韩国原生')));
       assert.ok(ai.some(n => n.includes('日本原生x15')));
-      assert.ok(!ai.some(n => n.includes('韩国') || n.includes('香港普通')));
+      assert.ok(ai.some(n => n.includes('韩国 AI专用')));
+      assert.ok(!ai.some(n => /香港|🇭🇰|Hong Kong|\]HK |\]HKG |俄罗斯普通|未知地区普通/.test(n)));
+      for (const name of extraAiNames) assert.ok(ai.includes('[天照]' + name), name);
       assert.ok(groups['👆 手动选择'].all.some(n => n.includes('Netherlands')));
       assert.ok(!groups['👆 手动选择'].all.some(n => n.endsWith(']LAN')));
-      assert.ok(!groups['♻️ 智能选择'].all.some(n => /x15|0\.5X/.test(n)));
-      if (groups['♻️ 低倍率自动']) {
-        assert.equal(groups['📦 CDN 低倍率'].type, 'Selector');
-        assert.equal(groups['♻️ 低倍率自动'].type, 'URLTest');
-        assert.ok(groups['♻️ 低倍率自动'].now.includes('0.5X') || /x3|3X/i.test(groups['♻️ 低倍率自动'].now));
-        assert.equal(groups['📦 CDN 低倍率'].now, '♻️ 低倍率自动');
-        assert.ok(groups['📦 CDN 低倍率'].all.includes('🚀 节点选择'));
-        assert.ok(groups['📦 CDN 低倍率'].all.includes('👆 手动选择'));
-        // Mihomo omits explicit DIRECT from a selector's runtime `all` list.
-        assert.ok(!groups['♻️ 低倍率测速']);
-      }
-      const cloudLow = normal.filter(n => /x3$| 3X$/.test(n)).map(n => '[月读]' + n);
-      for (const name of cloudLow) {
-        assert.ok(!groups['♻️ 智能选择'].all.includes(name));
-        if (groups['📦 CDN 低倍率'] && groups['👆 手动选择'].all.includes(name)) {
-          assert.ok(groups['📦 CDN 低倍率'].all.includes(name), name);
-        }
-      }
-      assert.ok(groups['♻️ 智能选择'].all.includes('[天照]美国 3X'));
-      if (groups['📦 CDN 低倍率']) {
-        assert.ok(!groups['📦 CDN 低倍率'].all.includes('[天照]美国 3X'));
-        assert.ok(!groups['📦 CDN 低倍率'].all.some(n => /x30|13x|x15/.test(n)));
+      assert.ok(!groups['♻️ 智能选择'].all.some(n => /x15/.test(n)));
+      assert.ok(!Object.keys(groups).some(n => /^(📦 CDN|♻️).*低倍率/.test(n)));
+      for (const name of ['[天照]美国低倍率 0.5X', '[月读]美国 3X']) {
+        if (groups['👆 手动选择'].all.includes(name)) assert.ok(groups['♻️ 智能选择'].all.includes(name));
       }
 
       for (const domain of ['chatgpt.com','api.anthropic.com','gemini.google.com','apple-relay.apple.com','apple-relay.cloudflare.com','push.apple.com','dl.steam.clngaa.com','steamchina.com','cn.apple.com','gs-loc-cn.apple.com']) await connect(domain);
@@ -152,16 +143,6 @@ for (const name of fs.readdirSync('config').filter(n => n.endsWith('.yaml'))) {
   });
 }
 
-test('no low-rate nodes: visible CDN selector keeps manual fallback', { skip: !enabled, timeout: 30000 }, async () => {
-  await runConfig('baiye-single.yaml', ['美国正常','韩国原生x15'], async ({ get }) => {
-    const p=(await get('proxies')).proxies;
-    assert.equal(p['📦 CDN 低倍率'].now, '♻️ 低倍率自动');
-    assert.equal(p['♻️ 低倍率自动'].now, 'REJECT');
-    assert.ok(p['📦 CDN 低倍率'].all.includes('🚀 节点选择'));
-    assert.equal(p['🇰🇷 - 择优节点'].now, 'REJECT');
-  });
-});
-
 test('mini without eligible AI nodes rejects instead of selecting COMPATIBLE', { skip: !enabled, timeout: 30000 }, async () => {
   await runConfig('baiye-multiple-lite.yaml', ['香港普通'], async ({ get }) => {
     const p=(await get('proxies')).proxies;
@@ -170,17 +151,6 @@ test('mini without eligible AI nodes rejects instead of selecting COMPATIBLE', {
   }, true);
 });
 
-
-test('low-rate pool keeps its selected node without hiding ordinary nodes', { skip: !enabled, timeout: 30000 }, async () => {
-  await runConfig('baiye-single.yaml', ['美国正常', { name: '美国低倍率 0.5X', type: 'socks5', server: '127.0.0.1', port: 9 }], async ({ get }) => {
-    let p;
-    for (let i=0;i<60;i++) { p=(await get('proxies')).proxies; if(p['♻️ 低倍率自动'].now.includes('美国低倍率')) break; await pause(100); }
-    assert.ok(p['♻️ 低倍率自动'].now.includes('美国低倍率'));
-    assert.equal(p['📦 CDN 低倍率'].now, '♻️ 低倍率自动');
-    assert.ok(p['📦 CDN 低倍率'].all.includes('🚀 节点选择'));
-    assert.ok(p['♻️ 智能选择'].now.includes('美国正常'));
-  });
-});
 
 test('cold start downloads all HTTP rule sets through payload nodes when both subscriptions return 503', { skip: !enabled, timeout: 30000 }, async () => {
   await runConfig('baiye-multiple.yaml', ['美国启动节点'], async ({ get, connect, logs, ruleDownloads }) => {
