@@ -5,7 +5,7 @@ permissions:
   contents: read
 jobs:
   diagnose:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v5
@@ -21,7 +21,7 @@ jobs:
           node - <<'JS'
           const {spawnSync}=require('child_process');
           const YAML=require('yaml');
-          for(const ua of ['clash.meta','ClashMeta/v1.19.29','FlClash/v0.8.92','Mozilla/5.0']) {
+          for(const ua of ['clash.meta']) {
             const r=spawnSync('curl',['-sS','-L','--connect-timeout','10','--max-time','25','-A',ua,'-w','\n%{http_code}',process.env.SUB_URL_1],{encoding:'utf8',timeout:30000});
             const body=(r.stdout||'').slice(0,-4),status=(r.stdout||'').slice(-3);
             let nodes=0;try {nodes=YAML.parse(body)?.proxies?.length||0;}catch{}
