@@ -155,6 +155,7 @@ async function collectSubscriptions() {
       return data.proxies;
     } catch (e) {
       // Never publish a configuration that needs unavailable nodes to fetch its own nodes.
+      // Only emit known codes, never error messages that may contain URLs or YAML credentials.
       const code = /^(HTTP_[1-5][0-9]{2}|ECONNRESET|ECONNREFUSED|ENOTFOUND|EAI_AGAIN|ETIMEDOUT|EPROTO|CERT_HAS_EXPIRED|UNABLE_TO_VERIFY_LEAF_SIGNATURE|ERR_TLS_CERT_ALTNAME_INVALID)$/.test(e.code || '') ? e.code : 'UNKNOWN';
       throw new Error(`订阅 ${i + 1} 节点快照获取失败，停止发布 (stage=${stage}, code=${code})`);
     }
@@ -340,5 +341,5 @@ async function main() {
   }
 }
 
-module.exports = { applySubscriptions, extractServerDomainFilters, deriveMini, collectSubscriptions };
+module.exports = { applySubscriptions, extractServerDomainFilters, deriveMini };
 if (require.main === module) main();
