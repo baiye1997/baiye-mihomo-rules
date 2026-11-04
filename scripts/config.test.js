@@ -85,8 +85,15 @@ test('failed snapshot download stops publication without exposing the subscripti
   const agents = [];
   const server = http.createServer((req, res) => {
     agents.push(req.headers['user-agent']);
-    if (req.url === '/secret-subscription-token') res.writeHead(302, { Location: '/redirected-subscription' });
-    else res.writeHead(503);
+    if (req.url === '/secret-subscription-token/http') {
+      res.writeHead(302, { Location: '/redirected-subscription' });
+    } else if (req.url === '/secret-subscription-token/parse') {
+      res.end('proxies: [secret-subscription-token'); return;
+    } else if (req.url === '/secret-subscription-token/validate') {
+      res.end('proxies: []'); return;
+    } else if (req.url === '/secret-subscription-token/reset') {
+      req.socket.destroy(); return;
+    } else res.writeHead(503);
     res.end();
   });
   server.listen(0, '127.0.0.1'); await once(server, 'listening');
@@ -94,13 +101,22 @@ test('failed snapshot download stops publication without exposing the subscripti
     const env = { ...process.env, DRY_RUN: 'false', GIST_TOKEN: 'test-only', GIST_ID_STANDARD: 'test-only', STATUS_FILE: '',
       CONFIG_MULTIPLE_STD: '', CONFIG_SINGLE_STD: 'config/baiye-single.yaml', CONFIG_MULTIPLE_LITE: '', CONFIG_SINGLE_LITE: '',
       SUB_URLS: `http://127.0.0.1:${server.address().port}/secret-subscription-token` };
-    await assert.rejects(execFile(process.execPath, ['.github/scripts/build-and-publish.js'], { env, timeout: 5000 }), error => {
-      assert.equal(error.code, 1);
-      assert.match(error.stderr, /节点快照获取失败/);
-      assert.ok(!error.stderr.includes('secret-subscription-token'));
-      return true;
-    });
-    assert.deepEqual(agents, ['clash.meta', 'clash.meta']);
+    for (const [mode, diagnostic] of [
+      ['http', 'stage=download, code=HTTP_503'],
+      ['parse', 'stage=parse, code=UNKNOWN'],
+      ['validate', 'stage=validate, code=UNKNOWN'],
+      ['reset', 'stage=download, code=ECONNRESET'],
+    ]) {
+      await assert.rejects(execFile(process.execPath, ['.github/scripts/build-and-publish.js'], { env: { ...env, SUB_URLS: env.SUB_URLS + '/' + mode }, timeout: 5000 }), error => {
+        assert.equal(error.code, 1);
+        assert.ok(error.stderr.includes(diagnostic), error.stderr);
+        assert.ok(!error.stderr.includes('secret-subscription-token'));
+        assert.ok(!error.stderr.includes('redirected-subscription'));
+        assert.ok(!error.stderr.includes('127.0.0.1'));
+        return true;
+      });
+    }
+    assert.deepEqual(agents, Array(5).fill('clash.meta'));
   } finally { server.closeAllConnections(); await new Promise(resolve => server.close(resolve)); }
 });
 
