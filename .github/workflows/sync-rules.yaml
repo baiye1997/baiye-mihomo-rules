@@ -1,85 +1,28 @@
 name: Sync External Rules
-
 on:
-  schedule:
-    - cron: "0 22 * * *"     # UTC 22:00（东八区 06:00）
   workflow_dispatch: {}
-
-concurrency:
-  group: sync-external-rules
-  cancel-in-progress: true
-
 permissions:
-  contents: read   # 拉取用；推送用 PAT
-
+  contents: read
 jobs:
-  sync:
+  diagnose:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
-    
+    timeout-minutes: 5
     steps:
-      - name: Checkout
-        uses: actions/checkout@v5
-        with:
-          fetch-depth: 1 # 优化：只拉取最新代码
-          persist-credentials: false
-
-      - name: Update rule files
-        run: bash scripts/update_rules.sh
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v5
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
           node-version: 20
-
-      - name: Install validation dependencies
-        run: npm ci --ignore-scripts
-
-      - name: Prepare pinned Mihomo and Geo data
-        run: bash .github/scripts/prepare-mihomo.sh
-
-      - name: Validate downloaded rules before committing
-        run: npm test
-
-      - name: Detect changes
-        id: diff
-        shell: bash
-        run: |
-          set -euo pipefail
-          if git status --porcelain | grep .; then
-            echo "changed=true" >>"$GITHUB_OUTPUT"
-          else
-            echo "changed=false" >>"$GITHUB_OUTPUT"
-          fi
-
-      - name: Commit & Push (PAT)
-        if: steps.diff.outputs.changed == 'true'
+      - run: npm ci --ignore-scripts
+      - name: Diagnose subscription snapshots without publication
         env:
-          GH_PAT: ${{ secrets.ACTIONS_PAT }}
-        shell: bash
+          SUB_URL_1: ${{ secrets.SUB_URL_1 }}
+          SUB_URL_2: ${{ secrets.SUB_URL_2 }}
         run: |
-          set -euo pipefail
-          git config user.name  "baiye-bot"
-          git config user.email "baiye-bot@users.noreply.github.com"
-          
-          git add rules/
-          git commit -m "chore(sync): update external rules from upstream"
-          
-          # 优化：更安全的 Push 方式
-          git config --global url."https://x-access-token:${GH_PAT}@github.com/".insteadOf "https://github.com/"
-          git push origin HEAD:${{ github.ref_name }}
-
-      - name: Summary
-        if: always()
-        shell: bash
-        run: |
-          echo "## Sync result" >> "$GITHUB_STEP_SUMMARY"
-          if [ "${{ steps.diff.outputs.changed }}" = "true" ]; then
-            echo "" >> "$GITHUB_STEP_SUMMARY"
-            echo "**Changed files:**" >> "$GITHUB_STEP_SUMMARY"
-            # 因为 fetch-depth=1，且刚 commit 了一次，所以 HEAD~1 是有效的
-            git diff --name-only HEAD~1 HEAD | sed 's/^/- /' >> "$GITHUB_STEP_SUMMARY" || echo "Check commits for details"
-          else
-            echo "" >> "$GITHUB_STEP_SUMMARY"
-            echo "No changes." >> "$GITHUB_STEP_SUMMARY"
-          fi
+          node - <<'JS'
+          const {spawnSync}=require('child_process');
+          for(let i=1;i<=2;i++) {
+            const result=spawnSync(process.execPath,['-e',"require('./.github/scripts/build-and-publish').collectSubscriptions().then(r=>console.log('OK nodes='+r.snapshots[0].length)).catch(e=>console.log(e.message))"],{env:{...process.env,SUB_URLS:process.env['SUB_URL_'+i]},encoding:'utf8',timeout:30000});
+            console.log('slot '+i+': '+result.stdout.trim());
+            if(result.error) console.log('process timeout');
+          }
+          JS

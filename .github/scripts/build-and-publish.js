@@ -126,15 +126,16 @@ function httpsText(url, redirects = 3) {
       }
       if (res.statusCode < 200 || res.statusCode >= 300) {
         res.resume();
-        reject(new Error(`HTTP ${res.statusCode}`));
+        reject(Object.assign(new Error('HTTP failure'), { code: `HTTP_${res.statusCode}` }));
         return;
       }
       let data = "";
       res.setEncoding("utf8");
       res.on("data", d => data += d);
       res.on("end", () => resolve(data));
+      res.on("error", reject);
     });
-    req.on("timeout", () => req.destroy(new Error("timeout")));
+    req.on("timeout", () => req.destroy(Object.assign(new Error('timeout'), { code: 'ETIMEDOUT' })));
     req.on("error", reject);
   });
 }
@@ -143,15 +144,19 @@ async function collectSubscriptions() {
   const filters = new Set(manualServerDomains);
   const snapshots = await Promise.all(subUrls.map(async (url, i) => {
     if (!url) return null;
+    let stage = 'download';
     try {
       const text = await httpsText(url);
+      stage = 'parse';
       const data = YAML.parse(text, { merge: true, maxAliasCount: 10000 });
+      stage = 'validate';
       if (!Array.isArray(data?.proxies) || !data.proxies.length) throw new Error("empty snapshot");
       extractServerDomainFilters(text).forEach(d => filters.add(d));
       return data.proxies;
     } catch (e) {
       // Never publish a configuration that needs unavailable nodes to fetch its own nodes.
-      throw new Error(`订阅 ${i + 1} 节点快照获取失败，停止发布`);
+      const code = /^(HTTP_[1-5][0-9]{2}|ECONNRESET|ECONNREFUSED|ENOTFOUND|EAI_AGAIN|ETIMEDOUT|EPROTO|CERT_HAS_EXPIRED|UNABLE_TO_VERIFY_LEAF_SIGNATURE|ERR_TLS_CERT_ALTNAME_INVALID)$/.test(e.code || '') ? e.code : 'UNKNOWN';
+      throw new Error(`订阅 ${i + 1} 节点快照获取失败，停止发布 (stage=${stage}, code=${code})`);
     }
   }));
   return { filters: [...filters].sort((a, b) => a.localeCompare(b)), snapshots };
@@ -335,5 +340,5 @@ async function main() {
   }
 }
 
-module.exports = { applySubscriptions, extractServerDomainFilters, deriveMini };
+module.exports = { applySubscriptions, extractServerDomainFilters, deriveMini, collectSubscriptions };
 if (require.main === module) main();

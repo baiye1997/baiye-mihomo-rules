@@ -96,7 +96,7 @@ test('failed snapshot download stops publication without exposing the subscripti
       SUB_URLS: `http://127.0.0.1:${server.address().port}/secret-subscription-token` };
     await assert.rejects(execFile(process.execPath, ['.github/scripts/build-and-publish.js'], { env, timeout: 5000 }), error => {
       assert.equal(error.code, 1);
-      assert.match(error.stderr, /节点快照获取失败/);
+      assert.match(error.stderr, /节点快照获取失败.*stage=download, code=HTTP_503/);
       assert.ok(!error.stderr.includes('secret-subscription-token'));
       return true;
     });
