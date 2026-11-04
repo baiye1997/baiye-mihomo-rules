@@ -105,7 +105,7 @@ async function runConfig(name, nodes, check, mini = false, cold = false) {
   }
 }
 
-const normal = ['美国正常', '美国低倍率 0.5X', '日本原生x15', '韩国 AI专用', '台湾正常', '🇺🇸 Ashland AI', '🇳🇱 Netherlands 01', 'LAN', '香港普通', '🇭🇰 下载专用01x3', '🇺🇸 下载专用USx3', '🇯🇵 下载专用03x3', '🇭🇰 下载专用04x3', '美国 3X', '美国x30', '美国13x'];
+const normal = ['美国正常', '美国低倍率 0.5X', '日本原生x15', '韩国 AI专用', '台湾正常', '🇺🇸 Ashland AI', '🇳🇱 Netherlands 01', 'LAN', '香港普通', '🇭🇰 下载专用01x3', '🇺🇸 下载专用USx3', '🇯🇵 下载专用03x3', '🇭🇰 下载专用04x3', '美国 3X', '美国x30', '美国13x', '🇺🇸United States 01', '🇨🇳Taiwan 01', '🇸🇬Singapore 01', '🇯🇵Japan 01', '🇺🇸 美国A1|国际优化', '🇰🇷 韩国原生', '剩余流量：1000 GB', '距离下次重置剩余：30 天', '套餐到期：2026-12-04', '官网：极速云导航.com'];
 for (const name of fs.readdirSync('config').filter(n => n.endsWith('.yaml'))) {
   test(`${name}: core routing, name filters and low-rate preference`, { skip: !enabled, timeout: 30000 }, async () => {
     await runConfig(name, normal, async ({ get, connect, logs }) => {
@@ -113,6 +113,11 @@ for (const name of fs.readdirSync('config').filter(n => n.endsWith('.yaml'))) {
       const ai = groups['🧠 AI 专用节点'].all;
       assert.ok(ai.some(n => n.includes('Ashland')));
       assert.ok(ai.some(n => n.includes('台湾')));
+      for (const name of ['🇺🇸United States 01', '🇨🇳Taiwan 01', '🇸🇬Singapore 01', '🇯🇵Japan 01', '🇺🇸 美国A1|国际优化']) {
+        assert.ok(ai.includes('[天照]' + name), name);
+      }
+      assert.ok(!groups['👆 手动选择'].all.some(n => /剩余|到期|官网/.test(n)));
+      assert.ok(!ai.some(n => n.includes('韩国原生')));
       assert.ok(ai.some(n => n.includes('日本原生x15')));
       assert.ok(!ai.some(n => n.includes('韩国') || n.includes('香港普通')));
       assert.ok(groups['👆 手动选择'].all.some(n => n.includes('Netherlands')));
@@ -152,11 +157,12 @@ for (const name of fs.readdirSync('config').filter(n => n.endsWith('.yaml'))) {
   });
 }
 
-test('no low-rate nodes: visible CDN selector keeps manual fallback', { skip: !enabled, timeout: 30000 }, async () => {
+test('no low-rate nodes: CDN uses smart selection without changing selector structure', { skip: !enabled, timeout: 30000 }, async () => {
   await runConfig('baiye-single.yaml', ['美国正常','韩国原生x15'], async ({ get }) => {
     const p=(await get('proxies')).proxies;
     assert.equal(p['📦 CDN 低倍率'].now, '♻️ 低倍率自动');
-    assert.equal(p['♻️ 低倍率自动'].now, 'REJECT');
+    assert.equal(p['♻️ 低倍率自动'].now, '♻️ 智能选择');
+    assert.ok(p['♻️ 智能选择'].now.includes('美国正常'));
     assert.ok(p['📦 CDN 低倍率'].all.includes('🚀 节点选择'));
     assert.equal(p['🇰🇷 - 择优节点'].now, 'REJECT');
   });

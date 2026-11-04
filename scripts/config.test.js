@@ -112,7 +112,7 @@ for (const name of fs.readdirSync('config').filter(n => n.endsWith('.yaml'))) {
     assert.ok(c.rules.indexOf('RULE-SET,apple_intelligence,🤖 AI 平台') < c.rules.findIndex(r => r.startsWith('GEOSITE,apple,') || r.startsWith('RULE-SET,apple_services,')));
     assert.ok(c.rules.includes('DOMAIN-SUFFIX,push.apple.com,DIRECT'));
     assert.ok(c.rules.findIndex(r => r.startsWith('GEOSITE,category-games@cn,')) < c.rules.indexOf('RULE-SET,game_non_ip,🎮 游戏平台'));
-    for (const g of c['proxy-groups'].filter(g => g['include-all-providers'] && !g.proxies?.length)) assert.equal(g['empty-fallback'], 'REJECT');
+    for (const g of c['proxy-groups'].filter(g => g['include-all-providers'] && !g.proxies?.length)) assert.equal(g['empty-fallback'], g.name === '♻️ 低倍率自动' ? '♻️ 智能选择' : 'REJECT');
     if (c['proxy-groups'].some(g => g.name === '📦 CDN 低倍率')) {
       const low = c['proxy-groups'].find(g => g.name === '📦 CDN 低倍率');
       const auto = c['proxy-groups'].find(g => g.name === '♻️ 低倍率自动');
