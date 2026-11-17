@@ -148,7 +148,10 @@ ai: &ai '(?i)^(?!.*(?:香港|🇭🇰|Hong[ -]?Kong|(?:^|[^A-Za-z])(?:HK|HKG)(?:
 proxy-groups:
   - {name: "🚀 节点选择", <<: *entr, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/choice.png"}
   - {name: "👆 手动选择", <<: *sel, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/select.png"}
-  - {name: "♻️ 智能选择", <<: *test, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/auto.png"}
+  # URLTest returns its first candidate when all probes fail. Reject rather than dial a failed node.
+  - {name: "♻️ 智能选择", <<: *test, proxies: [REJECT], icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/auto.png"}
+  # Keep rule and subscription downloads available before health checks complete.
+  - {name: "📥 资源下载", <<: *test}
 
   - {name: "🌐 全球直连", <<: *drc, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/link.png"}
   - {name: "🤖 AI 平台", <<: *aiapp, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/openai.png"}
@@ -176,8 +179,8 @@ proxy-groups:
   - {name: "🇺🇸 - 自动回退", <<: *fall, filter: *us}
 
 # ======================= 规则集 =======================
-cls: &cls {type: http, behavior: classical, interval: 43200, format: text, proxy: "🚀 节点选择"}
-dom: &dom {type: http, behavior: domain, interval: 43200, format: text, proxy: "🚀 节点选择"}
+cls: &cls {type: http, behavior: classical, interval: 43200, format: text, proxy: "📥 资源下载"}
+dom: &dom {type: http, behavior: domain, interval: 43200, format: text, proxy: "📥 资源下载"}
 
 rule-providers:
   game_non_ip:          {<<: *cls, url: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/non_ip/game.txt", path: ./rules/non_ip/game.txt}

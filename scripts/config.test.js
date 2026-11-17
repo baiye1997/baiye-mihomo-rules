@@ -45,7 +45,7 @@ test('published providers keep their URLs and prefixes with independent startup 
     Object.values(c['proxy-providers']).forEach((p, index) => {
       assert.deepEqual(p.payload, snapshots[index]);
       assert.equal(p.url, urls[index]);
-      assert.equal(p.proxy, '🚀 节点选择');
+      assert.equal(p.proxy, '📥 资源下载');
       assert.equal(p.override['additional-prefix'], names[index]);
     });
     if (process.env.MIHOMO_BIN) validateWithCore(text, name);

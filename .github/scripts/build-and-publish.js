@@ -188,7 +188,7 @@ function applySubscriptions(template, serverDomainFilters = [], urls = subUrls, 
         delete normalized.flow;
         return normalized;
       }));
-      doc.setIn(["proxy-providers", key, "proxy"], "🚀 节点选择");
+      doc.setIn(["proxy-providers", key, "proxy"], "📥 资源下载");
     }
   }
   if (serverDomainFilters.length) {

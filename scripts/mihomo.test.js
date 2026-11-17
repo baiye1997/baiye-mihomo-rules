@@ -27,6 +27,7 @@ async function runConfig(name, nodes, check, mini = false, cold = false) {
       ruleDownloads++;
       res.writeHead(200); res.end(fs.readFileSync(path.join(process.cwd(), req.url))); return;
     }
+    if (req.url === '/') { setTimeout(() => res.writeHead(204).end(), 25); return; }
     res.writeHead(204); res.end();
   });
   health.listen(0, '127.0.0.1'); await once(health, 'listening');
@@ -46,7 +47,7 @@ async function runConfig(name, nodes, check, mini = false, cold = false) {
       fs.rmSync(path.join(dir, 'rules'), { recursive: true, force: true });
       c['proxy-providers'] = original['proxy-providers'];
       c['rule-providers'] = original['rule-providers'];
-      for (const p of Object.values(c['proxy-providers'])) { p.url = probe + 'subscription'; p.proxy = '🚀 节点选择'; }
+      for (const p of Object.values(c['proxy-providers'])) { p.url = probe + 'subscription'; p.proxy = '📥 资源下载'; }
       for (const p of Object.values(c['rule-providers'])) p.url = probe + p.path.replace(/^\.\//, '');
     }
     for (const [key, p] of Object.entries(c['proxy-providers'])) {
@@ -62,9 +63,9 @@ async function runConfig(name, nodes, check, mini = false, cold = false) {
     let logs = '';
     proc = spawn(process.env.MIHOMO_BIN, ['-d', dir, '-f', file]);
     proc.stdout.on('data', b => logs += b); proc.stderr.on('data', b => logs += b);
-    async function get(resource) {
+    async function get(resource, allowedStatus = 200) {
       const res = await fetch(`http://127.0.0.1:${api}/${resource}`, { signal: AbortSignal.timeout(1000) });
-      assert.ok(res.ok); return res.json();
+      assert.equal(res.status, allowedStatus); return res.json();
     }
     async function request(domain) {
       await new Promise((resolve, reject) => {
@@ -97,7 +98,7 @@ async function runConfig(name, nodes, check, mini = false, cold = false) {
       for (let i = 0; i < 100 && !logs.includes(`--> ${domain}:`); i++) await pause(20);
       assert.ok(logs.includes(`--> ${domain}:`), `No routing result for ${domain}\n${logs}`);
     }
-    await check({ get, connect, logs: () => logs, ruleDownloads: () => ruleDownloads });
+    await check({ get, connect, probe, logs: () => logs, ruleDownloads: () => ruleDownloads });
   } finally {
     if (proc && proc.exitCode === null) { proc.kill(); await once(proc, 'exit'); }
     health.closeAllConnections(); await new Promise(resolve => health.close(resolve));
@@ -110,7 +111,9 @@ const normal = ['美国正常', '美国低倍率 0.5X', '日本原生x15', '韩�
 normal.push(...extraAiNames.filter(n => !normal.includes(n)), '俄罗斯普通', '未知地区普通', '香港 AI专用', '🇭🇰 ChatGPT', 'Hong Kong Claude', 'HK AI', 'HKG Gemini');
 for (const name of fs.readdirSync('config').filter(n => n.endsWith('.yaml'))) {
   test(`${name}: core routing and subscription name filters`, { skip: !enabled, timeout: 30000 }, async () => {
-    await runConfig(name, normal, async ({ get, connect, logs }) => {
+    await runConfig(name, normal, async ({ get, connect, logs, probe }) => {
+      const smart = encodeURIComponent('♻️ 智能选择');
+      await get(`group/${smart}/delay?url=${encodeURIComponent(probe)}&timeout=1000`);
       const groups = (await get('proxies')).proxies;
       const ai = groups['🧠 AI 专用节点'].all;
       assert.ok(ai.some(n => n.includes('Ashland')));
@@ -142,6 +145,22 @@ for (const name of fs.readdirSync('config').filter(n => n.endsWith('.yaml'))) {
     });
   });
 }
+
+test('smart selection rejects when all nodes fail and selects a healthy node when one is available', { skip: !enabled, timeout: 30000 }, async () => {
+  const down = { name: '美国不可用', type: 'socks5', server: '127.0.0.1', port: await freePort() };
+  const checkSelection = expected => async ({ get, probe }) => {
+    const smart = encodeURIComponent('♻️ 智能选择');
+    await get(`group/${smart}/delay?url=${encodeURIComponent(probe)}&timeout=1000`, expected.test('REJECT') ? 504 : 200);
+    const proxies = (await get('proxies')).proxies;
+    const provider = await get('providers/proxies/Sub-1');
+    const failed = provider.proxies.find(p => p.name === '[天照]美国不可用');
+    assert.ok(failed);
+    assert.equal(failed.extra[probe].alive, false);
+    assert.match(proxies['♻️ 智能选择'].now, expected);
+  };
+  await runConfig('baiye-multiple.yaml', [down], checkSelection(/^REJECT$/));
+  await runConfig('baiye-multiple.yaml', [down, '日本可用'], checkSelection(/日本可用$/));
+});
 
 test('mini without eligible AI nodes rejects instead of selecting COMPATIBLE', { skip: !enabled, timeout: 30000 }, async () => {
   await runConfig('baiye-multiple-lite.yaml', ['香港普通'], async ({ get }) => {
