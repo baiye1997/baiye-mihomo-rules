@@ -70,6 +70,15 @@ test('VLESS null flow is omitted without changing valid flow or the source snaps
   if (process.env.MIHOMO_BIN) validateWithCore(output, 'VLESS null flow');
 });
 
+test('subscription node DNS is carried into generated configs', () => {
+  const dns = ['https://airport.example/dns-query/token'];
+  const c = validateConfig(applySubscriptions(template, [], urls, names, [
+    [{ name: 'A', type: 'socks5', server: '127.0.0.1', port: 9 }],
+    [{ name: 'B', type: 'socks5', server: '127.0.0.1', port: 10 }],
+  ], dns));
+  assert.deepEqual(c.dns['proxy-server-nameserver'], dns);
+});
+
 test('rule download URLs and outbound references are validated before isolation', () => {
   const c = validateConfig(applySubscriptions(template, [], urls, names));
   const p = c['rule-providers'].apple_intelligence;

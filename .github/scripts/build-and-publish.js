@@ -142,6 +142,7 @@ function httpsText(url, redirects = 3) {
 
 async function collectSubscriptions() {
   const filters = new Set(manualServerDomains);
+  let proxyServerNameserver = null;
   const snapshots = await Promise.all(subUrls.map(async (url, i) => {
     if (!url) return null;
     let stage = 'download';
@@ -151,6 +152,9 @@ async function collectSubscriptions() {
       const data = YAML.parse(text, { merge: true, maxAliasCount: 10000 });
       stage = 'validate';
       if (!Array.isArray(data?.proxies) || !data.proxies.length) throw new Error("empty snapshot");
+      if (!proxyServerNameserver && Array.isArray(data?.dns?.['proxy-server-nameserver']) && data.dns['proxy-server-nameserver'].length) {
+        proxyServerNameserver = data.dns['proxy-server-nameserver'];
+      }
       extractServerDomainFilters(text).forEach(d => filters.add(d));
       return data.proxies;
     } catch (e) {
@@ -160,10 +164,10 @@ async function collectSubscriptions() {
       throw new Error(`订阅 ${i + 1} 节点快照获取失败，停止发布 (stage=${stage}, code=${code})`);
     }
   }));
-  return { filters: [...filters].sort((a, b) => a.localeCompare(b)), snapshots };
+  return { filters: [...filters].sort((a, b) => a.localeCompare(b)), snapshots, proxyServerNameserver };
 }
 
-function applySubscriptions(template, serverDomainFilters = [], urls = subUrls, names = subNames, snapshots) {
+function applySubscriptions(template, serverDomainFilters = [], urls = subUrls, names = subNames, snapshots, proxyServerNameserver) {
   const doc = YAML.parseDocument(bumpIconsV(template), { merge: true });
   if (doc.errors.length) throw new Error("配置模板不是有效 YAML");
   const config = doc.toJS({ maxAliasCount: 10000 });
@@ -194,6 +198,9 @@ function applySubscriptions(template, serverDomainFilters = [], urls = subUrls, 
   if (serverDomainFilters.length) {
     const existing = config.dns?.["fake-ip-filter"] || [];
     doc.setIn(["dns", "fake-ip-filter"], [...new Set([...existing, ...serverDomainFilters])]);
+  }
+  if (Array.isArray(proxyServerNameserver) && proxyServerNameserver.length) {
+    doc.setIn(["dns", "proxy-server-nameserver"], proxyServerNameserver);
   }
   const output = doc.toString();
   if (/替换订阅链接|\[显示名称|\[\*\*\*\]/.test(output)) throw new Error("生成配置仍有未替换占位符");
@@ -253,10 +260,10 @@ async function main() {
     for (const file of [CONFIG_MULTIPLE_STD, CONFIG_SINGLE_STD, CONFIG_MULTIPLE_LITE, CONFIG_SINGLE_LITE]) {
       if (file) applySubscriptions(readIfExists(file));
     }
-    const { filters: serverDomainFilters, snapshots } = DRY_RUN === "true"
-      ? { filters: manualServerDomains, snapshots: subUrls.map(() => [{ name: "美国 AI 启动校验", type: "socks5", server: "127.0.0.1", port: 9 }]) }
+    const { filters: serverDomainFilters, snapshots, proxyServerNameserver } = DRY_RUN === "true"
+      ? { filters: manualServerDomains, snapshots: subUrls.map(() => [{ name: "美国 AI 启动校验", type: "socks5", server: "127.0.0.1", port: 9 }]), proxyServerNameserver: null }
       : await collectSubscriptions();
-    const generate = template => applySubscriptions(template, serverDomainFilters, subUrls, subNames, snapshots);
+    const generate = template => applySubscriptions(template, serverDomainFilters, subUrls, subNames, snapshots, proxyServerNameserver);
     if (serverDomainFilters.length) {
       log(`已为 Gist 配置注入 ${serverDomainFilters.length} 个代理服务器 fake-ip-filter 域名`);
     }
