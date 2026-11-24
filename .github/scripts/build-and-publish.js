@@ -309,6 +309,8 @@ function applySubscriptions(
         interval: 300,
         lazy: true,
         timeout: 5000,
+        "max-failed-times": 3,
+        "expected-status": 204,
         hidden: true,
         proxies: ["🇯🇵 - 择优节点", "🇺🇸 - 择优节点", "🇭🇰 - 择优节点"],
       };

@@ -6,7 +6,7 @@
 
 url: &url "https://www.gstatic.com/generate_204"
 blk: &blk '^(?!.*(?i)(DIRECT|直接连接|群|邀请|官网|客服|网站|网址|获取|订阅|流量|到期|机场|下次|版本|备用|过期|已用|联系|邮箱|工单|通知|地址|频道|说明|教程|USE|USED|TOTAL|EXPIRE|EMAIL|Panel|Channel|Author)).*$'
-prov: &prov {type: http, interval: 3600, health-check: {enable: true, url: *url, interval: 600}}
+prov: &prov {type: http, interval: 3600, health-check: {enable: true, url: *url, interval: 600, timeout: 3000, lazy: true, expected-status: 204}}
 
 # ======================= 只改这里：订阅 =======================
 proxy-providers:
@@ -126,8 +126,8 @@ geox-url:
   geosite: "https://cdn.jsdelivr.net/gh/Loyalsoldier/v2ray-rules-dat@release/geosite.dat"
 
 # ======================= 策略组锚点 =======================
-tmpl: &tmpl {url: *url, interval: 300, lazy: true, timeout: 5000, disable-udp: false, max-failed-times: 3, hidden: true, include-all-providers: true, empty-fallback: REJECT, exclude-filter: "(?i)(DIRECT|直接连接|官网|订阅|流量|到期|套餐|客服|群|邀请|网址|剩余|过期|(?:^|[^A-Za-z])LAN(?:$|[^A-Za-z])|(?:^|[^0-9.])5x(?:$|[^0-9])|x15(?:$|[^0-9.]))"}
-sel:  &sel  {type: select, url: *url, disable-udp: false, hidden: false, include-all-providers: true, empty-fallback: REJECT, exclude-filter: "(?i)(DIRECT|直接连接|官网|订阅|流量|到期|套餐|客服|群|邀请|网址|剩余|过期|(?:^|[^A-Za-z])LAN(?:$|[^A-Za-z]))"}
+tmpl: &tmpl {url: *url, interval: 300, lazy: true, timeout: 3000, disable-udp: false, max-failed-times: 3, expected-status: 204, hidden: true, include-all-providers: true, empty-fallback: REJECT, exclude-filter: "(?i)(DIRECT|直接连接|官网|订阅|流量|到期|套餐|客服|群|邀请|网址|剩余|过期|(?:^|[^A-Za-z])LAN(?:$|[^A-Za-z])|(?:^|[^0-9.])5x(?:$|[^0-9])|x15(?:$|[^0-9.]))"}
+sel:  &sel  {type: select, url: "https://www.gstatic.com/generate_204?ui=1", disable-udp: false, hidden: false, include-all-providers: true, empty-fallback: REJECT, exclude-filter: "(?i)(DIRECT|直接连接|官网|订阅|流量|到期|套餐|客服|群|邀请|网址|剩余|过期|(?:^|[^A-Za-z])LAN(?:$|[^A-Za-z]))"}
 test: &test {type: url-test, <<: *tmpl, tolerance: 50}
 fall: &fall {type: fallback, <<: *tmpl}
 
@@ -158,7 +158,7 @@ proxy-groups:
   - {name: "📥 资源下载", <<: *test}
 
   - {name: "🤖 AI 平台", <<: *aiapp, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/openai.png"}
-  - {name: "🛡️ AI 自动优选", type: fallback, url: *url, interval: 300, lazy: true, timeout: 5000, hidden: false, proxies: ["🇺🇸 - 择优节点","🇯🇵 - 择优节点","🇸🇬 - 择优节点"], icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/auto.png"}
+  - {name: "🛡️ AI 自动优选", type: fallback, url: *url, interval: 300, lazy: true, timeout: 5000, max-failed-times: 3, expected-status: 204, hidden: false, proxies: ["🇺🇸 - 择优节点","🇯🇵 - 择优节点","🇸🇬 - 择优节点"], icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/auto.png"}
   - {name: "🧠 AI 专用节点", <<: *sel, filter: *ai, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/openai.png"}
   - {name: "✈️ Telegram", <<: *tg, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/telegram.png"}
   - {name: "📺 视频媒体", <<: *strm, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/netflix.png"}

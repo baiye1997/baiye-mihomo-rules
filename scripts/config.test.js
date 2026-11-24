@@ -118,8 +118,14 @@ test('AI_STATIC_PROXY injects relayed dedicated node into AI groups without leak
   const aiPlatform = c['proxy-groups'].find(g => g.name === '🤖 AI 平台');
   const relay = c['proxy-groups'].find(g => g.name === '🔗 AI 接力中转');
   assert.equal(aiAuto.proxies[0], '🇺🇸 专属静态住宅 AI');
+  assert.equal(aiAuto.timeout, 5000);
+  assert.equal(aiAuto['max-failed-times'], 3);
+  assert.equal(aiAuto['expected-status'], 204);
   assert.deepEqual(aiPlatform.proxies.slice(0, 2), ['🛡️ AI 自动优选', '🇺🇸 专属静态住宅 AI']);
   assert.deepEqual(relay.proxies, ['🇯🇵 - 择优节点', '🇺🇸 - 择优节点', '🇭🇰 - 择优节点']);
+  assert.equal(relay.timeout, 5000);
+  assert.equal(relay['max-failed-times'], 3);
+  assert.equal(relay['expected-status'], 204);
   if (process.env.MIHOMO_BIN) validateWithCore(output, 'AI_STATIC_PROXY');
 
   assert.throws(() => parseStaticProxy('not-a-url-secretTokenXYZ'), err => {
@@ -218,6 +224,22 @@ for (const name of fs.readdirSync('config').filter(n => n.endsWith('.yaml'))) {
     assert.equal(c['proxy-groups'].find(g => g.name === '🤖 AI 平台').proxies[0], '🛡️ AI 自动优选');
     assert.equal(c['proxy-groups'].find(g => g.name === '🍎 苹果服务').proxies[0], 'DIRECT');
     assert.equal(c['proxy-groups'].find(g => g.name === 'Ⓜ️ 微软服务').proxies[0], 'DIRECT');
+    const smartGroup = c['proxy-groups'].find(g => g.name === '♻️ 智能选择');
+    const manualGroup = c['proxy-groups'].find(g => g.name === '👆 手动选择');
+    const aiAutoGroup = c['proxy-groups'].find(g => g.name === '🛡️ AI 自动优选');
+    assert.equal(smartGroup.timeout, 3000);
+    assert.equal(smartGroup['expected-status'], 204);
+    assert.equal(aiAutoGroup.timeout, 5000);
+    assert.equal(aiAutoGroup['max-failed-times'], 3);
+    assert.equal(aiAutoGroup['expected-status'], 204);
+    assert.notEqual(manualGroup.url, smartGroup.url);
+    assert.equal(manualGroup.url, 'https://www.gstatic.com/generate_204?ui=1');
+    for (const provider of Object.values(c['proxy-providers'])) {
+      assert.equal(provider['health-check'].interval, 600);
+      assert.equal(provider['health-check'].timeout, 3000);
+      assert.equal(provider['health-check'].lazy, true);
+      assert.equal(provider['health-check']['expected-status'], 204);
+    }
     assert.ok(!c['proxy-groups'].some(g => g.name === '☁️ OneDrive' || g.name === '🎵 Spotify'));
     for (const g of c['proxy-groups'].filter(g => g['include-all-providers'] && !g.proxies?.length)) assert.equal(g['empty-fallback'], 'REJECT');
     assert.ok(!c['proxy-groups'].some(g => g.name.includes('低倍率')));
