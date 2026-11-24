@@ -60,7 +60,7 @@ geodata-loader: memconservative
 
 - `publish-gist.yml` 默认以**单订阅模式**发布（输出 `baiye-single.yaml` / `baiye-mini.yaml` 及 Lite 对应版本），仅需在 GitHub Secrets 中维护 `SUB_URL_1`；仓库仍保留 `baiye-multiple*.yaml` 模板供多订阅手动使用。
 - 可选在 GitHub Secrets 中设置 `AI_STATIC_PROXY`（格式如 `socks5://user:pass@ip:port`），发布脚本会自动将其注入为 `🇺🇸 专属静态住宅 AI`（经隐藏组 `🔗 AI 接力中转` 优先走日本节点接力，异常时自动回退美/港），并置于 `🛡️ AI 自动优选` 首位；未配置该 Secret 时，`🛡️ AI 自动优选` 自动按美/日/新择优节点回退。
-- `🤖 AI 平台` 默认走隐藏的 `🛡️ AI 自动优选`，同时保留 `🧠 AI 专用节点` 供随时手动切换；`🍎 苹果服务` 与 `Ⓜ️ 微软服务`（含 OneDrive）默认 `DIRECT` 优先，`🎵 Spotify` 合并至 `📺 视频媒体` 减少面板冗余。
+- `🤖 AI 平台` 默认走 `🛡️ AI 自动优选`（面板可见，方便随时查看当前实际命中的节点），同时保留 `🧠 AI 专用节点` 供随时手动切换；`🍎 苹果服务` 与 `Ⓜ️ 微软服务`（含 OneDrive）默认 `DIRECT` 优先，`🎵 Spotify` 合并至 `📺 视频媒体` 减少面板冗余。
 - `x15` / `5x` 高倍率节点排除出自动择优与回退组，手动仍可选；AI / 地区 / 手动节点组为空时明确拒绝连接，避免隐式直连。
 - Gist 输出为每个 HTTP 节点 provider 附带启动节点快照（`payload`），并保留默认国内公共 DNS 与订阅自带 `proxy-server-nameserver` 合并，避免单一机场私有 DNS 故障导致断网。
 - Apple Intelligence 在所有版本中进入 AI 组；这只配置网络分流，不改变设备、账号或地区的功能限制。
