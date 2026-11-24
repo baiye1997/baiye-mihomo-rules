@@ -4,9 +4,15 @@
 const fs = require("fs");
 const https = require("https");
 const http = require("http");
+const net = require("net");
 const path = require("path");
 const YAML = require("yaml");
 const { validateConfig, validateWithCore } = require("./validate-config.js");
+
+const AI_STATIC_NODE_NAME = "🇺🇸 专属静态住宅 AI";
+const AI_RELAY_GROUP_NAME = "🔗 AI 接力中转";
+const AI_AUTO_GROUP_NAME = "🛡️ AI 自动优选";
+const AI_PLATFORM_GROUP_NAME = "🤖 AI 平台";
 
 /* ===================== ENV ===================== */
 const {
@@ -17,6 +23,7 @@ const {
   SUB_URLS = "",
   SUB_NAMES = "",
   SUB_SERVER_DOMAINS = "",
+  AI_STATIC_PROXY = "",
 
   CONFIG_MULTIPLE_STD,
   CONFIG_SINGLE_STD,
@@ -73,7 +80,7 @@ function maskUrl(raw = "") {
   return raw.replace(/([?&]token=)[^&]+/gi, "$1***");
 }
 
-/* ===================== Subscriptions ===================== */
+/* ===================== Subscriptions & Static AI Proxy ===================== */
 const subUrls = SUB_URLS
   .split(/\r?\n/)
   .map(normalizeSubscriptionUrl);
@@ -88,7 +95,7 @@ function normalizeDomainFilter(raw = "") {
   if (!s) return "";
   s = s.replace(/^server\s*:\s*/i, "").trim();
   s = s.replace(/^['"]|['"]$/g, "").trim();
-  if (!s || /^\d+\.\d+\.\d+\.\d+$/.test(s) || s.includes(":")) return "";
+  if (!s || net.isIP(s) || s.includes(":")) return "";
   s = s.replace(/^\+\./, "").replace(/^\*\./, "");
   return `+.${s}`;
 }
@@ -108,8 +115,58 @@ function extractServerDomainFilters(text = "") {
   // Exact server hosts avoid exempting unrelated tenants of shared domains.
   return [...new Set(data.proxies.map(p => {
     const host = String(p?.server || "").trim().replace(/\.$/, "").toLowerCase();
-    return host && !require("net").isIP(host) && !host.includes(":") ? host : null;
+    return host && !net.isIP(host) && !host.includes(":") ? host : null;
   }).filter(Boolean))];
+}
+
+function sanitizeProxyNameservers(list) {
+  if (!Array.isArray(list)) return [];
+  return list
+    .map(item => String(item || "").trim())
+    .filter(item => item && !item.includes("#"));
+}
+
+function parseStaticProxy(raw = "") {
+  const text = String(raw || "").trim();
+  if (!text) return null;
+  let u;
+  try {
+    u = new URL(text);
+  } catch {
+    throw new Error("AI_STATIC_PROXY 格式无效，应为 socks5://user:pass@host:port 或 http://user:pass@host:port");
+  }
+  const protocolMap = { "socks5:": "socks5", "socks5h:": "socks5", "http:": "http", "https:": "http" };
+  const type = protocolMap[u.protocol.toLowerCase()];
+  const host = u.hostname.replace(/^\[|\]$/g, "").trim();
+  const port = Number(u.port);
+  if (!type || !host || !Number.isInteger(port) || port < 1 || port > 65535) {
+    throw new Error("AI_STATIC_PROXY 协议、主机或端口无效");
+  }
+  const proxy = {
+    name: AI_STATIC_NODE_NAME,
+    type,
+    server: host,
+    port,
+  };
+  if (u.username) proxy.username = decodeURIComponent(u.username);
+  if (u.password) proxy.password = decodeURIComponent(u.password);
+  if (type === "socks5") proxy.udp = true;
+  if (u.protocol.toLowerCase() === "https:") proxy.tls = true;
+  proxy["dialer-proxy"] = AI_RELAY_GROUP_NAME;
+  return proxy;
+}
+
+function detectRequiredSlots(templates) {
+  const slots = new Set();
+  for (const template of templates) {
+    if (!template) continue;
+    const config = YAML.parse(template, { merge: true, maxAliasCount: 10000 });
+    for (const provider of Object.values(config?.["proxy-providers"] || {})) {
+      const m = /^替换订阅链接([0-9]+)$/.exec(provider?.url || "");
+      if (m) slots.add(Number(m[1]) - 1);
+    }
+  }
+  return [...slots].sort((a, b) => a - b);
 }
 
 function httpsText(url, redirects = 3) {
@@ -140,11 +197,18 @@ function httpsText(url, redirects = 3) {
   });
 }
 
-async function collectSubscriptions() {
-  const filters = new Set(manualServerDomains);
-  let proxyServerNameserver = null;
-  const snapshots = await Promise.all(subUrls.map(async (url, i) => {
-    if (!url) return null;
+async function collectSubscriptions(requiredSlots = []) {
+  const targetSlots = requiredSlots.length
+    ? requiredSlots
+    : subUrls.map((u, i) => (u ? i : -1)).filter(i => i >= 0);
+
+  const snapshots = [];
+  const filtersBySlot = [];
+  const dnsBySlot = [];
+
+  await Promise.all(targetSlots.map(async (i) => {
+    const url = subUrls[i];
+    if (!url) return;
     let stage = 'download';
     try {
       const text = await httpsText(url);
@@ -152,11 +216,9 @@ async function collectSubscriptions() {
       const data = YAML.parse(text, { merge: true, maxAliasCount: 10000 });
       stage = 'validate';
       if (!Array.isArray(data?.proxies) || !data.proxies.length) throw new Error("empty snapshot");
-      if (!proxyServerNameserver && Array.isArray(data?.dns?.['proxy-server-nameserver']) && data.dns['proxy-server-nameserver'].length) {
-        proxyServerNameserver = data.dns['proxy-server-nameserver'];
-      }
-      extractServerDomainFilters(text).forEach(d => filters.add(d));
-      return data.proxies;
+      snapshots[i] = data.proxies;
+      filtersBySlot[i] = extractServerDomainFilters(text);
+      dnsBySlot[i] = sanitizeProxyNameservers(data?.dns?.["proxy-server-nameserver"]);
     } catch (e) {
       // Never publish a configuration that needs unavailable nodes to fetch its own nodes.
       // Only emit known codes, never error messages that may contain URLs or YAML credentials.
@@ -164,17 +226,29 @@ async function collectSubscriptions() {
       throw new Error(`订阅 ${i + 1} 节点快照获取失败，停止发布 (stage=${stage}, code=${code})`);
     }
   }));
-  return { filters: [...filters].sort((a, b) => a.localeCompare(b)), snapshots, proxyServerNameserver };
+
+  return { filtersBySlot, snapshots, dnsBySlot };
 }
 
-function applySubscriptions(template, serverDomainFilters = [], urls = subUrls, names = subNames, snapshots, proxyServerNameserver) {
+function applySubscriptions(
+  template,
+  serverDomainFilters = [],
+  urls = subUrls,
+  names = subNames,
+  snapshots,
+  proxyServerNameserver,
+  aiStaticProxyRaw = ""
+) {
   const doc = YAML.parseDocument(bumpIconsV(template), { merge: true });
   if (doc.errors.length) throw new Error("配置模板不是有效 YAML");
   const config = doc.toJS({ maxAliasCount: 10000 });
+  const usedSlots = [];
+
   for (const [key, provider] of Object.entries(config["proxy-providers"] || {})) {
     const slot = /^替换订阅链接([0-9]+)$/.exec(provider.url || "");
     if (!slot) continue;
     const index = Number(slot[1]) - 1;
+    usedSlots.push(index);
     const url = urls[index];
     let parsed;
     try { parsed = new URL(url); } catch { /* checked below */ }
@@ -195,13 +269,79 @@ function applySubscriptions(template, serverDomainFilters = [], urls = subUrls, 
       doc.setIn(["proxy-providers", key, "proxy"], "📥 资源下载");
     }
   }
-  if (serverDomainFilters.length) {
+
+  // Merge fake-ip-filter domains (supports flat array or per-slot array)
+  const resolvedFilters = [];
+  if (Array.isArray(serverDomainFilters)) {
+    if (serverDomainFilters.some(Array.isArray)) {
+      for (const slotIdx of usedSlots) {
+        if (Array.isArray(serverDomainFilters[slotIdx])) resolvedFilters.push(...serverDomainFilters[slotIdx]);
+      }
+    } else {
+      resolvedFilters.push(...serverDomainFilters);
+    }
+  }
+
+  // Optional static residential AI proxy injection via GitHub Secret
+  const staticProxy = parseStaticProxy(aiStaticProxyRaw);
+  if (staticProxy) {
+    const existingProxies = Array.isArray(config.proxies) ? config.proxies : [];
+    doc.setIn(["proxies"], [...existingProxies.filter(p => p?.name !== AI_STATIC_NODE_NAME), staticProxy]);
+
+    const groups = config["proxy-groups"] || [];
+    const autoIdx = groups.findIndex(g => g.name === AI_AUTO_GROUP_NAME);
+    if (autoIdx >= 0) {
+      const current = (groups[autoIdx].proxies || []).filter(n => n !== AI_STATIC_NODE_NAME);
+      doc.setIn(["proxy-groups", autoIdx, "proxies"], [AI_STATIC_NODE_NAME, ...current]);
+    }
+    const aiIdx = groups.findIndex(g => g.name === AI_PLATFORM_GROUP_NAME);
+    if (aiIdx >= 0) {
+      const current = (groups[aiIdx].proxies || []).filter(n => n !== AI_STATIC_NODE_NAME);
+      const insertAt = current.includes(AI_AUTO_GROUP_NAME) ? current.indexOf(AI_AUTO_GROUP_NAME) + 1 : 0;
+      current.splice(insertAt, 0, AI_STATIC_NODE_NAME);
+      doc.setIn(["proxy-groups", aiIdx, "proxies"], current);
+    }
+    if (!groups.some(g => g.name === AI_RELAY_GROUP_NAME)) {
+      const relayGroup = {
+        name: AI_RELAY_GROUP_NAME,
+        type: "fallback",
+        url: "https://www.gstatic.com/generate_204",
+        interval: 300,
+        lazy: true,
+        timeout: 5000,
+        hidden: true,
+        proxies: ["🇯🇵 - 择优节点", "🇺🇸 - 择优节点", "🇭🇰 - 择优节点"],
+      };
+      const proxyGroupsNode = doc.getIn(["proxy-groups"]);
+      proxyGroupsNode.add(doc.createNode(relayGroup));
+    }
+    if (!net.isIP(staticProxy.server) && !staticProxy.server.includes(":")) {
+      resolvedFilters.push(staticProxy.server.toLowerCase());
+    }
+  }
+
+  if (resolvedFilters.length) {
     const existing = config.dns?.["fake-ip-filter"] || [];
-    doc.setIn(["dns", "fake-ip-filter"], [...new Set([...existing, ...serverDomainFilters])]);
+    const merged = [...new Set([...existing, ...resolvedFilters.sort((a, b) => a.localeCompare(b))])];
+    doc.setIn(["dns", "fake-ip-filter"], merged);
   }
-  if (Array.isArray(proxyServerNameserver) && proxyServerNameserver.length) {
-    doc.setIn(["dns", "proxy-server-nameserver"], proxyServerNameserver);
+
+  // Merge subscription proxy-server-nameserver AFTER default public DNS (avoid single-point override & races)
+  const extraProxyDns = [];
+  if (Array.isArray(proxyServerNameserver)) {
+    if (proxyServerNameserver.some(Array.isArray)) {
+      for (const slotIdx of usedSlots) {
+        extraProxyDns.push(...sanitizeProxyNameservers(proxyServerNameserver[slotIdx]));
+      }
+    } else {
+      extraProxyDns.push(...sanitizeProxyNameservers(proxyServerNameserver));
+    }
   }
+  if (extraProxyDns.length) {
+    const existingProxyDns = sanitizeProxyNameservers(config.dns?.["proxy-server-nameserver"]);
+    doc.setIn(["dns", "proxy-server-nameserver"], [...new Set([...existingProxyDns, ...extraProxyDns])]);
+  }
+
   const output = doc.toString();
   if (/替换订阅链接|\[显示名称|\[\*\*\*\]/.test(output)) throw new Error("生成配置仍有未替换占位符");
   validateConfig(output);
@@ -254,43 +394,73 @@ async function main() {
     }
 
     log("开始处理配置文件...");
-    
+
     const outputs = { standard: {}, lite: {} };
-    // Fail before network access if required slots/templates are invalid.
-    for (const file of [CONFIG_MULTIPLE_STD, CONFIG_SINGLE_STD, CONFIG_MULTIPLE_LITE, CONFIG_SINGLE_LITE]) {
-      if (file) applySubscriptions(readIfExists(file));
-    }
-    const { filters: serverDomainFilters, snapshots, proxyServerNameserver } = DRY_RUN === "true"
-      ? { filters: manualServerDomains, snapshots: subUrls.map(() => [{ name: "美国 AI 启动校验", type: "socks5", server: "127.0.0.1", port: 9 }]), proxyServerNameserver: null }
-      : await collectSubscriptions();
-    const generate = template => applySubscriptions(template, serverDomainFilters, subUrls, subNames, snapshots, proxyServerNameserver);
-    if (serverDomainFilters.length) {
-      log(`已为 Gist 配置注入 ${serverDomainFilters.length} 个代理服务器 fake-ip-filter 域名`);
+    const templateTexts = {
+      multiStd: readIfExists(CONFIG_MULTIPLE_STD),
+      singleStd: readIfExists(CONFIG_SINGLE_STD),
+      multiLite: readIfExists(CONFIG_MULTIPLE_LITE),
+      singleLite: readIfExists(CONFIG_SINGLE_LITE),
+    };
+
+    // Fail before network access if required slots/templates or AI_STATIC_PROXY are invalid.
+    for (const text of Object.values(templateTexts)) {
+      if (text) applySubscriptions(text, [], subUrls, subNames, undefined, undefined, AI_STATIC_PROXY);
     }
 
-    // --- 读取逻辑保持不变 ---
-    const multiStd = readIfExists(CONFIG_MULTIPLE_STD);
-    if (multiStd) {
-      const s = generate(multiStd);
-      outputs.standard[GIST_FILE_MULTIPLE_STD] = { content: s };
-      outputs.standard[GIST_FILE_MINI_STD] = { content: deriveMini(s) };
+    const requiredSlots = detectRequiredSlots(Object.values(templateTexts));
+    const { filtersBySlot, snapshots, dnsBySlot } = DRY_RUN === "true"
+      ? {
+        filtersBySlot: requiredSlots.reduce((acc, idx) => { acc[idx] = [...manualServerDomains]; return acc; }, []),
+        snapshots: requiredSlots.reduce((acc, idx) => { acc[idx] = [{ name: "美国 AI 启动校验", type: "socks5", server: "127.0.0.1", port: 9 }]; return acc; }, []),
+        dnsBySlot: [],
+      }
+      : await collectSubscriptions(requiredSlots);
+
+    if (manualServerDomains.length) {
+      for (const idx of requiredSlots) {
+        filtersBySlot[idx] = [...new Set([...(filtersBySlot[idx] || []), ...manualServerDomains])];
+      }
     }
 
-    const singleStd = readIfExists(CONFIG_SINGLE_STD);
-    if (singleStd) {
-      outputs.standard[GIST_FILE_SINGLE_STD] = { content: generate(singleStd) };
+    const generate = template => applySubscriptions(
+      template,
+      filtersBySlot,
+      subUrls,
+      subNames,
+      snapshots,
+      dnsBySlot,
+      AI_STATIC_PROXY
+    );
+
+    // --- Standard Gist ---
+    let multiStdOut = null;
+    if (templateTexts.multiStd) {
+      multiStdOut = generate(templateTexts.multiStd);
+      outputs.standard[GIST_FILE_MULTIPLE_STD] = { content: multiStdOut };
+    }
+    let singleStdOut = null;
+    if (templateTexts.singleStd) {
+      singleStdOut = generate(templateTexts.singleStd);
+      outputs.standard[GIST_FILE_SINGLE_STD] = { content: singleStdOut };
+    }
+    if (GIST_FILE_MINI_STD && (multiStdOut || singleStdOut)) {
+      outputs.standard[GIST_FILE_MINI_STD] = { content: deriveMini(multiStdOut || singleStdOut) };
     }
 
-    const multiLite = readIfExists(CONFIG_MULTIPLE_LITE);
-    if (multiLite) {
-      const s = generate(multiLite);
-      outputs.lite[GIST_FILE_MULTIPLE_LITE] = { content: s };
-      outputs.lite[GIST_FILE_MINI_LITE] = { content: deriveMini(s) };
+    // --- Lite Gist ---
+    let multiLiteOut = null;
+    if (templateTexts.multiLite) {
+      multiLiteOut = generate(templateTexts.multiLite);
+      outputs.lite[GIST_FILE_MULTIPLE_LITE] = { content: multiLiteOut };
     }
-
-    const singleLite = readIfExists(CONFIG_SINGLE_LITE);
-    if (singleLite) {
-      outputs.lite[GIST_FILE_SINGLE_LITE] = { content: generate(singleLite) };
+    let singleLiteOut = null;
+    if (templateTexts.singleLite) {
+      singleLiteOut = generate(templateTexts.singleLite);
+      outputs.lite[GIST_FILE_SINGLE_LITE] = { content: singleLiteOut };
+    }
+    if (GIST_FILE_MINI_LITE && (multiLiteOut || singleLiteOut)) {
+      outputs.lite[GIST_FILE_MINI_LITE] = { content: deriveMini(multiLiteOut || singleLiteOut) };
     }
 
     log(`处理完成，Standard Gist 文件数: ${Object.keys(outputs.standard).length}, Lite/GEO Gist 文件数: ${Object.keys(outputs.lite).length}`);
@@ -309,10 +479,9 @@ async function main() {
       return;
     }
 
-    // === 优化：并发更新 Gist ===
+    // === 并发更新 Gist ===
     const tasks = [];
 
-    // 任务 1: Standard Gist
     if (GIST_ID_STANDARD && Object.keys(outputs.standard).length) {
       tasks.push((async () => {
         log(`正在更新标准版 Gist: ${GIST_ID_STANDARD}...`);
@@ -325,7 +494,6 @@ async function main() {
       })());
     }
 
-    // 任务 2: Lite Gist
     if (GIST_ID_LITE && Object.keys(outputs.lite).length) {
       tasks.push((async () => {
         log(`正在更新 Lite/GEO Gist: ${GIST_ID_LITE}...`);
@@ -338,7 +506,6 @@ async function main() {
       })());
     }
 
-    // 等待所有任务完成
     if (tasks.length > 0) {
       await Promise.all(tasks);
     } else {
@@ -354,5 +521,5 @@ async function main() {
   }
 }
 
-module.exports = { applySubscriptions, extractServerDomainFilters, deriveMini };
+module.exports = { applySubscriptions, extractServerDomainFilters, deriveMini, parseStaticProxy };
 if (require.main === module) main();

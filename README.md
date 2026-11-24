@@ -56,14 +56,13 @@ geodata-loader: memconservative
 
 ---
 
-## NOW / 极速 cloud 订阅
+## 订阅与 Gist 发布说明
 
-- 两家一起使用选 `baiye-multiple.yaml` 或 `baiye-multiple-lite.yaml`；订阅 1 对应 NOW，订阅 2 对应极速 cloud。
-- 手动导入时填写订阅链接和显示名称；通过 Gist 发布时，更新 GitHub Secrets `SUB_URL_1` / `SUB_URL_2`，保留自定义显示前缀 `[天照]` / `[月读]`。单订阅输出使用订阅 1。
-- `🧠 AI 专用节点` 保留原组名与手动选择方式，候选扩大为带独立 AI 标签、美国、新加坡、日本、台湾节点，排除韩国；按名称筛选不保证实际 AI 解锁。
-- 极速 cloud 默认按 10X 扣量（1000G 额度可用约 100G 实际流量）；`x15` 相对其默认节点为 1.5 倍消耗，因消耗较高而排除自动择优 / 回退，手动仍可选，符合地区条件的节点也保留在手动 AI 候选中。不能直接与 NOW 的倍率数字比较。NOW 的 `0.5X` 节点继续进入标准版 CDN 低倍率组；Lite 版没有该组。
-- AI / 地区 / 手动节点组为空时明确拒绝连接，避免隐式直连；标准版 CDN 自动组优先低倍率池，不可用时回退普通智能节点池。
-- Gist 输出为每个 HTTP 节点 provider 附带启动节点快照（`payload`），首次导入无需先下载节点列表才能联网；后续通过“节点选择”更新订阅。快照获取失败会停止发布并保留线上旧配置。手动使用仓库模板时需自行提供可直连的订阅或备用 payload。
+- `publish-gist.yml` 默认以**单订阅模式**发布（输出 `baiye-single.yaml` / `baiye-mini.yaml` 及 Lite 对应版本），仅需在 GitHub Secrets 中维护 `SUB_URL_1`；仓库仍保留 `baiye-multiple*.yaml` 模板供多订阅手动使用。
+- 可选在 GitHub Secrets 中设置 `AI_STATIC_PROXY`（格式如 `socks5://user:pass@ip:port`），发布脚本会自动将其注入为 `🇺🇸 专属静态住宅 AI`（经隐藏组 `🔗 AI 接力中转` 优先走日本节点接力，异常时自动回退美/港），并置于 `🛡️ AI 自动优选` 首位；未配置该 Secret 时，`🛡️ AI 自动优选` 自动按美/日/新择优节点回退。
+- `🤖 AI 平台` 默认走隐藏的 `🛡️ AI 自动优选`，同时保留 `🧠 AI 专用节点` 供随时手动切换；`🍎 苹果服务` 与 `Ⓜ️ 微软服务`（含 OneDrive）默认 `DIRECT` 优先，`🎵 Spotify` 合并至 `📺 视频媒体` 减少面板冗余。
+- `x15` / `5x` 高倍率节点排除出自动择优与回退组，手动仍可选；AI / 地区 / 手动节点组为空时明确拒绝连接，避免隐式直连。
+- Gist 输出为每个 HTTP 节点 provider 附带启动节点快照（`payload`），并保留默认国内公共 DNS 与订阅自带 `proxy-server-nameserver` 合并，避免单一机场私有 DNS 故障导致断网。
 - Apple Intelligence 在所有版本中进入 AI 组；这只配置网络分流，不改变设备、账号或地区的功能限制。
 
 ---

@@ -7,8 +7,8 @@ on:
     branches: [main]
 
   workflow_dispatch: {}
-  
-  # 优化：增加 PR 触发，用于测试配置是否正确 (自动 Dry Run)
+
+  # PR 触发：仅用于测试配置是否正确 (自动 Dry Run)
   pull_request:
     paths:
       - '.github/scripts/**'
@@ -27,16 +27,15 @@ permissions:
 
 jobs:
   publish:
-    # 逻辑：如果是 PR，或者 workflow_dispatch，或者 workflow_run 成功时运行
     if: ${{ github.event_name == 'pull_request' || (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main') || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main') }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    
+
     steps:
       - name: Checkout main
         uses: actions/checkout@v5
         with:
-          fetch-depth: 1 # 发布 Gist 不需要历史
+          fetch-depth: 1
 
       - name: Setup Node.js
         uses: actions/setup-node@v5
@@ -59,35 +58,31 @@ jobs:
           GIST_ID_STANDARD:  ${{ secrets.GIST_ID_STANDARD }}
           GIST_ID_LITE:      ${{ secrets.GIST_ID_LITE }}
 
-          # === Subscriptions
+          # === Single Subscription (不再生成双订阅，续费的订阅填在 SUB_URL_1)
           SUB_URLS: |
             ${{ secrets.SUB_URL_1 }}
-            ${{ secrets.SUB_URL_2 }}
-          
+
           SUB_NAMES: |
-            [天照]
             [月读]
 
+          # Optional: 专属美国静态住宅 AI 代理，格式如 socks5://user:pass@ip:port
+          AI_STATIC_PROXY: ${{ secrets.AI_STATIC_PROXY }}
+
           # Optional manual additions, comma/newline separated.
-          # Usually unnecessary because the script extracts proxy server domains from SUB_URLS.
           SUB_SERVER_DOMAINS: ${{ secrets.SUB_SERVER_DOMAINS }}
 
           COMMIT_SHORT: ${{ github.sha }}
 
-          # === Files
-          CONFIG_MULTIPLE_STD:   config/baiye-multiple.yaml
+          # === Files (仅生成单订阅标准版/Lite 及对应 Mini 版)
           CONFIG_SINGLE_STD:     config/baiye-single.yaml
-          CONFIG_MULTIPLE_LITE:  config/baiye-multiple-lite.yaml
           CONFIG_SINGLE_LITE:    config/baiye-single-lite.yaml
 
-          GIST_FILE_MULTIPLE_STD:  baiye-multiple.yaml
           GIST_FILE_SINGLE_STD:    baiye-single.yaml
           GIST_FILE_MINI_STD:      baiye-mini.yaml
-          GIST_FILE_MULTIPLE_LITE: baiye-multiple-lite.yaml
           GIST_FILE_SINGLE_LITE:   baiye-single-lite.yaml
           GIST_FILE_MINI_LITE:     baiye-mini-lite.yaml
 
-          # 优化：如果是 PR，强制开启 Dry Run；否则默认 false
+          # PR 强制 Dry Run；正式发布为 false
           DRY_RUN: ${{ github.event_name == 'pull_request' && 'true' || 'false' }}
           QUIET:   "true"
           STATUS_FILE: status-publish.txt
@@ -96,7 +91,8 @@ jobs:
           set -euo pipefail
           if [ "$DRY_RUN" = "true" ]; then
             # PR checks need neither subscription credentials nor a publish token.
-            export SUB_URLS=$'https://example.invalid/one\nhttps://example.invalid/two'
+            export SUB_URLS='https://example.invalid/one'
+            export AI_STATIC_PROXY=''
           fi
           node .github/scripts/build-and-publish.js
 

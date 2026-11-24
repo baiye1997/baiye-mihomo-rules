@@ -4,11 +4,12 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const YAML = require('yaml');
-const { applySubscriptions, extractServerDomainFilters, deriveMini } = require('../.github/scripts/build-and-publish');
+const { applySubscriptions, extractServerDomainFilters, deriveMini, parseStaticProxy } = require('../.github/scripts/build-and-publish');
 const { validateConfig, validateWithCore } = require('../.github/scripts/validate-config');
 const urls = ['https://example.invalid/one?token=a$&b', 'https://example.invalid/two'];
 const names = ['[天照]', '[月读]'];
 const template = fs.readFileSync('config/baiye-multiple.yaml', 'utf8');
+const singleTemplate = fs.readFileSync('config/baiye-single.yaml', 'utf8');
 
 test('subscription slots cannot shift when a URL is absent', () => {
   assert.throws(() => applySubscriptions(template, [], ['', urls[1]], names), /订阅 1/);
@@ -70,13 +71,61 @@ test('VLESS null flow is omitted without changing valid flow or the source snaps
   if (process.env.MIHOMO_BIN) validateWithCore(output, 'VLESS null flow');
 });
 
-test('subscription node DNS is carried into generated configs', () => {
-  const dns = ['https://airport.example/dns-query/token'];
-  const c = validateConfig(applySubscriptions(template, [], urls, names, [
+test('subscription node DNS is merged with default public DNS per slot and rejects proxy-pinned entries', () => {
+  const dnsBySlot = [
+    ['https://airport1.example/dns-query/token', 'https://bad.example/dns-query#Proxy'],
+    ['https://airport2.example/dns-query/token'],
+  ];
+  const multi = validateConfig(applySubscriptions(template, [], urls, names, [
     [{ name: 'A', type: 'socks5', server: '127.0.0.1', port: 9 }],
     [{ name: 'B', type: 'socks5', server: '127.0.0.1', port: 10 }],
-  ], dns));
-  assert.deepEqual(c.dns['proxy-server-nameserver'], dns);
+  ], dnsBySlot));
+  assert.deepEqual(multi.dns['proxy-server-nameserver'], [
+    '223.5.5.5',
+    '119.29.29.29',
+    'https://airport1.example/dns-query/token',
+    'https://airport2.example/dns-query/token',
+  ]);
+
+  const single = validateConfig(applySubscriptions(singleTemplate, [], [urls[0]], ['[月读]'], [
+    [{ name: 'A', type: 'socks5', server: '127.0.0.1', port: 9 }],
+  ], dnsBySlot));
+  assert.deepEqual(single.dns['proxy-server-nameserver'], [
+    '223.5.5.5',
+    '119.29.29.29',
+    'https://airport1.example/dns-query/token',
+  ]);
+});
+
+test('AI_STATIC_PROXY injects relayed dedicated node into AI groups without leaking credentials on error', () => {
+  const staticUrl = 'socks5://demoUser:superSecret123@198.51.100.10:50101';
+  const output = applySubscriptions(singleTemplate, [], [urls[0]], ['[月读]'], [
+    [{ name: '日本01', type: 'socks5', server: '127.0.0.1', port: 9 }],
+  ], undefined, staticUrl);
+  const c = validateConfig(output);
+  const node = c.proxies.find(p => p.name === '🇺🇸 专属静态住宅 AI');
+  assert.deepEqual(node, {
+    name: '🇺🇸 专属静态住宅 AI',
+    type: 'socks5',
+    server: '198.51.100.10',
+    port: 50101,
+    username: 'demoUser',
+    password: 'superSecret123',
+    udp: true,
+    'dialer-proxy': '🔗 AI 接力中转',
+  });
+  const aiAuto = c['proxy-groups'].find(g => g.name === '🛡️ AI 自动优选');
+  const aiPlatform = c['proxy-groups'].find(g => g.name === '🤖 AI 平台');
+  const relay = c['proxy-groups'].find(g => g.name === '🔗 AI 接力中转');
+  assert.equal(aiAuto.proxies[0], '🇺🇸 专属静态住宅 AI');
+  assert.deepEqual(aiPlatform.proxies.slice(0, 2), ['🛡️ AI 自动优选', '🇺🇸 专属静态住宅 AI']);
+  assert.deepEqual(relay.proxies, ['🇯🇵 - 择优节点', '🇺🇸 - 择优节点', '🇭🇰 - 择优节点']);
+  if (process.env.MIHOMO_BIN) validateWithCore(output, 'AI_STATIC_PROXY');
+
+  assert.throws(() => parseStaticProxy('not-a-url-secretTokenXYZ'), err => {
+    assert.ok(!err.message.includes('secretTokenXYZ'));
+    return true;
+  });
 });
 
 test('rule download URLs and outbound references are validated before isolation', () => {
@@ -147,46 +196,61 @@ test('failed snapshot download stops publication without exposing the subscripti
 });
 
 for (const name of fs.readdirSync('config').filter(n => n.endsWith('.yaml'))) {
-  test(`${name}: generated config and mini preserve policy and pass core validation`, () => {
+  test(`${name}: generated config and mini preserve policy, DNS hygiene, and pass core validation`, () => {
     const output = applySubscriptions(fs.readFileSync(path.join('config', name), 'utf8'), [], urls, names);
     const c = validateConfig(output);
     assert.equal(Object.values(c['proxy-providers'])[0].override['additional-prefix'], '[天照]');
     assert.ok(c.rules.indexOf('RULE-SET,apple_intelligence,🤖 AI 平台') < c.rules.findIndex(r => r.startsWith('GEOSITE,apple,') || r.startsWith('RULE-SET,apple_services,')));
     assert.ok(c.rules.includes('DOMAIN-SUFFIX,push.apple.com,DIRECT'));
+    assert.ok(c.rules.includes('DOMAIN,dl.wechat.com,DIRECT'));
+    assert.ok(c.rules.includes('DOMAIN,mirrors.aliyun.com,DIRECT'));
+    assert.ok(c.rules.includes('DOMAIN-SUFFIX,steamcontent.com,DIRECT'));
+    assert.ok(c.rules.includes('DOMAIN-SUFFIX,bytedapm.com,DIRECT'));
+    assert.ok(c.rules.includes('DOMAIN,cdnstatic.tencentcs.com,DIRECT'));
+    assert.ok(c.rules.includes('GEOIP,private,DIRECT'));
+    assert.ok(c.rules.includes('GEOIP,cn,DIRECT'));
+    assert.ok(!c.rules.includes('GEOIP,cn,DIRECT,no-resolve'));
     assert.ok(c.rules.findIndex(r => r.startsWith('GEOSITE,category-games@cn,')) < c.rules.indexOf('RULE-SET,game_non_ip,🎮 游戏平台'));
+    assert.ok(Array.isArray(c.dns['direct-nameserver']) && c.dns['direct-nameserver'].length >= 2);
+    assert.ok(c.dns['nameserver-policy']?.['geosite:private,cn']);
+    assert.equal(c.sniffer.sniff.QUIC, undefined);
+    assert.equal(c.tun['endpoint-independent-nat'], true);
+    assert.equal(c['proxy-groups'].find(g => g.name === '🤖 AI 平台').proxies[0], '🛡️ AI 自动优选');
+    assert.equal(c['proxy-groups'].find(g => g.name === '🍎 苹果服务').proxies[0], 'DIRECT');
+    assert.equal(c['proxy-groups'].find(g => g.name === 'Ⓜ️ 微软服务').proxies[0], 'DIRECT');
+    assert.ok(!c['proxy-groups'].some(g => g.name === '☁️ OneDrive' || g.name === '🎵 Spotify'));
     for (const g of c['proxy-groups'].filter(g => g['include-all-providers'] && !g.proxies?.length)) assert.equal(g['empty-fallback'], 'REJECT');
     assert.ok(!c['proxy-groups'].some(g => g.name.includes('低倍率')));
     for (const key of ['cdn_domainset', 'cdn_non_ip']) {
       if (c['rule-providers'][key]) assert.ok(c.rules.includes(`RULE-SET,${key},🚀 节点选择`));
     }
     if (process.env.MIHOMO_BIN) validateWithCore(output, name);
-    if (name.includes('multiple')) {
+    if (name.includes('single')) {
       const mini = deriveMini(output);
       const m = validateConfig(mini);
       assert.equal(m.sniffer.enable, false);
       assert.equal(m['geodata-loader'], 'memconservative');
       assert.deepEqual(m.rules, c.rules);
-      if (process.env.MIHOMO_BIN) validateWithCore(mini, name.replace('multiple', 'mini'));
+      if (process.env.MIHOMO_BIN) validateWithCore(mini, name.replace('single', 'mini'));
     }
   });
 }
 
-test('publisher dry-run validates all six outputs without token or subscription network', { skip: !process.env.MIHOMO_BIN }, () => {
+test('publisher dry-run validates single-subscription outputs without second subscription or token', { skip: !process.env.MIHOMO_BIN }, () => {
   const { spawnSync } = require('node:child_process');
-  const env = { ...process.env, DRY_RUN: 'true', QUIET: 'false', SUB_URLS: urls.join('\n'), SUB_NAMES: names.join('\n'), STATUS_FILE: '' };
+  const env = { ...process.env, DRY_RUN: 'true', QUIET: 'false', SUB_URLS: urls[0], SUB_NAMES: '[月读]', STATUS_FILE: '',
+    CONFIG_MULTIPLE_STD: '', CONFIG_MULTIPLE_LITE: '',
+    CONFIG_SINGLE_STD: 'config/baiye-single.yaml', GIST_FILE_SINGLE_STD: 'baiye-single.yaml', GIST_FILE_MINI_STD: 'baiye-mini.yaml',
+    CONFIG_SINGLE_LITE: 'config/baiye-single-lite.yaml', GIST_FILE_SINGLE_LITE: 'baiye-single-lite.yaml', GIST_FILE_MINI_LITE: 'baiye-mini-lite.yaml',
+    AI_STATIC_PROXY: 'socks5://user:pass@198.51.100.10:50101',
+  };
   delete env.GIST_TOKEN;
   delete env.SUB_SERVER_DOMAINS;
-  for (const [key, file] of [['MULTIPLE_STD','multiple'],['SINGLE_STD','single'],['MULTIPLE_LITE','multiple-lite'],['SINGLE_LITE','single-lite']]) {
-    env[`CONFIG_${key}`] = `config/baiye-${file}.yaml`;
-    env[`GIST_FILE_${key}`] = `baiye-${file}.yaml`;
-  }
-  env.GIST_FILE_MINI_STD = 'baiye-mini.yaml';
-  env.GIST_FILE_MINI_LITE = 'baiye-mini-lite.yaml';
   const result = spawnSync(process.execPath, ['.github/scripts/build-and-publish.js'], { env, encoding: 'utf8', timeout: 60000 });
   assert.equal(result.status, 0, result.stdout + result.stderr);
-  assert.match(result.stdout, /Standard Gist 文件数: 3, Lite\/GEO Gist 文件数: 3/);
+  assert.match(result.stdout, /Standard Gist 文件数: 2, Lite\/GEO Gist 文件数: 2/);
   assert.match(result.stdout, /DRY RUN/);
-  const missing = spawnSync(process.execPath, ['.github/scripts/build-and-publish.js'], { env: { ...env, SUB_URLS: '\n' + urls[1] }, encoding: 'utf8', timeout: 5000 });
+  const missing = spawnSync(process.execPath, ['.github/scripts/build-and-publish.js'], { env: { ...env, SUB_URLS: '' }, encoding: 'utf8', timeout: 5000 });
   assert.equal(missing.status, 1);
   assert.match(missing.stderr, /订阅 1 缺失/);
 });

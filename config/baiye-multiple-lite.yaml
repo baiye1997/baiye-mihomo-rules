@@ -1,5 +1,5 @@
 # ============================================================
-# Baiye Mihomo Lite：GEO 上游版
+# Baiye Mihomo Lite 多订阅：GEO 上游版
 # 适合：偏好 GEOSITE / GEOIP 上游规则的日常使用
 # 特点：主要使用 GEO 上游，规则文件较少；真正轻量版由 Gist 脚本生成 mini
 # ============================================================
@@ -68,9 +68,18 @@ dns:
     - 223.5.5.5
     - 119.29.29.29
 
+  direct-nameserver:
+    - https://223.5.5.5/dns-query
+    - https://1.12.12.12/dns-query
+
   nameserver:
-    - https://dns.alidns.com/dns-query
-    - https://doh.pub/dns-query
+    - https://223.5.5.5/dns-query
+    - https://1.12.12.12/dns-query
+
+  nameserver-policy:
+    "geosite:private,cn":
+      - https://223.5.5.5/dns-query
+      - https://1.12.12.12/dns-query
 
   fallback:
     - "https://1.1.1.1/dns-query#🚀 节点选择"
@@ -98,7 +107,6 @@ sniffer:
   sniff:
     HTTP: {ports: [80, 8080-8880], override-destination: true}
     TLS:  {ports: [443, 8443]}
-    QUIC: {ports: [443, 8443]}
   skip-domain:
     - rule-set:sniff-skip
     - "Mijia Cloud"
@@ -110,6 +118,7 @@ tun:
   auto-route: true
   auto-detect-interface: true
   strict-route: true
+  endpoint-independent-nat: true
   dns-hijack:
     - any:53
     - tcp://any:53
@@ -132,7 +141,7 @@ fall: &fall {type: fallback, <<: *tmpl}
 
 entr: &entr {type: select, proxies: ["♻️ 智能选择","👆 手动选择","DIRECT"]}
 app:  &app  {type: select, proxies: ["♻️ 智能选择","👆 手动选择","DIRECT","🇭🇰 - 择优节点","🇨🇳 - 择优节点","🇯🇵 - 择优节点","🇰🇷 - 择优节点","🇸🇬 - 择优节点","🇺🇸 - 择优节点"]}
-aiapp: &aiapp {type: select, proxies: ["🧠 AI 专用节点","👆 手动选择"]}
+aiapp: &aiapp {type: select, proxies: ["🛡️ AI 自动优选","🧠 AI 专用节点","👆 手动选择"]}
 drc:  &drc  {type: select, proxies: ["DIRECT","♻️ 智能选择","👆 手动选择","🇭🇰 - 择优节点","🇨🇳 - 择优节点","🇯🇵 - 择优节点","🇸🇬 - 择优节点","🇺🇸 - 择优节点"]}
 strm: &strm {type: select, proxies: ["♻️ 智能选择","👆 手动选择","DIRECT","🇭🇰 - 择优节点","🇨🇳 - 择优节点","🇯🇵 - 择优节点","🇰🇷 - 择优节点","🇸🇬 - 择优节点","🇺🇸 - 择优节点","🇭🇰 - 自动回退","🇨🇳 - 自动回退","🇯🇵 - 自动回退","🇸🇬 - 自动回退","🇺🇸 - 自动回退"]}
 tg:   &tg   {type: select, proxies: ["♻️ 智能选择","👆 手动选择","DIRECT","🇸🇬 - 择优节点","🇭🇰 - 择优节点","🇯🇵 - 择优节点","🇺🇸 - 择优节点"]}
@@ -156,16 +165,15 @@ proxy-groups:
   # Keep rule and subscription downloads available before health checks complete.
   - {name: "📥 资源下载", <<: *test}
 
-  - {name: "🌐 全球直连", <<: *drc, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/link.png"}
   - {name: "🤖 AI 平台", <<: *aiapp, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/openai.png"}
+  - {name: "🛡️ AI 自动优选", type: fallback, url: *url, interval: 300, lazy: true, timeout: 5000, hidden: true, proxies: ["🇺🇸 - 择优节点","🇯🇵 - 择优节点","🇸🇬 - 择优节点"]}
   - {name: "🧠 AI 专用节点", <<: *sel, filter: *ai, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/openai.png"}
   - {name: "✈️ Telegram", <<: *tg, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/telegram.png"}
-  - {name: "☁️ OneDrive", <<: *app, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/onedrive.png"}
-  - {name: "Ⓜ️ 微软服务", <<: *app, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/microsoft.png"}
-  - {name: "🍎 苹果服务", <<: *app, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/apple.png"}
-  - {name: "🎮 游戏平台", <<: *app, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/game.png"}
-  - {name: "🎵 Spotify", <<: *strm, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/spotify.png"}
   - {name: "📺 视频媒体", <<: *strm, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/netflix.png"}
+  - {name: "🎮 游戏平台", <<: *app, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/game.png"}
+  - {name: "Ⓜ️ 微软服务", <<: *drc, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/microsoft.png"}
+  - {name: "🍎 苹果服务", <<: *drc, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/apple.png"}
+  - {name: "🌐 全球直连", <<: *drc, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/link.png"}
 
   - {name: "🇭🇰 - 择优节点", <<: *test, filter: *hk}
   - {name: "🇨🇳 - 择优节点", <<: *test, filter: *tw}
@@ -223,11 +231,16 @@ rules:
   - DOMAIN-SUFFIX,xiaomiyoupin.com,DIRECT
 
   # 3. 精准特殊处理
+  - DOMAIN,cdnstatic.tencentcs.com,DIRECT
+  - DOMAIN,dl.wechat.com,DIRECT
+  - DOMAIN,mirrors.aliyun.com,DIRECT
+  - DOMAIN-SUFFIX,steamcontent.com,DIRECT
+  - DOMAIN-SUFFIX,bytedapm.com,DIRECT
   - DOMAIN-SUFFIX,oaiusercontent.com,🤖 AI 平台
   - DOMAIN-SUFFIX,bing.com,🌐 全球直连
 
   # 4. Sukka non_ip（保持上游 README 顺序）
-  - GEOSITE,spotify,🎵 Spotify
+  - GEOSITE,spotify,📺 视频媒体
   - RULE-SET,stream_non_ip,📺 视频媒体
   - RULE-SET,ai_non_ip,🤖 AI 平台
   - RULE-SET,apple_intelligence,🤖 AI 平台
@@ -240,7 +253,7 @@ rules:
   - RULE-SET,game_non_ip,🎮 游戏平台
 
   # 6. 服务类 GEOSITE
-  - GEOSITE,onedrive,☁️ OneDrive
+  - GEOSITE,onedrive,Ⓜ️ 微软服务
   - GEOSITE,apple-cn,DIRECT
   - GEOSITE,apple,🍎 苹果服务
   - GEOSITE,microsoft@cn,DIRECT
@@ -249,14 +262,14 @@ rules:
   # 7. Sukka Misc / 国内分类直连
   - RULE-SET,direct_non_ip,DIRECT
   - GEOSITE,category-ai-cn,DIRECT
-  - GEOSITE,google-cn,DIRECT
+  - GEOSITE,google-cn,🌐 全球直连
   - GEOSITE,category-media-cn,DIRECT
   - GEOSITE,cn,DIRECT
 
   # 8. 海外兜底
   - GEOSITE,geolocation-!cn,🚀 节点选择
 
-  # 9. Sukka IP（保持上游 README 顺序）
+  # 9. Sukka IP（保持上游 README 顺序；海外 IP 保留 no-resolve 防 DNS 泄露）
   - RULE-SET,stream_ip,📺 视频媒体,no-resolve
   - RULE-SET,ai_ip,🤖 AI 平台,no-resolve
   - RULE-SET,telegram_ip,✈️ Telegram,no-resolve
@@ -265,9 +278,9 @@ rules:
   - RULE-SET,domestic_ip,DIRECT,no-resolve
   - RULE-SET,game_ip,🎮 游戏平台,no-resolve
 
-  # 10. GEOIP 兜底
-  - GEOIP,private,DIRECT,no-resolve
-  - GEOIP,cn,DIRECT,no-resolve
+  # 10. GEOIP 兜底（不加 no-resolve，确保未收录国内动态 CDN 域名解析后命中直连）
+  - GEOIP,private,DIRECT
+  - GEOIP,cn,DIRECT
 
   # 11. 最终兜底
   - MATCH,🚀 节点选择

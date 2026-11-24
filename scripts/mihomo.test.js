@@ -57,7 +57,7 @@ async function runConfig(name, nodes, check, mini = false, cold = false) {
     }
     // Preserve production intervals/laziness so startup fallback is not masked by accelerated probes.
     for (const g of c['proxy-groups']) if (g.url) g.url = probe;
-    const domains = ['chatgpt.com', 'api.anthropic.com', 'gemini.google.com', 'apple-relay.apple.com', 'apple-relay.cloudflare.com', 'push.apple.com', 'dl.steam.clngaa.com', 'steamchina.com','cn.apple.com','gs-loc-cn.apple.com'];
+    const domains = ['chatgpt.com', 'api.anthropic.com', 'gemini.google.com', 'apple-relay.apple.com', 'apple-relay.cloudflare.com', 'push.apple.com', 'dl.steam.clngaa.com', 'steamchina.com','cn.apple.com','gs-loc-cn.apple.com','dl.wechat.com','mirrors.aliyun.com','cdnstatic.tencentcs.com','api.bytedapm.com'];
     c.hosts = Object.fromEntries(domains.map(domain => [domain, '127.0.0.1']));
     const file = path.join(dir, 'config.json'); fs.writeFileSync(file, JSON.stringify(c));
     let logs = '';
@@ -135,13 +135,13 @@ for (const name of fs.readdirSync('config').filter(n => n.endsWith('.yaml'))) {
         if (groups['👆 手动选择'].all.includes(name)) assert.ok(groups['♻️ 智能选择'].all.includes(name));
       }
 
-      for (const domain of ['chatgpt.com','api.anthropic.com','gemini.google.com','apple-relay.apple.com','apple-relay.cloudflare.com','push.apple.com','dl.steam.clngaa.com','steamchina.com','cn.apple.com','gs-loc-cn.apple.com']) await connect(domain);
+      for (const domain of ['chatgpt.com','api.anthropic.com','gemini.google.com','apple-relay.apple.com','apple-relay.cloudflare.com','push.apple.com','dl.steam.clngaa.com','steamchina.com','cn.apple.com','gs-loc-cn.apple.com','dl.wechat.com','mirrors.aliyun.com','cdnstatic.tencentcs.com','api.bytedapm.com']) await connect(domain);
       const output = logs();
       // Preserve the upstream Apple Service -> Apple CN order; routing is a policy choice.
       assert.ok(output.split('\n').some(l => l.includes('--> cn.apple.com:') && l.includes('🍎 苹果服务')), output);
       assert.ok(output.split('\n').some(l => l.includes('--> gs-loc-cn.apple.com:') && l.includes('DIRECT')), output);
       for (const domain of ['chatgpt.com','api.anthropic.com','gemini.google.com','apple-relay.apple.com','apple-relay.cloudflare.com']) assert.ok(output.split('\n').some(l => l.includes(`--> ${domain}:`) && l.includes('🤖 AI 平台')), domain + '\n' + output);
-      for (const domain of ['push.apple.com','dl.steam.clngaa.com','steamchina.com']) assert.ok(output.split('\n').some(l => l.includes(`--> ${domain}:`) && l.includes('DIRECT')), domain + '\n' + output);
+      for (const domain of ['push.apple.com','dl.steam.clngaa.com','steamchina.com','dl.wechat.com','mirrors.aliyun.com','cdnstatic.tencentcs.com','api.bytedapm.com']) assert.ok(output.split('\n').some(l => l.includes(`--> ${domain}:`) && l.includes('DIRECT')), domain + '\n' + output);
     });
   });
 }
