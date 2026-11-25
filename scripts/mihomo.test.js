@@ -115,7 +115,7 @@ for (const name of fs.readdirSync('config').filter(n => n.endsWith('.yaml'))) {
       const smart = encodeURIComponent('♻️ 智能选择');
       await get(`group/${smart}/delay?url=${encodeURIComponent(probe)}&timeout=1000`);
       const groups = (await get('proxies')).proxies;
-      const ai = groups['🧠 AI 专用节点'].all;
+      const ai = groups['🧠 AI 手动节点'].all;
       assert.ok(ai.some(n => n.includes('Ashland')));
       assert.ok(ai.some(n => n.includes('台湾')));
       const prefix = name.includes('multiple') ? '[天照]' : '';
@@ -149,26 +149,32 @@ for (const name of fs.readdirSync('config').filter(n => n.endsWith('.yaml'))) {
   });
 }
 
-test('smart selection rejects when all nodes fail and selects a healthy node when one is available', { skip: !enabled, timeout: 30000 }, async () => {
+test('smart selection marks failed nodes unavailable and selects a healthy node when one is available', { skip: !enabled, timeout: 30000 }, async () => {
   const down = { name: '美国不可用', type: 'socks5', server: '127.0.0.1', port: await freePort() };
-  const checkSelection = expected => async ({ get, probe }) => {
+  await runConfig('baiye-multiple.yaml', [down], async ({ get, probe }) => {
     const smart = encodeURIComponent('♻️ 智能选择');
-    await get(`group/${smart}/delay?url=${encodeURIComponent(probe)}&timeout=1000`, expected.test('REJECT') ? 504 : 200);
+    await get(`group/${smart}/delay?url=${encodeURIComponent(probe)}&timeout=1000`, 504);
+    const provider = await get('providers/proxies/Sub-1');
+    const failed = provider.proxies.find(p => p.name === '[天照]美国不可用');
+    assert.ok(failed);
+    assert.equal(failed.extra[probe].alive, false);
+  });
+  await runConfig('baiye-multiple.yaml', [down, '日本可用'], async ({ get, probe }) => {
+    const smart = encodeURIComponent('♻️ 智能选择');
+    await get(`group/${smart}/delay?url=${encodeURIComponent(probe)}&timeout=1000`, 200);
     const proxies = (await get('proxies')).proxies;
     const provider = await get('providers/proxies/Sub-1');
     const failed = provider.proxies.find(p => p.name === '[天照]美国不可用');
     assert.ok(failed);
     assert.equal(failed.extra[probe].alive, false);
-    assert.match(proxies['♻️ 智能选择'].now, expected);
-  };
-  await runConfig('baiye-multiple.yaml', [down], checkSelection(/^REJECT$/));
-  await runConfig('baiye-multiple.yaml', [down, '日本可用'], checkSelection(/日本可用$/));
+    assert.match(proxies['♻️ 智能选择'].now, /日本可用$/);
+  });
 });
 
 test('mini without eligible AI nodes rejects instead of selecting COMPATIBLE', { skip: !enabled, timeout: 30000 }, async () => {
   await runConfig('baiye-multiple-lite.yaml', ['香港普通'], async ({ get }) => {
     const p=(await get('proxies')).proxies;
-    assert.deepEqual(p['🧠 AI 专用节点'].all, ['REJECT']);
+    assert.deepEqual(p['🧠 AI 手动节点'].all, ['REJECT']);
     assert.equal(p['🇯🇵 - 择优节点'].now, 'REJECT');
   }, true);
 });
@@ -177,8 +183,8 @@ test('mini without eligible AI nodes rejects instead of selecting COMPATIBLE', {
 test('cold start downloads all HTTP rule sets through payload nodes when both subscriptions return 503', { skip: !enabled, timeout: 30000 }, async () => {
   await runConfig('baiye-multiple.yaml', ['美国启动节点'], async ({ get, connect, logs, ruleDownloads }) => {
     const p = (await get('proxies')).proxies;
-    assert.ok(p['🧠 AI 专用节点'].all.some(n => n.startsWith('[天照]')));
-    assert.ok(p['🧠 AI 专用节点'].all.some(n => n.startsWith('[月读]')));
+    assert.ok(p['🧠 AI 手动节点'].all.some(n => n.startsWith('[天照]')));
+    assert.ok(p['🧠 AI 手动节点'].all.some(n => n.startsWith('[月读]')));
     const rules = (await get('providers/rules')).providers;
     assert.equal(ruleDownloads(), Object.keys(rules).length);
     assert.ok(Object.values(rules).every(r => r.ruleCount > 0));

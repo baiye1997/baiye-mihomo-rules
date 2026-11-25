@@ -243,9 +243,13 @@ for (const name of fs.readdirSync('config').filter(n => n.endsWith('.yaml'))) {
     const aiAutoGroup = c['proxy-groups'].find(g => g.name === '🛡️ AI 自动优选');
     assert.equal(smartGroup.timeout, 3000);
     assert.equal(smartGroup['expected-status'], 204);
+    assert.equal(smartGroup.proxies, undefined);
+    assert.equal(smartGroup['empty-fallback'], 'REJECT');
     assert.equal(aiAutoGroup.timeout, 5000);
     assert.equal(aiAutoGroup['max-failed-times'], 3);
     assert.equal(aiAutoGroup['expected-status'], 204);
+    assert.equal(aiAutoGroup.hidden, true);
+    assert.ok(c['proxy-groups'].some(g => g.name === '🧠 AI 手动节点'));
     assert.notEqual(manualGroup.url, smartGroup.url);
     assert.equal(manualGroup.url, 'https://www.gstatic.com/generate_204?ui=1');
     for (const provider of Object.values(c['proxy-providers'])) {

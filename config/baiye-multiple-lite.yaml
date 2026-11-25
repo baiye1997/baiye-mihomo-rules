@@ -145,7 +145,7 @@ fall: &fall {type: fallback, <<: *tmpl}
 
 entr: &entr {type: select, proxies: ["♻️ 智能选择","👆 手动选择","DIRECT"]}
 app:  &app  {type: select, proxies: ["♻️ 智能选择","👆 手动选择","DIRECT","🇭🇰 - 择优节点","🇨🇳 - 择优节点","🇯🇵 - 择优节点","🇰🇷 - 择优节点","🇸🇬 - 择优节点","🇺🇸 - 择优节点"]}
-aiapp: &aiapp {type: select, proxies: ["🛡️ AI 自动优选","🧠 AI 专用节点","👆 手动选择"]}
+aiapp: &aiapp {type: select, proxies: ["🛡️ AI 自动优选","🧠 AI 手动节点","👆 手动选择"]}
 ggl:  &ggl  {type: select, proxies: ["🛡️ AI 自动优选","♻️ 智能选择","👆 手动选择","🇺🇸 - 择优节点","🇯🇵 - 择优节点","🇸🇬 - 择优节点","🇭🇰 - 择优节点"]}
 drc:  &drc  {type: select, proxies: ["DIRECT","♻️ 智能选择","👆 手动选择","🇭🇰 - 择优节点","🇨🇳 - 择优节点","🇯🇵 - 择优节点","🇸🇬 - 择优节点","🇺🇸 - 择优节点"]}
 strm: &strm {type: select, proxies: ["♻️ 智能选择","👆 手动选择","DIRECT","🇭🇰 - 择优节点","🇨🇳 - 择优节点","🇯🇵 - 择优节点","🇰🇷 - 择优节点","🇸🇬 - 择优节点","🇺🇸 - 择优节点","🇭🇰 - 自动回退","🇨🇳 - 自动回退","🇯🇵 - 自动回退","🇸🇬 - 自动回退","🇺🇸 - 自动回退"]}
@@ -165,14 +165,13 @@ ai: &ai '(?i)^(?!.*(?:香港|🇭🇰|Hong[ -]?Kong|(?:^|[^A-Za-z])(?:HK|HKG)(?:
 proxy-groups:
   - {name: "🚀 节点选择", <<: *entr, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/choice.png"}
   - {name: "👆 手动选择", <<: *sel, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/select.png"}
-  # URLTest returns its first candidate when all probes fail. Reject rather than dial a failed node.
-  - {name: "♻️ 智能选择", <<: *test, proxies: [REJECT], icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/auto.png"}
+  - {name: "♻️ 智能选择", <<: *test, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/auto.png"}
   # Keep rule and subscription downloads available before health checks complete.
   - {name: "📥 资源下载", <<: *test}
 
   - {name: "🤖 AI 平台", <<: *aiapp, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/openai.png"}
-  - {name: "🛡️ AI 自动优选", type: fallback, url: *url, interval: 300, lazy: true, timeout: 5000, max-failed-times: 3, expected-status: 204, hidden: false, proxies: ["🇺🇸 - 择优节点","🇯🇵 - 择优节点","🇸🇬 - 择优节点"], icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/auto.png"}
-  - {name: "🧠 AI 专用节点", <<: *sel, filter: *ai, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/openai.png"}
+  - {name: "🛡️ AI 自动优选", type: fallback, url: *url, interval: 300, lazy: true, timeout: 5000, max-failed-times: 3, expected-status: 204, hidden: true, proxies: ["🇺🇸 - 择优节点","🇯🇵 - 择优节点","🇸🇬 - 择优节点"], icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/auto.png"}
+  - {name: "🧠 AI 手动节点", <<: *sel, filter: *ai, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/openai.png"}
   - {name: "🔍 谷歌服务", <<: *ggl, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/google.png"}
   - {name: "✈️ Telegram", <<: *tg, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/telegram.png"}
   - {name: "📺 视频媒体", <<: *strm, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/netflix.png"}

@@ -60,7 +60,7 @@ geodata-loader: memconservative
 
 - `publish-gist.yml` 默认以**单订阅模式**发布（输出 `baiye-single.yaml` / `baiye-mini.yaml` 及 Lite 对应版本），仅需在 GitHub Secrets 中维护 `SUB_URL_1`；单订阅不追加节点前缀，多订阅模板 `baiye-multiple*.yaml` 保留前缀防同名冲突。
 - 可选在 GitHub Secrets 中设置 `AI_STATIC_PROXY`（格式如 `socks5://user:pass@ip:port`），发布脚本会自动将其注入为 `🇺🇸 专属静态住宅 AI`（经隐藏组 `🔗 AI 接力中转` 优先走日本节点接力，异常时自动回退美/港），并置于 `🛡️ AI 自动优选` 首位；未配置该 Secret 时，`🛡️ AI 自动优选` 自动按美/日/新择优节点回退。
-- `🤖 AI 平台` 与 `🔍 谷歌服务`（通过 `GEOSITE,google` 承接 Google 登录/支付/Gmail/搜索等核心账号域名，不抢占 YouTube 视频与大文件下载）均默认走 `🛡️ AI 自动优选`，同时保留 `🧠 AI 专用节点` 供随时手动切换；`🍎 苹果服务`、`Ⓜ️ 微软服务`（含 OneDrive）与 `🌐 全球直连` 均默认 `DIRECT` 优先，`🎵 Spotify` 合并至 `📺 视频媒体`。
+- `🤖 AI 平台` 与 `🔍 谷歌服务`（通过 `GEOSITE,google` 承接 Google 登录/支付/Gmail/搜索等核心账号域名，不抢占 YouTube 视频与大文件下载）均默认走 `🛡️ AI 自动优选`（隐藏组，在卡片上直接显示当前实时命中的节点），同时保留 `🧠 AI 手动节点` 供随时手动切换；`🍎 苹果服务`、`Ⓜ️ 微软服务`（含 OneDrive）与 `🌐 全球直连` 均默认 `DIRECT` 优先，`🎵 Spotify` 合并至 `📺 视频媒体`。
 - `x15` / `5x` 高倍率节点排除出自动择优与回退组，手动仍可选；手动选择组使用独立测速 URL（`?ui=1`）避免手点测速污染后台自动择优缓存；AI / 地区 / 手动节点组为空时明确拒绝连接，避免隐式直连。
 - Gist 输出为每个 HTTP 节点 provider 附带启动节点快照（`payload`），并保留默认国内公共 DNS 与订阅自带 `proxy-server-nameserver` 合并，避免单一机场私有 DNS 故障导致断网。
 - Apple Intelligence 在所有版本中进入 AI 组；这只配置网络分流，不改变设备、账号或地区的功能限制。
