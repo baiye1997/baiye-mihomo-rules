@@ -118,21 +118,22 @@ for (const name of fs.readdirSync('config').filter(n => n.endsWith('.yaml'))) {
       const ai = groups['🧠 AI 专用节点'].all;
       assert.ok(ai.some(n => n.includes('Ashland')));
       assert.ok(ai.some(n => n.includes('台湾')));
-      for (const name of ['🇺🇸United States 01', '🇨🇳Taiwan 01', '🇸🇬Singapore 01', '🇯🇵Japan 01', '🇺🇸 美国A1|国际优化']) {
-        assert.ok(ai.includes('[天照]' + name), name);
+      const prefix = name.includes('multiple') ? '[天照]' : '';
+      for (const nodeName of ['🇺🇸United States 01', '🇨🇳Taiwan 01', '🇸🇬Singapore 01', '🇯🇵Japan 01', '🇺🇸 美国A1|国际优化']) {
+        assert.ok(ai.includes(prefix + nodeName), nodeName);
       }
       assert.ok(!groups['👆 手动选择'].all.some(n => /剩余|到期|官网/.test(n)));
       assert.ok(ai.some(n => n.includes('韩国原生')));
       assert.ok(ai.some(n => n.includes('日本原生x15')));
       assert.ok(ai.some(n => n.includes('韩国 AI专用')));
-      assert.ok(!ai.some(n => /香港|🇭🇰|Hong Kong|\]HK |\]HKG |俄罗斯普通|未知地区普通/.test(n)));
-      for (const name of extraAiNames) assert.ok(ai.includes('[天照]' + name), name);
+      assert.ok(!ai.some(n => /(?:香港|🇭🇰|Hong Kong|(?:^|\])HK |(?:^|\])HKG |俄罗斯普通|未知地区普通)/.test(n)));
+      for (const nodeName of extraAiNames) assert.ok(ai.includes(prefix + nodeName), nodeName);
       assert.ok(groups['👆 手动选择'].all.some(n => n.includes('Netherlands')));
-      assert.ok(!groups['👆 手动选择'].all.some(n => n.endsWith(']LAN')));
+      assert.ok(!groups['👆 手动选择'].all.some(n => /(?:^|\])LAN$/.test(n)));
       assert.ok(!groups['♻️ 智能选择'].all.some(n => /x15/.test(n)));
       assert.ok(!Object.keys(groups).some(n => /^(📦 CDN|♻️).*低倍率/.test(n)));
-      for (const name of ['[天照]美国低倍率 0.5X', '[月读]美国 3X']) {
-        if (groups['👆 手动选择'].all.includes(name)) assert.ok(groups['♻️ 智能选择'].all.includes(name));
+      for (const nodeName of [prefix + '美国低倍率 0.5X', '[月读]美国 3X']) {
+        if (groups['👆 手动选择'].all.includes(nodeName)) assert.ok(groups['♻️ 智能选择'].all.includes(nodeName));
       }
 
       for (const domain of ['chatgpt.com','api.anthropic.com','gemini.google.com','accounts.google.com','mail.google.com','payments.google.com','www.google.com','www.youtube.com','apple-relay.apple.com','apple-relay.cloudflare.com','push.apple.com','dl.steam.clngaa.com','steamchina.com','cn.apple.com','gs-loc-cn.apple.com','dl.wechat.com','mirrors.aliyun.com','cdnstatic.tencentcs.com','api.bytedapm.com']) await connect(domain);

@@ -47,7 +47,11 @@ test('published providers keep their URLs and prefixes with independent startup 
       assert.deepEqual(p.payload, snapshots[index]);
       assert.equal(p.url, urls[index]);
       assert.equal(p.proxy, '📥 资源下载');
-      assert.equal(p.override['additional-prefix'], names[index]);
+      if (name.includes('multiple')) {
+        assert.equal(p.override['additional-prefix'], names[index]);
+      } else {
+        assert.equal(p.override?.['additional-prefix'], undefined);
+      }
     });
     if (process.env.MIHOMO_BIN) validateWithCore(text, name);
   }
@@ -207,7 +211,11 @@ for (const name of fs.readdirSync('config').filter(n => n.endsWith('.yaml'))) {
   test(`${name}: generated config and mini preserve policy, DNS hygiene, and pass core validation`, () => {
     const output = applySubscriptions(fs.readFileSync(path.join('config', name), 'utf8'), [], urls, names);
     const c = validateConfig(output);
-    assert.equal(Object.values(c['proxy-providers'])[0].override['additional-prefix'], '[天照]');
+    if (name.includes('multiple')) {
+      assert.equal(Object.values(c['proxy-providers'])[0].override['additional-prefix'], '[天照]');
+    } else {
+      assert.equal(Object.values(c['proxy-providers'])[0].override?.['additional-prefix'], undefined);
+    }
     assert.ok(c.rules.indexOf('RULE-SET,apple_intelligence,🤖 AI 平台') < c.rules.findIndex(r => r.startsWith('GEOSITE,apple,') || r.startsWith('RULE-SET,apple_services,')));
     assert.ok(c.rules.includes('DOMAIN-SUFFIX,push.apple.com,DIRECT'));
     assert.ok(c.rules.includes('DOMAIN,dl.wechat.com,DIRECT'));

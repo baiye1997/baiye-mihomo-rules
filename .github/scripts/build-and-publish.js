@@ -257,7 +257,9 @@ function applySubscriptions(
       throw new Error(`订阅 ${index + 1} 缺失或 URL 无效`);
     }
     doc.setIn(["proxy-providers", key, "url"], url);
-    doc.setIn(["proxy-providers", key, "override", "additional-prefix"], names[index] || `[Sub${index + 1}]`);
+    if (provider.override?.["additional-prefix"]) {
+      doc.setIn(["proxy-providers", key, "override", "additional-prefix"], names[index] || `[Sub${index + 1}]`);
+    }
     if (snapshots) {
       if (!Array.isArray(snapshots[index]) || !snapshots[index].length) throw new Error(`订阅 ${index + 1} 缺少启动节点快照`);
       doc.setIn(["proxy-providers", key, "payload"], snapshots[index].map(proxy => {
