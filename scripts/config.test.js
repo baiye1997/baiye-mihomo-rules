@@ -229,6 +229,8 @@ for (const name of fs.readdirSync('config').filter(n => n.endsWith('.yaml'))) {
     assert.ok(c.rules.findIndex(r => r.startsWith('GEOSITE,category-games@cn,')) < c.rules.indexOf('RULE-SET,game_non_ip,🎮 游戏平台'));
     assert.ok(Array.isArray(c.dns['direct-nameserver']) && c.dns['direct-nameserver'].length >= 2);
     assert.ok(c.dns['nameserver-policy']?.['geosite:private,cn']);
+    assert.ok(c.dns['nameserver-policy']?.['geosite:gfw']);
+    assert.ok(c.dns['fallback-filter']?.ipcidr?.includes('127.0.0.0/8'));
     assert.equal(c.sniffer.sniff.QUIC, undefined);
     assert.equal(c.tun['endpoint-independent-nat'], true);
     assert.equal(c['proxy-groups'].find(g => g.name === '🤖 AI 平台').proxies[0], '🛡️ AI 自动优选');
