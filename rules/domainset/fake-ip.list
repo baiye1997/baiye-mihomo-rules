@@ -5,6 +5,8 @@
 *.home.arpa
 *.localhost
 localhost.ptlogin2.qq.com
+localhost.sec.qq.com
+localhost.work.weixin.qq.com
 
 # 时间同步 / NTP
 +.pool.ntp.org

@@ -13,6 +13,7 @@ const AI_STATIC_NODE_NAME = "🇺🇸 专属静态住宅 AI";
 const AI_RELAY_GROUP_NAME = "🔗 AI 接力中转";
 const AI_AUTO_GROUP_NAME = "🛡️ AI 自动优选";
 const AI_PLATFORM_GROUP_NAME = "🤖 AI 平台";
+const GOOGLE_GROUP_NAME = "🔍 谷歌服务";
 
 /* ===================== ENV ===================== */
 const {
@@ -294,12 +295,14 @@ function applySubscriptions(
       const current = (groups[autoIdx].proxies || []).filter(n => n !== AI_STATIC_NODE_NAME);
       doc.setIn(["proxy-groups", autoIdx, "proxies"], [AI_STATIC_NODE_NAME, ...current]);
     }
-    const aiIdx = groups.findIndex(g => g.name === AI_PLATFORM_GROUP_NAME);
-    if (aiIdx >= 0) {
-      const current = (groups[aiIdx].proxies || []).filter(n => n !== AI_STATIC_NODE_NAME);
-      const insertAt = current.includes(AI_AUTO_GROUP_NAME) ? current.indexOf(AI_AUTO_GROUP_NAME) + 1 : 0;
-      current.splice(insertAt, 0, AI_STATIC_NODE_NAME);
-      doc.setIn(["proxy-groups", aiIdx, "proxies"], current);
+    for (const targetGroup of [AI_PLATFORM_GROUP_NAME, GOOGLE_GROUP_NAME]) {
+      const idx = groups.findIndex(g => g.name === targetGroup);
+      if (idx >= 0) {
+        const current = (groups[idx].proxies || []).filter(n => n !== AI_STATIC_NODE_NAME);
+        const insertAt = current.includes(AI_AUTO_GROUP_NAME) ? current.indexOf(AI_AUTO_GROUP_NAME) + 1 : 0;
+        current.splice(insertAt, 0, AI_STATIC_NODE_NAME);
+        doc.setIn(["proxy-groups", idx, "proxies"], current);
+      }
     }
     if (!groups.some(g => g.name === AI_RELAY_GROUP_NAME)) {
       const relayGroup = {

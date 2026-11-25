@@ -139,6 +139,7 @@ fall: &fall {type: fallback, <<: *tmpl}
 entr: &entr {type: select, proxies: ["♻️ 智能选择","👆 手动选择","DIRECT"]}
 app:  &app  {type: select, proxies: ["♻️ 智能选择","👆 手动选择","DIRECT","🇭🇰 - 择优节点","🇨🇳 - 择优节点","🇯🇵 - 择优节点","🇰🇷 - 择优节点","🇸🇬 - 择优节点","🇺🇸 - 择优节点"]}
 aiapp: &aiapp {type: select, proxies: ["🛡️ AI 自动优选","🧠 AI 专用节点","👆 手动选择"]}
+ggl:  &ggl  {type: select, proxies: ["🛡️ AI 自动优选","♻️ 智能选择","👆 手动选择","🇺🇸 - 择优节点","🇯🇵 - 择优节点","🇸🇬 - 择优节点","🇭🇰 - 择优节点"]}
 drc:  &drc  {type: select, proxies: ["DIRECT","♻️ 智能选择","👆 手动选择","🇭🇰 - 择优节点","🇨🇳 - 择优节点","🇯🇵 - 择优节点","🇸🇬 - 择优节点","🇺🇸 - 择优节点"]}
 strm: &strm {type: select, proxies: ["♻️ 智能选择","👆 手动选择","DIRECT","🇭🇰 - 择优节点","🇨🇳 - 择优节点","🇯🇵 - 择优节点","🇰🇷 - 择优节点","🇸🇬 - 择优节点","🇺🇸 - 择优节点","🇭🇰 - 自动回退","🇨🇳 - 自动回退","🇯🇵 - 自动回退","🇸🇬 - 自动回退","🇺🇸 - 自动回退"]}
 tg:   &tg   {type: select, proxies: ["♻️ 智能选择","👆 手动选择","DIRECT","🇸🇬 - 择优节点","🇭🇰 - 择优节点","🇯🇵 - 择优节点","🇺🇸 - 择优节点"]}
@@ -165,6 +166,7 @@ proxy-groups:
   - {name: "🤖 AI 平台", <<: *aiapp, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/openai.png"}
   - {name: "🛡️ AI 自动优选", type: fallback, url: *url, interval: 300, lazy: true, timeout: 5000, max-failed-times: 3, expected-status: 204, hidden: false, proxies: ["🇺🇸 - 择优节点","🇯🇵 - 择优节点","🇸🇬 - 择优节点"], icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/auto.png"}
   - {name: "🧠 AI 专用节点", <<: *sel, filter: *ai, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/openai.png"}
+  - {name: "🔍 谷歌服务", <<: *ggl, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/google.png"}
   - {name: "✈️ Telegram", <<: *tg, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/telegram.png"}
   - {name: "📺 视频媒体", <<: *strm, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/netflix.png"}
   - {name: "🎮 游戏平台", <<: *app, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/game.png"}
@@ -270,6 +272,7 @@ rules:
 
   # 5. 自定义服务规则（位于 Sukka Misc 兜底之前）
   - GEOSITE,google-cn,🌐 全球直连
+  - GEOSITE,google,🔍 谷歌服务
   - GEOSITE,category-games@cn,DIRECT
   - RULE-SET,game_non_ip,🎮 游戏平台
 

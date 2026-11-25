@@ -5,15 +5,15 @@
 # ============================================================
 
 url: &url "https://www.gstatic.com/generate_204"
-blk: &blk '^(?!.*(?i)(DIRECT|直接连接|群|邀请|官网|客服|网站|网址|获取|订阅|流量|到期|机场|下次|版本|备用|过期|已用|联系|邮箱|工单|通知|地址|频道|说明|教程|USE|USED|TOTAL|EXPIRE|EMAIL|Panel|Channel|Author)).*$'
+blk: &blk '^(?!.*(?i)(DIRECT|直接连接|群|邀请|返利|循环|官网|客服|网站|网址|获取|订阅|流量|到期|机场|下次|版本|官址|备用|过期|已用|联系|邮箱|工单|贩卖|通知|倒卖|防止|国内|地址|频道|无法|说明|使用|提示|特别|访问|支持|教程|关注|更新|作者|加入|USE|USED|TOTAL|EXPIRE|EMAIL|Panel|Channel|Author)).*$'
 prov: &prov {type: http, interval: 3600, health-check: {enable: true, url: *url, interval: 600, timeout: 3000, lazy: true, expected-status: 204}}
 
 # ======================= 只改这里：订阅 =======================
 proxy-providers:
-  Node:
+  Sub-1:
     <<: *prov
     url: "替换订阅链接1"
-    path: "./proxy_provider/providers.yaml"
+    path: "./proxy_provider/providers-1.yaml"
     override:
       additional-prefix: "[显示名称1]"
     filter: *blk
@@ -134,6 +134,7 @@ fall: &fall {type: fallback, <<: *tmpl}
 entr: &entr {type: select, proxies: ["♻️ 智能选择","👆 手动选择","DIRECT"]}
 app:  &app  {type: select, proxies: ["♻️ 智能选择","👆 手动选择","DIRECT","🇭🇰 - 择优节点","🇨🇳 - 择优节点","🇯🇵 - 择优节点","🇰🇷 - 择优节点","🇸🇬 - 择优节点","🇺🇸 - 择优节点"]}
 aiapp: &aiapp {type: select, proxies: ["🛡️ AI 自动优选","🧠 AI 专用节点","👆 手动选择"]}
+ggl:  &ggl  {type: select, proxies: ["🛡️ AI 自动优选","♻️ 智能选择","👆 手动选择","🇺🇸 - 择优节点","🇯🇵 - 择优节点","🇸🇬 - 择优节点","🇭🇰 - 择优节点"]}
 drc:  &drc  {type: select, proxies: ["DIRECT","♻️ 智能选择","👆 手动选择","🇭🇰 - 择优节点","🇨🇳 - 择优节点","🇯🇵 - 择优节点","🇸🇬 - 择优节点","🇺🇸 - 择优节点"]}
 strm: &strm {type: select, proxies: ["♻️ 智能选择","👆 手动选择","DIRECT","🇭🇰 - 择优节点","🇨🇳 - 择优节点","🇯🇵 - 择优节点","🇰🇷 - 择优节点","🇸🇬 - 择优节点","🇺🇸 - 择优节点","🇭🇰 - 自动回退","🇨🇳 - 自动回退","🇯🇵 - 自动回退","🇸🇬 - 自动回退","🇺🇸 - 自动回退"]}
 tg:   &tg   {type: select, proxies: ["♻️ 智能选择","👆 手动选择","DIRECT","🇸🇬 - 择优节点","🇭🇰 - 择优节点","🇯🇵 - 择优节点","🇺🇸 - 择优节点"]}
@@ -160,6 +161,7 @@ proxy-groups:
   - {name: "🤖 AI 平台", <<: *aiapp, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/openai.png"}
   - {name: "🛡️ AI 自动优选", type: fallback, url: *url, interval: 300, lazy: true, timeout: 5000, max-failed-times: 3, expected-status: 204, hidden: false, proxies: ["🇺🇸 - 择优节点","🇯🇵 - 择优节点","🇸🇬 - 择优节点"], icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/auto.png"}
   - {name: "🧠 AI 专用节点", <<: *sel, filter: *ai, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/openai.png"}
+  - {name: "🔍 谷歌服务", <<: *ggl, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/google.png"}
   - {name: "✈️ Telegram", <<: *tg, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/telegram.png"}
   - {name: "📺 视频媒体", <<: *strm, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/netflix.png"}
   - {name: "🎮 游戏平台", <<: *app, icon: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/icons/game.png"}
@@ -255,6 +257,7 @@ rules:
   - RULE-SET,direct_non_ip,DIRECT
   - GEOSITE,category-ai-cn,DIRECT
   - GEOSITE,google-cn,🌐 全球直连
+  - GEOSITE,google,🔍 谷歌服务
   - GEOSITE,category-media-cn,DIRECT
   - GEOSITE,cn,DIRECT
 

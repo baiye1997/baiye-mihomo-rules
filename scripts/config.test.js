@@ -116,12 +116,14 @@ test('AI_STATIC_PROXY injects relayed dedicated node into AI groups without leak
   });
   const aiAuto = c['proxy-groups'].find(g => g.name === '🛡️ AI 自动优选');
   const aiPlatform = c['proxy-groups'].find(g => g.name === '🤖 AI 平台');
+  const googleGroup = c['proxy-groups'].find(g => g.name === '🔍 谷歌服务');
   const relay = c['proxy-groups'].find(g => g.name === '🔗 AI 接力中转');
   assert.equal(aiAuto.proxies[0], '🇺🇸 专属静态住宅 AI');
   assert.equal(aiAuto.timeout, 5000);
   assert.equal(aiAuto['max-failed-times'], 3);
   assert.equal(aiAuto['expected-status'], 204);
   assert.deepEqual(aiPlatform.proxies.slice(0, 2), ['🛡️ AI 自动优选', '🇺🇸 专属静态住宅 AI']);
+  assert.deepEqual(googleGroup.proxies.slice(0, 2), ['🛡️ AI 自动优选', '🇺🇸 专属静态住宅 AI']);
   assert.deepEqual(relay.proxies, ['🇯🇵 - 择优节点', '🇺🇸 - 择优节点', '🇭🇰 - 择优节点']);
   assert.equal(relay.timeout, 5000);
   assert.equal(relay['max-failed-times'], 3);
@@ -222,6 +224,8 @@ for (const name of fs.readdirSync('config').filter(n => n.endsWith('.yaml'))) {
     assert.equal(c.sniffer.sniff.QUIC, undefined);
     assert.equal(c.tun['endpoint-independent-nat'], true);
     assert.equal(c['proxy-groups'].find(g => g.name === '🤖 AI 平台').proxies[0], '🛡️ AI 自动优选');
+    assert.equal(c['proxy-groups'].find(g => g.name === '🔍 谷歌服务').proxies[0], '🛡️ AI 自动优选');
+    assert.ok(c.rules.indexOf('GEOSITE,google-cn,🌐 全球直连') < c.rules.indexOf('GEOSITE,google,🔍 谷歌服务'));
     assert.equal(c['proxy-groups'].find(g => g.name === '🍎 苹果服务').proxies[0], 'DIRECT');
     assert.equal(c['proxy-groups'].find(g => g.name === 'Ⓜ️ 微软服务').proxies[0], 'DIRECT');
     const smartGroup = c['proxy-groups'].find(g => g.name === '♻️ 智能选择');
