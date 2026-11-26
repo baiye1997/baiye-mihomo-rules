@@ -53,3 +53,24 @@ miot-spec.org
 +.miwifi.com
 +.mijia.tech
 +.market.xiaomi.com
+
+# 抖音 / 字节国内核心域名（避免 Fake-IP 与 TTNet / HTTPDNS 冲突导致直连加载失败）
++.douyin.com
++.douyinvod.com
++.douyinpic.com
++.douyincdn.com
++.douyinstatic.com
++.douyinliving.com
++.amemv.com
++.snssdk.com
++.zijieapi.com
++.bytedance.com
++.byteimg.com
++.bytegoofy.com
++.bytescm.com
++.bytednsdoc.com
++.bytecdntp.com
++.pstatp.com
++.toutiaoimg.com
++.zjcdn.com
++.bdurl.net

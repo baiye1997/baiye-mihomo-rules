@@ -251,6 +251,9 @@ rules:
   - DOMAIN-SUFFIX,steamcontent.com,DIRECT
   - DOMAIN-SUFFIX,bytedapm.com,DIRECT
   - DOMAIN-SUFFIX,oaiusercontent.com,🤖 AI 平台
+  - DOMAIN,translate.googleapis.com,🚀 节点选择
+  - DOMAIN,translate-pa.googleapis.com,🚀 节点选择
+  - DOMAIN,translate.google.com,🚀 节点选择
   - DOMAIN-SUFFIX,bing.com,🌐 全球直连
 
   # 4. Sukka domainset / non_ip（保持上游 README 顺序）
