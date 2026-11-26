@@ -232,9 +232,13 @@ rules:
   - DOMAIN-SUFFIX,steamcontent.com,DIRECT
   - DOMAIN-SUFFIX,bytedapm.com,DIRECT
   - DOMAIN-SUFFIX,oaiusercontent.com,🤖 AI 平台
+  - DOMAIN-SUFFIX,claudeusercontent.com,🤖 AI 平台
+  - DOMAIN-SUFFIX,cursor.com,🤖 AI 平台
+  - DOMAIN,api.github.com,🚀 节点选择
   - DOMAIN,translate.googleapis.com,🚀 节点选择
   - DOMAIN,translate-pa.googleapis.com,🚀 节点选择
   - DOMAIN,translate.google.com,🚀 节点选择
+  - DOMAIN,translate.google.cn,🚀 节点选择
   - DOMAIN-SUFFIX,bing.com,🌐 全球直连
 
   # 4. Sukka non_ip（保持上游 README 顺序）

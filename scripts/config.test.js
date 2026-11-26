@@ -225,6 +225,10 @@ for (const name of fs.readdirSync('config').filter(n => n.endsWith('.yaml'))) {
     assert.ok(c.rules.includes('DOMAIN,cdnstatic.tencentcs.com,DIRECT'));
     assert.ok(c.rules.includes('DOMAIN,translate.googleapis.com,🚀 节点选择'));
     assert.ok(c.rules.includes('DOMAIN,translate.google.com,🚀 节点选择'));
+    assert.ok(c.rules.includes('DOMAIN,translate.google.cn,🚀 节点选择'));
+    assert.ok(c.rules.includes('DOMAIN,api.github.com,🚀 节点选择'));
+    assert.ok(c.rules.includes('DOMAIN-SUFFIX,cursor.com,🤖 AI 平台'));
+    assert.ok(c.rules.includes('DOMAIN-SUFFIX,claudeusercontent.com,🤖 AI 平台'));
     assert.ok(c.rules.includes('GEOIP,private,DIRECT'));
     assert.ok(c.rules.includes('GEOIP,cn,DIRECT'));
     assert.ok(!c.rules.includes('GEOIP,cn,DIRECT,no-resolve'));
