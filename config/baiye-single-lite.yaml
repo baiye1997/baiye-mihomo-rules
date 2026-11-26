@@ -188,7 +188,6 @@ cls: &cls {type: http, behavior: classical, interval: 43200, format: text, proxy
 dom: &dom {type: http, behavior: domain, interval: 43200, format: text, proxy: "📥 资源下载"}
 
 rule-providers:
-  apple_intelligence: {<<: *cls, url: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/non_ip/apple_intelligence.txt", path: ./rules/non_ip/apple_intelligence.txt}
   game_non_ip:     {<<: *cls, url: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/non_ip/game.txt", path: ./rules/non_ip/game.txt}
   game_ip:         {<<: *cls, url: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/ip/game.txt", path: ./rules/ip/game.txt}
   sniff-skip:      {<<: *dom, url: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/domainset/sniff-skip.list", path: ./rules/domainset/sniff-skip.list}
@@ -199,12 +198,8 @@ rule-providers:
   ai_ip:           {<<: *cls, url: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/ip/ai.txt", path: ./rules/ip/ai.txt}
   telegram_non_ip: {<<: *cls, url: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/non_ip/telegram.txt", path: ./rules/non_ip/telegram.txt}
   telegram_ip:     {<<: *cls, url: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/ip/telegram.txt", path: ./rules/ip/telegram.txt}
-  neteasemusic_non_ip: {<<: *cls, url: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/non_ip/neteasemusic.txt", path: ./rules/non_ip/neteasemusic.txt}
-  neteasemusic_ip: {<<: *cls, url: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/ip/neteasemusic.txt", path: ./rules/ip/neteasemusic.txt}
   lan_non_ip:      {<<: *cls, url: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/non_ip/lan.txt", path: ./rules/non_ip/lan.txt}
-  lan_ip:          {<<: *cls, url: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/ip/lan.txt", path: ./rules/ip/lan.txt}
   direct_non_ip:   {<<: *cls, url: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/non_ip/direct.txt", path: ./rules/non_ip/direct.txt}
-  domestic_ip:     {<<: *cls, url: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/ip/domestic.txt", path: ./rules/ip/domestic.txt}
 
 # ======================= 分流规则 =======================
 rules:
@@ -245,9 +240,7 @@ rules:
   - GEOSITE,spotify,📺 视频媒体
   - RULE-SET,stream_non_ip,📺 视频媒体
   - RULE-SET,ai_non_ip,🤖 AI 平台
-  - RULE-SET,apple_intelligence,🤖 AI 平台
   - RULE-SET,telegram_non_ip,✈️ Telegram
-  - RULE-SET,neteasemusic_non_ip,DIRECT
   - RULE-SET,lan_non_ip,DIRECT
 
   # 5. 自定义服务规则
@@ -276,9 +269,6 @@ rules:
   - RULE-SET,stream_ip,📺 视频媒体,no-resolve
   - RULE-SET,ai_ip,🤖 AI 平台,no-resolve
   - RULE-SET,telegram_ip,✈️ Telegram,no-resolve
-  - RULE-SET,neteasemusic_ip,DIRECT,no-resolve
-  - RULE-SET,lan_ip,DIRECT,no-resolve
-  - RULE-SET,domestic_ip,DIRECT,no-resolve
   - RULE-SET,game_ip,🎮 游戏平台,no-resolve
 
   # 10. GEOIP 兜底（不加 no-resolve，确保未收录国内动态 CDN 域名解析后命中直连）

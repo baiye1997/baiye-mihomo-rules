@@ -189,13 +189,11 @@ rule-providers:
   game_ip:              {<<: *cls, url: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/ip/game.txt", path: ./rules/ip/game.txt}
   sniff-skip:           {<<: *dom, url: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/domainset/sniff-skip.list", path: ./rules/domainset/sniff-skip.list}
   fake-ip:              {<<: *dom, url: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/domainset/fake-ip.list", path: ./rules/domainset/fake-ip.list}
-  speedtest:            {<<: *dom, url: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/domainset/speedtest.txt", path: ./rules/domainset/speedtest.txt}
   cdn_domainset:        {<<: *dom, url: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/domainset/cdn.txt", path: ./rules/domainset/cdn.txt}
   cdn_non_ip:           {<<: *cls, url: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/non_ip/cdn.txt", path: ./rules/non_ip/cdn.txt}
   stream_non_ip:        {<<: *cls, url: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/non_ip/stream.txt", path: ./rules/non_ip/stream.txt}
   stream_ip:            {<<: *cls, url: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/ip/stream.txt", path: ./rules/ip/stream.txt}
   ai_non_ip:            {<<: *cls, url: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/non_ip/ai.txt", path: ./rules/non_ip/ai.txt}
-  apple_intelligence:   {<<: *cls, url: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/non_ip/apple_intelligence.txt", path: ./rules/non_ip/apple_intelligence.txt}
   ai_ip:                {<<: *cls, url: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/ip/ai.txt", path: ./rules/ip/ai.txt}
   telegram_non_ip:      {<<: *cls, url: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/non_ip/telegram.txt", path: ./rules/non_ip/telegram.txt}
   telegram_ip:          {<<: *cls, url: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/ip/telegram.txt", path: ./rules/ip/telegram.txt}
@@ -204,16 +202,10 @@ rule-providers:
   apple_cn_non_ip:      {<<: *cls, url: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/non_ip/apple_cn.txt", path: ./rules/non_ip/apple_cn.txt}
   microsoft_cdn_non_ip: {<<: *cls, url: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/non_ip/microsoft_cdn.txt", path: ./rules/non_ip/microsoft_cdn.txt}
   microsoft_non_ip:     {<<: *cls, url: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/non_ip/microsoft.txt", path: ./rules/non_ip/microsoft.txt}
-  neteasemusic_non_ip:  {<<: *cls, url: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/non_ip/neteasemusic.txt", path: ./rules/non_ip/neteasemusic.txt}
-  neteasemusic_ip:      {<<: *cls, url: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/ip/neteasemusic.txt", path: ./rules/ip/neteasemusic.txt}
-  download_domainset:   {<<: *dom, url: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/domainset/download.txt", path: ./rules/domainset/download.txt}
-  download_non_ip:      {<<: *cls, url: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/non_ip/download.txt", path: ./rules/non_ip/download.txt}
   lan_non_ip:           {<<: *cls, url: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/non_ip/lan.txt", path: ./rules/non_ip/lan.txt}
-  lan_ip:               {<<: *cls, url: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/ip/lan.txt", path: ./rules/ip/lan.txt}
   domestic_non_ip:      {<<: *cls, url: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/non_ip/domestic.txt", path: ./rules/non_ip/domestic.txt}
   direct_non_ip:        {<<: *cls, url: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/non_ip/direct.txt", path: ./rules/non_ip/direct.txt}
   global_non_ip:        {<<: *cls, url: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/non_ip/global.txt", path: ./rules/non_ip/global.txt}
-  domestic_ip:          {<<: *cls, url: "https://cdn.jsdelivr.net/gh/baiye1997/baiye-mihomo-rules@main/rules/ip/domestic.txt", path: ./rules/ip/domestic.txt}
 
 # ======================= 分流规则 =======================
 rules:
@@ -234,7 +226,7 @@ rules:
   - DOMAIN-SUFFIX,xiaomixiaoai.com,DIRECT
   - DOMAIN-SUFFIX,xiaomiyoupin.com,DIRECT
 
-  # 3. 精准特殊处理（压过 Sukka cdn/download 中的国内高频下载/CDN，不动上游文件）
+  # 3. 精准特殊处理（压过上游 cdn/game 等规则中的国内高频下载/CDN，不动上游文件）
   - DOMAIN,cdnstatic.tencentcs.com,DIRECT
   - DOMAIN,dl.wechat.com,DIRECT
   - DOMAIN,mirrors.aliyun.com,DIRECT
@@ -251,13 +243,11 @@ rules:
   - DOMAIN-SUFFIX,bing.com,🌐 全球直连
 
   # 4. Sukka domainset / non_ip（保持上游 README 顺序）
-  - RULE-SET,speedtest,🚀 节点选择
   - RULE-SET,cdn_domainset,🚀 节点选择
   - RULE-SET,cdn_non_ip,🚀 节点选择
   - GEOSITE,spotify,📺 视频媒体
   - RULE-SET,stream_non_ip,📺 视频媒体
   - RULE-SET,ai_non_ip,🤖 AI 平台
-  - RULE-SET,apple_intelligence,🤖 AI 平台
   - RULE-SET,telegram_non_ip,✈️ Telegram
   - RULE-SET,apple_cdn,DIRECT
   - RULE-SET,apple_services,🍎 苹果服务
@@ -265,9 +255,6 @@ rules:
   - RULE-SET,microsoft_cdn_non_ip,DIRECT
   - GEOSITE,onedrive,Ⓜ️ 微软服务
   - RULE-SET,microsoft_non_ip,Ⓜ️ 微软服务
-  - RULE-SET,neteasemusic_non_ip,DIRECT
-  - RULE-SET,download_domainset,🚀 节点选择
-  - RULE-SET,download_non_ip,🚀 节点选择
   - RULE-SET,lan_non_ip,DIRECT
 
   # 5. 自定义服务规则（位于 Sukka Misc 兜底之前）
@@ -291,9 +278,6 @@ rules:
   - RULE-SET,stream_ip,📺 视频媒体,no-resolve
   - RULE-SET,ai_ip,🤖 AI 平台,no-resolve
   - RULE-SET,telegram_ip,✈️ Telegram,no-resolve
-  - RULE-SET,neteasemusic_ip,DIRECT,no-resolve
-  - RULE-SET,lan_ip,DIRECT,no-resolve
-  - RULE-SET,domestic_ip,DIRECT,no-resolve
   - RULE-SET,game_ip,🎮 游戏平台,no-resolve
 
   # 9. GEOIP 兜底（不加 no-resolve，确保未收录国内动态 CDN 域名解析后命中直连）

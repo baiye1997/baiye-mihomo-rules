@@ -63,17 +63,16 @@ geodata-loader: memconservative
 - `🤖 AI 平台` 与 `🔍 谷歌服务`（通过 `GEOSITE,google` 承接 Google 登录/支付/Gmail/搜索等核心账号域名，不抢占 YouTube 视频与大文件下载）均默认走 `🛡️ AI 自动优选`（隐藏组，在卡片上直接显示当前实时命中的节点），同时保留 `🧠 AI 手动节点` 供随时手动切换；`🍎 苹果服务`、`Ⓜ️ 微软服务`（含 OneDrive）与 `🌐 全球直连` 均默认 `DIRECT` 优先，`🎵 Spotify` 合并至 `📺 视频媒体`。
 - `x15` / `5x` 高倍率节点排除出自动择优与回退组，手动仍可选；手动选择组使用独立测速 URL（`?ui=1`）避免手点测速污染后台自动择优缓存；AI / 地区 / 手动节点组为空时明确拒绝连接，避免隐式直连。
 - Gist 输出为每个 HTTP 节点 provider 附带启动节点快照（`payload`），并保留默认国内公共 DNS 与订阅自带 `proxy-server-nameserver` 合并，避免单一机场私有 DNS 故障导致断网。
-- Apple Intelligence 在所有版本中进入 AI 组；这只配置网络分流，不改变设备、账号或地区的功能限制。
 
 ---
 
 ## 🧩 Lite 版说明（GEO 上游）
 
-Lite 版主要使用 GEO 分类，保留 AI、谷歌服务、Apple Intelligence、苹果推送直连及国内游戏直连；规则文件更少，但两版在部分细分服务上的匹配粒度不同。
+Lite 版主要使用 GEO 分类，保留 AI、谷歌服务、苹果推送直连及国内游戏直连；规则文件更少，但两版在部分细分服务上的匹配粒度不同。
 
 标准版保留 Sukka README 的 Apple CDN → Apple Service → Apple CN 顺序；Lite 使用自己的 GEO 分类，不能据此假定两版每个苹果域名出口相同。默认 `find-process-mode: off`，上游中的进程名规则不会参与匹配；当前配置主要依靠域名与 IP 分流。
 
-当前已按要求加入 Apple Intelligence 独立规则；其中的定位相关域名也可能影响地图、天气等服务，不能将它理解为只包含 AI 请求。规则来源与顺序以 [Sukka 上游说明](https://github.com/SukkaW/Surge/blob/master/README.md) 为依据，本地例外单独维护。
+规则来源与顺序以 [Sukka 上游说明](https://github.com/SukkaW/Surge/blob/master/README.md) 为依据，本地例外单独维护。
 
 ---
 

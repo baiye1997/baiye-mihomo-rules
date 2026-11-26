@@ -142,7 +142,7 @@ test('AI_STATIC_PROXY injects relayed dedicated node into AI groups without leak
 
 test('rule download URLs and outbound references are validated before isolation', () => {
   const c = validateConfig(applySubscriptions(template, [], urls, names));
-  const p = c['rule-providers'].apple_intelligence;
+  const p = c['rule-providers'].ai_non_ip;
   const original = p.url;
   p.url = 'not-a-url';
   assert.throws(() => validateConfig(YAML.stringify(c)), /Provider URL/);
@@ -216,7 +216,9 @@ for (const name of fs.readdirSync('config').filter(n => n.endsWith('.yaml'))) {
     } else {
       assert.equal(Object.values(c['proxy-providers'])[0].override?.['additional-prefix'], undefined);
     }
-    assert.ok(c.rules.indexOf('RULE-SET,apple_intelligence,🤖 AI 平台') < c.rules.findIndex(r => r.startsWith('GEOSITE,apple,') || r.startsWith('RULE-SET,apple_services,')));
+    for (const removed of ['neteasemusic_non_ip', 'neteasemusic_ip', 'lan_ip', 'domestic_ip', 'speedtest', 'download_domainset', 'download_non_ip', 'apple_intelligence']) {
+      assert.equal(c['rule-providers'][removed], undefined);
+    }
     assert.ok(c.rules.includes('DOMAIN-SUFFIX,push.apple.com,DIRECT'));
     assert.ok(c.rules.includes('DOMAIN,dl.wechat.com,DIRECT'));
     assert.ok(c.rules.includes('DOMAIN,mirrors.aliyun.com,DIRECT'));
